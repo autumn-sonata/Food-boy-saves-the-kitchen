@@ -4,7 +4,9 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Food
+  - Cheese
+  - Tomato
+  - Olive
   layers:
   - Default
   - TransparentFX
@@ -12,8 +14,8 @@ TagManager:
   - 
   - Water
   - UI
-  - Food
-  - 
+  - Heavy
+  - Push
   - 
   - 
   - 
