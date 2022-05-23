@@ -4,35 +4,50 @@ using UnityEngine;
 
 public class MovementPlayer : MonoBehaviour
 {
-    public float playerSpeed = 9000f;
+    public float playerSpeed = 7f;
     public Transform destination;
+    public LayerMask collisionType;
     private float spriteSize;
+    private float timeDelayPerMovement = 0.1f;
+    private float timeToMoveAgain = 0f;
     // Start is called before the first frame update
     void Start()
     {
         spriteSize = gameObject.GetComponent<SpriteRenderer>().bounds.size.x;
         destination.SetParent(null);
+        //Debug.Log(destination.position);
+        //Debug.Log(transform.position);
     }
 
-    // Update is called once per frame
     void Update()
     {
-        float horzPress = Input.GetAxisRaw("Horizontal");
-        float vertPress = Input.GetAxisRaw("Vertical");
+        float horizontalMove = Input.GetAxisRaw("Horizontal");
+        float verticalMove = Input.GetAxisRaw("Vertical");
+        // Debug.Log(horizontalMove);
+        // Debug.Log(verticalMove);
+        // Debug.Log(destination.position);
+        // Debug.Log(transform.position);
 
-        //always move towards the destination.
-        transform.position = Vector3.MoveTowards(transform.position, destination.position, playerSpeed * Time.deltaTime);
-        
-        //only change destination position in increments.
-        if (Vector3.Distance(destination.position, transform.position) == 0f)
+        transform.position = Vector3.MoveTowards(transform.position, destination.position, spriteSize * Time.deltaTime * playerSpeed);
+        //TODO ADD A DELAY AFTER REACHING DEST
+        if (Vector3.Distance(destination.position, transform.position) <= 0.05f)
         {
-            if (Mathf.Abs(horzPress) == 1f) 
+            //update destination position
+            if (Mathf.Abs(horizontalMove) == 1f && 
+            !Physics2D.OverlapCircle(destination.position + new Vector3(horizontalMove * spriteSize, 0f, 0f), .3f, collisionType) &&
+            Time.time >= timeToMoveAgain) 
             {
-                destination.position = transform.position + new Vector3(horzPress * spriteSize, 0f, 0f);
-            } else if (Mathf.Abs(vertPress) == 1f)
+                destination.position += new Vector3(horizontalMove * spriteSize, 0f, 0f);
+            } else if (Mathf.Abs(verticalMove) == 1f && 
+            !Physics2D.OverlapCircle(destination.position + new Vector3(0f, verticalMove * spriteSize, 0f), .3f, collisionType) &&
+            Time.time >= timeToMoveAgain)
             {
-                destination.position = transform.position + new Vector3(0f, vertPress * spriteSize, 0f);
+                destination.position += new Vector3(0f, verticalMove * spriteSize, 0f);
             }
+        } else 
+        {
+            timeToMoveAgain = Time.time + timeDelayPerMovement;
+            //Debug.Log(timeToMoveAgain);
         }
     }
 }
