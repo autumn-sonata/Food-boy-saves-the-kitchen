@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2988196734696357815}
   - component: {fileID: 4125525119917933842}
   - component: {fileID: 4125525119917933846}
-  m_Layer: 6
+  m_Layer: 7
   m_Name: Tomato
   m_TagString: Tomato
   m_Icon: {fileID: 0}
@@ -154,7 +154,7 @@ MonoBehaviour:
     m_Bits: 64
   collisionPush:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
 --- !u!1 &4125525120534255042
 GameObject:
   m_ObjectHideFlags: 0
@@ -164,7 +164,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4125525120534255041}
-  m_Layer: 6
+  m_Layer: 7
   m_Name: destination
   m_TagString: Untagged
   m_Icon: {fileID: 0}
