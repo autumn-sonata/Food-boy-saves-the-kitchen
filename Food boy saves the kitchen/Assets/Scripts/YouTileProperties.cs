@@ -9,12 +9,29 @@ public class YouTileProperties : MonoBehaviour
     private GameObject parentFood;
     private GameObject[] playerFoods;
     private string beforeTag;
-
-    private void OnTriggerEnter2D(Collider2D col)
+    
+    IEnumerator OnTriggerExit2D(Collider2D col)
+    {
+        Debug.Log("Exit trigger!");
+        Debug.Log(col.gameObject.GetComponent<MovementPlayer>().destination.position);
+        yield return new WaitUntil(() => col.gameObject.transform.position == col.gameObject.GetComponent<MovementPlayer>().destination.position);
+        parentFood.GetComponent<MovementPlayer>().enabled = true;
+        foreach (GameObject food in playerFoods)
+        {
+            food.tag = beforeTag;
+            Debug.Log("returned original food tag");
+        }
+    }
+    IEnumerator OnTriggerEnter2D(Collider2D col)
     {
         //Make all corresponding items which are the same foods players.
+        Debug.Log("Enter triggered!");
         if (col.gameObject.layer == pushLayer)
         {
+            Debug.Log(col.gameObject);
+            Debug.Log(col.gameObject.GetComponent<MovementPlayer>().destination.position);
+            yield return new WaitUntil(() => col.gameObject.transform.position == col.gameObject.GetComponent<MovementPlayer>().destination.position);
+            Debug.Log("Should be position " + col.gameObject.GetComponent<MovementPlayer>().destination.position);
             parentFood = col.gameObject;
             //Debug.Log(parentFood);
             playerFoods = GameObject.FindGameObjectsWithTag(parentFood.gameObject.tag);
@@ -24,20 +41,8 @@ public class YouTileProperties : MonoBehaviour
             {
                 food.tag = "Player";
             }
-            Debug.Log(beforeTag);
+            //Prevent parentFood from moving
+            parentFood.GetComponent<MovementPlayer>().enabled = false;
         }    
-
-        //Prevent parentFood from moving
-        parentFood.GetComponent<MovementPlayer>().enabled = false;
-    }
-
-    void OnTriggerExit2D(Collider2D col)
-    {
-        Debug.Log(beforeTag);
-        parentFood.GetComponent<MovementPlayer>().enabled = true;
-        foreach (GameObject food in playerFoods)
-        {
-            food.tag = beforeTag;
-        }
     }
 }

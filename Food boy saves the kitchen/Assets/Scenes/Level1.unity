@@ -1664,8 +1664,8 @@ GameObject:
   - component: {fileID: 1851871222}
   - component: {fileID: 1851871224}
   - component: {fileID: 1851871223}
-  - component: {fileID: 1851871226}
   - component: {fileID: 1851871227}
+  - component: {fileID: 1851871226}
   m_Layer: 3
   m_Name: YouTile
   m_TagString: Untagged
@@ -1845,7 +1845,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.5, y: 0.5}
+  m_Size: {x: 0.01, y: 0.01}
   m_EdgeRadius: 0
 --- !u!1 &1912561158
 GameObject:
