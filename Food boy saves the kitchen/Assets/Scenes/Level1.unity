@@ -267,7 +267,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4125525119917933844, guid: c2c9fa2285733f0438efb6ea94073643, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -4.5
+      value: -5.5
       objectReference: {fileID: 0}
     - target: {fileID: 4125525119917933844, guid: c2c9fa2285733f0438efb6ea94073643, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1538,6 +1538,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3100371421737719378, guid: 209cfa9650961ef41b4a77262fc1ea54, type: 3}
+      propertyPath: m_Icon
+      value: 
+      objectReference: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
     - target: {fileID: 3100371422001079306, guid: 209cfa9650961ef41b4a77262fc1ea54, type: 3}
       propertyPath: m_Name
       value: Cheese (1)
@@ -1556,11 +1560,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3100371422001079311, guid: 209cfa9650961ef41b4a77262fc1ea54, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.5
+      value: 3.5
       objectReference: {fileID: 0}
     - target: {fileID: 3100371422001079311, guid: 209cfa9650961ef41b4a77262fc1ea54, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.5
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 3100371422001079311, guid: 209cfa9650961ef41b4a77262fc1ea54, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1621,7 +1625,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3100371422001079311, guid: 209cfa9650961ef41b4a77262fc1ea54, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.5
+      value: -4.5
       objectReference: {fileID: 0}
     - target: {fileID: 3100371422001079311, guid: 209cfa9650961ef41b4a77262fc1ea54, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1829,6 +1833,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15a56127a3227b64b80a56a16998ef3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  originalTag: 
 --- !u!61 &1851871227
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2597,7 +2602,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4125525119917933844, guid: c2c9fa2285733f0438efb6ea94073643, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.5
+      value: -3.5
       objectReference: {fileID: 0}
     - target: {fileID: 4125525119917933844, guid: c2c9fa2285733f0438efb6ea94073643, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2664,6 +2669,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3100371421737719378, guid: 209cfa9650961ef41b4a77262fc1ea54, type: 3}
+      propertyPath: m_Icon
+      value: 
+      objectReference: {fileID: 4162164826716764455, guid: 0000000000000000d000000000000000, type: 0}
     - target: {fileID: 3100371421737719378, guid: 209cfa9650961ef41b4a77262fc1ea54, type: 3}
       propertyPath: m_Name
       value: destination

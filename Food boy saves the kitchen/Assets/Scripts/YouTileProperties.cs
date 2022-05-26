@@ -5,7 +5,7 @@ using UnityEngine;
 public class YouTileProperties : MonoBehaviour
 {
     private GameObject[] foodSameTag;
-    private string originalTag;
+    public string originalTag;
     private Collider2D col;
 
     private void Start()
