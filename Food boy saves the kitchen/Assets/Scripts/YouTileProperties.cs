@@ -4,35 +4,51 @@ using UnityEngine;
 
 public class YouTileProperties : MonoBehaviour
 {
-    //private readonly int pushLayer = 7;
-    // Start is called before the first frame update
-    private GameObject parentFood;
-    private GameObject[] playerFoods;
+    private GameObject[] foodSameTag;
+    private Collider2D col; //Food item that is within YouTile.
 
-    private void OnTriggerEnter2D(Collider2D col)
+    private void Start()
     {
-        parentFood = col.gameObject;
-        playerFoods = GameObject.FindGameObjectsWithTag(parentFood.gameObject.tag);
-
-        foreach (GameObject food in playerFoods)
-        {
-            //Goes to Tags(script) component and changes element1 to Player
-            food.GetComponent<Tags>().objectTags[1] = "Player";
-        }
-
-        //Prevent parentFood from moving
-        parentFood.GetComponent<MovementPlayer>().enabled = false;
+        foodSameTag = new List<GameObject>().ToArray();
     }
-    
-    void OnTriggerExit2D(Collider2D col)
+    private void Update()
     {
-        parentFood = col.gameObject;
-        playerFoods = GameObject.FindGameObjectsWithTag(parentFood.gameObject.tag);
 
-        foreach (GameObject food in playerFoods)
+        if (col != null && col.GetComponent<MovementPlayer>().isAtDestination())
         {
-            food.GetComponent<Tags>().objectTags[1] = ".g";
+            //Alter tag of player and food
+            foreach (GameObject food in foodSameTag)
+            {
+
+                food.GetComponent<FoodTags>().disablePlayerTag();
+            }
+
+            foodSameTag = GameObject.FindGameObjectsWithTag(col.GetComponent<FoodTags>().getFoodName());
+            foreach (GameObject food in foodSameTag)
+            {
+                food.GetComponent<FoodTags>().enablePlayerTag();
+            }
+
+            //Disable movement of gameObject on the You tile
+            col.GetComponent<MovementPlayer>().enabled = false;
+
         }
-        parentFood.GetComponent<MovementPlayer>().enabled = true;
+    }
+
+    public GameObject getObjOnYouTile()
+    {
+        return col.gameObject;
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        /*
+         * Enable movement of previous collider, and make col the new food item coming into YouTile.
+         */
+        if (col != null)
+        {
+            col.GetComponent<MovementPlayer>().enabled = true;
+        }
+        col = collision;
     }
 }

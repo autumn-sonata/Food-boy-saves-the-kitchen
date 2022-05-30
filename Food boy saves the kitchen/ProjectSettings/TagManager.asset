@@ -44,3 +44,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Tiles
+    uniqueID: 2861563973
+    locked: 0
+  - name: Food
+    uniqueID: 3645081479
+    locked: 0
