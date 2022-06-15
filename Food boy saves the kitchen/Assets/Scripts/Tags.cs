@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FoodTags : MonoBehaviour
+public class Tags : MonoBehaviour
 {
     /* objectTags stores all Tags. Tags control the behaviour of the object.
      * Tags include:
@@ -20,6 +20,11 @@ public class FoodTags : MonoBehaviour
     {
         objectTags[0] = "Food";
         objectTags[1] = foodItemName;
+    }
+
+    public bool isFood()
+    {
+        return objectTags[1] != null;
     }
 
     public string getFoodName()
@@ -69,5 +74,10 @@ public class FoodTags : MonoBehaviour
     public bool isInYouTile()
     {
         return objectTags[4] == "YouTile";
+    }
+
+    public bool isInAnyTile()
+    {
+        return objectTags[3] == "WinTile" || objectTags[4] == "YouTile";
     }
 }

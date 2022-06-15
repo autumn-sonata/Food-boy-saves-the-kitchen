@@ -19,7 +19,6 @@ public class YouTileProperties : MonoBehaviour
             //Alter tag of player and food
             foreach (GameObject food in foodSameTag)
             {
-
                 food.GetComponent<FoodTags>().disablePlayerTag();
             }
 
