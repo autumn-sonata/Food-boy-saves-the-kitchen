@@ -40,7 +40,6 @@ public class PlayerManager : MonoBehaviour
                     {
                         //Needs to move itself and the other food items in front of it
                         destination.position += new Vector3(horizontalMove, 0f, 0f);
-                        
                     }
                 }
                 else if (Mathf.Abs(verticalMove) == 1f && GetComponent<Timer>().countdownFinished() && !GetComponent<Tags>().isInAnyTile())
@@ -61,8 +60,13 @@ public class PlayerManager : MonoBehaviour
 
     public bool isAtDestination()
     {
-        /* Checks if the player has finished moving one tile movement.
+        /* Checks if the player has finished moving one tile movement, via parent or itself (if is player).
          */
+        if (isChild())
+        {
+            return transform.parent.GetComponent<PlayerManager>().destination.position ==
+                transform.parent.transform.position;
+        }
         return destination.position == transform.position;
     }
 

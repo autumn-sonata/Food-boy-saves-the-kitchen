@@ -8,34 +8,20 @@ public class PlayerMovementCoordinator : MonoBehaviour
     /* Coordinates all player movements to be in sync. Only allows
      * for next set of movements once all players have finished moving.
      */
-    List<GameObject> movableObjects;
+    List<GameObject> players;
 
     // Start is called before the first frame update
     void Start()
     {
         //Get all players that can be moved.
         GameObject[] youTiles = GameObject.FindGameObjectsWithTag("You");
+        players = new List<GameObject>();
         foreach (GameObject youTile in youTiles)
         {
             GameObject onYouTile = youTile.GetComponent<YouManager>().currentObjectOnYouTile();
-            GameObject[] sameFoodTag = GameObject.FindGameObjectsWithTag(onYouTile.GetComponent<Tags>().getFoodName());
-            foreach (GameObject food in sameFoodTag)
-            {
-                if (!food.GetComponent<Tags>().isInAnyTile())
-                {
-                    //can be moved
-                    movableObjects.Add(food);
-                }
-            }
+            GameObject[] sameTag = GameObject.FindGameObjectsWithTag(onYouTile.GetComponent<Tags>().getFoodName());
+            players.AddRange(sameTag);
         }
-    }
-
-    void Update()
-    {
-        if (allMovementsComplete())
-        {
-            //Make sure movableObjects updated, and permit next move
-        }            
     }
 
     public bool allMovementsComplete()
@@ -44,7 +30,14 @@ public class PlayerMovementCoordinator : MonoBehaviour
          * by checking whether they are all at their destination.
          */
 
-        return movableObjects.Select(food => food.GetComponent<PlayerManager>().isAtDestination())
-            .Any(atDest => false);
+        return !players.Any(food => !food.GetComponent<PlayerManager>().isAtDestination());
+    }
+
+    public void addAndRemovePlayers(GameObject[] foods)
+    {
+        /* To call to add and remove items from players that are no longer players.
+         */
+        players.RemoveAll(food => !food.GetComponent<Tags>().isPlayer());
+        players.AddRange(foods);
     }
 }

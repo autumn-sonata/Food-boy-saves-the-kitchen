@@ -10,7 +10,9 @@ public class YouManager : MonoBehaviour
     private GameObject[] foodSameTag; //To change the player tags.
     private Collider2D oldCol;
 
-    private void Start()
+    private GameObject playerCoordinator; //the main camera
+
+    private void Awake()
     {
         //Find gameObject on You tile.
         Vector2 youTilePosition = new Vector2(transform.position.x, transform.position.y);
@@ -23,26 +25,42 @@ public class YouManager : MonoBehaviour
             food.GetComponent<Tags>().enablePlayerTag();
         }
         oldCol = col;
+        playerCoordinator = GameObject.Find("Main Camera");
     }
 
     void Update()
     {
-        youFoodChange();
         if (isOnTopOfTile())
         {
+            /* There is a change in food items on the You tile.
+             * Pass info to PlayerMovementCoordinator.
+             * Wait until parent of col is at destination, then
+             * update all oldCol children destinations to their transform position.
+             */
+
+            foreach (GameObject food in foodSameTag)
+            {
+                foreach (Transform pushedObject in food.transform)
+                {
+                    pushedObject.GetComponent<PlayerManager>().updateDestinationToCurrPosition();
+                }
+                food.transform.DetachChildren();
+            }
+
             //Update all the Player and You tags, foodSameTag and destination of all objects.
-                foreach (GameObject food in foodSameTag)
+            foreach (GameObject food in foodSameTag)
             {
                 food.GetComponent<Tags>().disablePlayerTag();
             }
             oldCol.GetComponent<Tags>().disableYouTileTag();
 
             col.GetComponent<Tags>().enableYouTileTag();
-            foodSameTag = GameObject.FindGameObjectsWithTag(col.tag);
+            foodSameTag = GameObject.FindGameObjectsWithTag(col.GetComponent<Tags>().getFoodName());
             foreach (GameObject food in foodSameTag)
             {
                 food.GetComponent<Tags>().enablePlayerTag();
             }
+            playerCoordinator.GetComponent<PlayerMovementCoordinator>().addAndRemovePlayers(foodSameTag);
             oldCol = col; //run this statement once every You tile food object change.
         }
     }
@@ -87,36 +105,5 @@ public class YouManager : MonoBehaviour
          */
 
         return col.GetComponent<PlayerManager>().isAtDestination() && col != oldCol;
-    }
-
-    private void youFoodChange()
-    {
-        if (col != oldCol && colParentAtDest())
-        {
-            /* There is a change in food items on the You tile.
-             * Wait until parent of col is at destination, then
-             * update all oldCol children destinations to their transform position.
-             */
-            
-            foreach (GameObject food in foodSameTag)
-            {
-                foreach (Transform pushedObject in food.transform)
-                {
-                    pushedObject.GetComponent<PlayerManager>().updateDestinationToCurrPosition();
-                }
-                food.transform.DetachChildren();
-            }
-            
-        }
-    }
-
-    private bool colParentAtDest()
-    {
-        /* To check whether the parent of col or col itself is at the destination.
-         */
-
-        return col.transform.parent != null ? 
-            col.transform.parent.GetComponent<PlayerManager>().isAtDestination() :
-            col.GetComponent<PlayerManager>().isAtDestination();
     }
 }
