@@ -39,18 +39,6 @@ public class YouManager : MonoBehaviour
              * update all oldCol children destinations to their transform position.
              */
 
-<<<<<<< Updated upstream
-            foreach (GameObject food in foodSameTag)
-            {
-                foreach (Transform pushedObject in food.transform)
-                {
-                    pushedObject.GetComponent<PlayerManager>().updateDestinationToCurrPosition();
-                }
-                food.transform.DetachChildren();
-            }
-
-=======
->>>>>>> Stashed changes
             //Update all the Player and You tags, foodSameTag and destination of all objects.
             foreach (GameObject food in foodSameTag)
             {

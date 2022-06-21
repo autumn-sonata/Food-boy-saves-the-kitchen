@@ -12,10 +12,6 @@ public class WinManager : MonoBehaviour
     private GameObject[,] winConfig; //current winning configuration of the level
     private List<GameObject> foodSameTagTopLeft; //stores all foods that are the same tag as topLeft that is not on the win tile.
     private Vector2 topLeftCenteredCoord;
-<<<<<<< Updated upstream
-    private bool checkedMove;
-=======
->>>>>>> Stashed changes
 
     private LayerMask push;
     private GameObject playerCoordinator;
@@ -55,10 +51,6 @@ public class WinManager : MonoBehaviour
         }
 
         playerCoordinator = GameObject.Find("Main Camera");
-<<<<<<< Updated upstream
-        checkedMove = false;
-=======
->>>>>>> Stashed changes
     }
 
     // Update is called once per frame
@@ -71,24 +63,8 @@ public class WinManager : MonoBehaviour
              */
             updateWinCondition();
             checkIfWin();
-<<<<<<< Updated upstream
-            checkedMove = true;
-=======
             playerCoordinator.GetComponent<PlayerMovementCoordinator>().hasCheckedMove();
->>>>>>> Stashed changes
         }
-    }
-
-    private bool hasMoved()
-    {
-        /* Ask if a move is done.
-         */
-        bool allMovementsComplete = playerCoordinator.GetComponent<PlayerMovementCoordinator>().allMovementsComplete();
-        if (!allMovementsComplete)
-        {
-            checkedMove = false;
-        }
-        return allMovementsComplete && !checkedMove;
     }
 
     private void updateWinCondition()
@@ -173,8 +149,6 @@ public class WinManager : MonoBehaviour
             }
         }
     }
-<<<<<<< Updated upstream
-=======
 
     private void OnTriggerExit2D(Collider2D collision)
     {
@@ -185,5 +159,4 @@ public class WinManager : MonoBehaviour
     {
         collision.GetComponent<Tags>().enableWinTileTag();
     }
->>>>>>> Stashed changes
 }
