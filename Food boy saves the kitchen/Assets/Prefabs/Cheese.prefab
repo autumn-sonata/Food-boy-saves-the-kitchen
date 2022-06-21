@@ -19,6 +19,8 @@ GameObject:
   - component: {fileID: 713146313728396711}
   - component: {fileID: 713146313728396728}
   - component: {fileID: 713146313728396729}
+  - component: {fileID: -7316122772259831708}
+  - component: {fileID: -1883712313862570364}
   m_Layer: 7
   m_Name: Cheese
   m_TagString: Cheese
@@ -165,7 +167,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06c598b9fcbcb6c4ab24dcd6da81dfb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  foodItemName: Cheese
+  itemName: Cheese
 --- !u!114 &713146313728396721
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -226,6 +228,31 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 739dd98b67acd3046a2c0627b1cffb13, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-7316122772259831708
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 713146313728396723}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 544b880449a30a846abbe00a929b8ff7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cutObject: {fileID: 21300000, guid: 759a35045c009f943b6d7f68dc50d994, type: 3}
+--- !u!114 &-1883712313862570364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 713146313728396723}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 082c359425d8a724aab65e48e6611b67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &713146313870764197

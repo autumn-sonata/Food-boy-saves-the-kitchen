@@ -9,6 +9,10 @@ public class PlayerMovementCoordinator : MonoBehaviour
      * for next set of movements once all players have finished moving.
      */
     List<GameObject> players;
+<<<<<<< Updated upstream
+=======
+    private bool checkedMove;
+>>>>>>> Stashed changes
 
     // Start is called before the first frame update
     void Start()
@@ -22,15 +26,15 @@ public class PlayerMovementCoordinator : MonoBehaviour
             GameObject[] sameTag = GameObject.FindGameObjectsWithTag(onYouTile.GetComponent<Tags>().getFoodName());
             players.AddRange(sameTag);
         }
+        checkedMove = false;
     }
 
+<<<<<<< Updated upstream
     public bool allMovementsComplete()
+=======
+    public void hasCheckedMove()
     {
-        /* Checks whether the moves for all moving players are complete
-         * by checking whether they are all at their destination.
-         */
-
-        return !players.Any(food => !food.GetComponent<PlayerManager>().isAtDestination());
+        checkedMove = true;
     }
 
     public void addAndRemovePlayers(GameObject[] foods)
@@ -39,5 +43,38 @@ public class PlayerMovementCoordinator : MonoBehaviour
          */
         players.RemoveAll(food => !food.GetComponent<Tags>().isPlayer());
         players.AddRange(foods);
+    }
+
+    public bool hasMoved()
+    {
+        /* Ask if a move is done.
+         */
+        bool allMovementsComplete = GetComponent<PlayerMovementCoordinator>().allMovementsComplete();
+        if (!allMovementsComplete)
+        {
+            checkedMove = false;
+        }
+        return allMovementsComplete && !checkedMove;
+    }
+
+    private bool allMovementsComplete()
+>>>>>>> Stashed changes
+    {
+        /* Checks whether the moves for all moving players are complete
+         * by checking whether they are all at their destination.
+         */
+
+        return !players.Any(food => !food.GetComponent<PlayerManager>().isAtDestination());
+<<<<<<< Updated upstream
+    }
+
+    public void addAndRemovePlayers(GameObject[] foods)
+    {
+        /* To call to add and remove items from players that are no longer players.
+         */
+        players.RemoveAll(food => !food.GetComponent<Tags>().isPlayer());
+        players.AddRange(foods);
+=======
+>>>>>>> Stashed changes
     }
 }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class PushObstacleManager : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class PushObstacleManager : MonoBehaviour
     private LayerMask push;
     private Vector2 directionPush;
     private List<GameObject> inFront; //Does not include the player themselves.
+    private List<GameObject> otherForeFrontParents; //store other forefront parents that come from eg knife.
 
     // Start is called before the first frame update
     void Start()
@@ -18,6 +20,7 @@ public class PushObstacleManager : MonoBehaviour
         push = LayerMask.GetMask("Push");
         directionPush = new Vector2(0f, 0f);
         inFront = new List<GameObject>();
+        otherForeFrontParents = new List<GameObject>();
     }
 
     public bool hasPushInFront()
@@ -72,7 +75,7 @@ public class PushObstacleManager : MonoBehaviour
          * update foreFrontOfPlayer and inFront list accordingly.
          */
 
-        foreFrontUpdate(PosInfrontOfPushQueue(directionPush));
+        foreFrontUpdate(PosInfrontOfPushQueue());
         attachFoodToPlayer();
     }
 
@@ -84,7 +87,19 @@ public class PushObstacleManager : MonoBehaviour
         Collider2D foreFront = Physics2D.OverlapPoint(startPosition, push);
         while (foreFront)
         {
+            if (foreFront.GetComponent<Tags>().isSharp())
+            {
+                foreFrontOfPlayer.GetComponent<Tags>().enableIsCut();
+            }
             foreFrontOfPlayer = foreFront.gameObject;
+            if (foreFrontOfPlayer.GetComponent<Tags>().isKnife() &&
+                !foreFrontOfPlayer.GetComponent<SharpController>().sameOrientation(directionPush))
+            {
+                //Attach entirety of other component and its pushables to this object.
+                foreFrontOfPlayer.GetComponent<SharpController>().makeParentOfOtherComponent();
+                otherForeFrontParents.Add(foreFrontOfPlayer.GetComponent<SharpController>().getOtherComponent());
+            }
+
             inFront.Add(foreFrontOfPlayer);
             foreFront = Physics2D.OverlapPoint(directionPush * ++i + startPosition, push);
         }
@@ -104,20 +119,23 @@ public class PushObstacleManager : MonoBehaviour
     {
         //Clear the inFrontOfPlayer list and detach all children. Update all their
         //destination position to its current transform position as well.
-        transform.DetachChildren();
-        foreach (GameObject food in inFront)
-        {
-            food.GetComponent<PlayerManager>().updateDestinationToCurrPosition();
-        }
+        GetComponent<DetachChildren>().detachAllChildren();
         inFront.Clear();
+        otherForeFrontParents.Clear();
     }
 
-    public Vector2 PosInfrontOfPushQueue(Vector2 direction)
+    public Vector2 PosInfrontOfPushQueue()
     {
         /* Returns the position that is in front
          * of the front object that the player is pushing.
          */
+
         return new Vector2(foreFrontOfPlayer.transform.position.x, foreFrontOfPlayer.transform.position.y) + directionPush;
+    }
+
+    public bool allOtherComponentsCanMove()
+    {
+        return otherForeFrontParents.All(parent => parent.GetComponent<SharpController>().canMove(directionPush));
     }
 
     private bool isSameDirection(Vector2 newDirection)

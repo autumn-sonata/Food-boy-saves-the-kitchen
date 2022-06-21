@@ -12,7 +12,10 @@ public class WinManager : MonoBehaviour
     private GameObject[,] winConfig; //current winning configuration of the level
     private List<GameObject> foodSameTagTopLeft; //stores all foods that are the same tag as topLeft that is not on the win tile.
     private Vector2 topLeftCenteredCoord;
+<<<<<<< Updated upstream
     private bool checkedMove;
+=======
+>>>>>>> Stashed changes
 
     private LayerMask push;
     private GameObject playerCoordinator;
@@ -52,20 +55,27 @@ public class WinManager : MonoBehaviour
         }
 
         playerCoordinator = GameObject.Find("Main Camera");
+<<<<<<< Updated upstream
         checkedMove = false;
+=======
+>>>>>>> Stashed changes
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (hasMoved())
+        if (playerCoordinator.GetComponent<PlayerMovementCoordinator>().hasMoved())
         {
             /* 1) Get winning configuration on win tile.
              * 2) Search board for winning states.
              */
             updateWinCondition();
             checkIfWin();
+<<<<<<< Updated upstream
             checkedMove = true;
+=======
+            playerCoordinator.GetComponent<PlayerMovementCoordinator>().hasCheckedMove();
+>>>>>>> Stashed changes
         }
     }
 
@@ -129,6 +139,8 @@ public class WinManager : MonoBehaviour
 
     private bool matchWinConfig(GameObject food)
     {
+        /* Matches win configuration using the food name of each item.
+         */
         Vector2 foodCoord = food.transform.position;
         for (int row = 0; row < winConfig.GetLength(0); row++)
         {
@@ -161,4 +173,17 @@ public class WinManager : MonoBehaviour
             }
         }
     }
+<<<<<<< Updated upstream
+=======
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        collision.GetComponent<Tags>().disableWinTileTag();
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        collision.GetComponent<Tags>().enableWinTileTag();
+    }
+>>>>>>> Stashed changes
 }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class YouManager : MonoBehaviour
 {
@@ -38,6 +39,7 @@ public class YouManager : MonoBehaviour
              * update all oldCol children destinations to their transform position.
              */
 
+<<<<<<< Updated upstream
             foreach (GameObject food in foodSameTag)
             {
                 foreach (Transform pushedObject in food.transform)
@@ -47,9 +49,12 @@ public class YouManager : MonoBehaviour
                 food.transform.DetachChildren();
             }
 
+=======
+>>>>>>> Stashed changes
             //Update all the Player and You tags, foodSameTag and destination of all objects.
             foreach (GameObject food in foodSameTag)
             {
+                food.GetComponent<DetachChildren>().detachAllChildren();
                 food.GetComponent<Tags>().disablePlayerTag();
             }
             oldCol.GetComponent<Tags>().disableYouTileTag();
@@ -63,23 +68,18 @@ public class YouManager : MonoBehaviour
             playerCoordinator.GetComponent<PlayerMovementCoordinator>().addAndRemovePlayers(foodSameTag);
             oldCol = col; //run this statement once every You tile food object change.
         }
-    }
-
-    public bool playerMoveIsDone()
-    {
-        /* Returns true if the player move is complete; that is when the player
-         * moves to its destination.
-         */
-        
-        foreach (GameObject food in foodSameTag)
+        if (playerCoordinator.GetComponent<PlayerMovementCoordinator>().hasMoved())
         {
-            if (!food.GetComponent<Tags>().isInAnyTile())
-            {
-                //food can be moved
-                return food.GetComponent<PlayerManager>().isAtDestination();
-            }
+            //Update foodSameTag if there are any cut values.
+            List<GameObject> sameFood = foodSameTag.ToList();
+            sameFood.FindAll(food => food.GetComponent<Tags>().isCut())
+                .ForEach(food =>
+                {
+                    food.GetComponent<DetachChildren>().detachAllChildren();
+                    food.GetComponent<Tags>().disablePlayerTag();
+                });
+            foodSameTag = sameFood.FindAll(food => !food.GetComponent<Tags>().isCut()).ToArray();
         }
-        return false;
     }
 
     public GameObject currentObjectOnYouTile()
