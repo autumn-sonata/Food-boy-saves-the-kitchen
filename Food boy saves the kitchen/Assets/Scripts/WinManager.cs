@@ -58,6 +58,8 @@ public class WinManager : MonoBehaviour
     {
         if (playerCoordinator.GetComponent<PlayerMovementCoordinator>().hasMoved())
         {
+            PastMovesManager.instance.AddTurn();
+
             /* 1) Get winning configuration on win tile.
              * 2) Search board for winning states.
              */
