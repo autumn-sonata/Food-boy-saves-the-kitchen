@@ -23,7 +23,7 @@ public class Tags : MonoBehaviour
 
     public bool isKnife()
     {
-        return itemName == "Knife";
+        return itemName == "KnifeHilt" || itemName == "KnifeBlade";
     }
     public bool isPlayer()
     {
@@ -93,8 +93,6 @@ public class Tags : MonoBehaviour
     public void enableIsCut()
     {
         objectTags[4] = "Cut";
-        //Change the food name to "~Food~cut" to differentiate.
-        itemName += "cut";
     }
 
     public bool isCut()
