@@ -2568,7 +2568,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3819550435929995017, guid: adce8e9baabb326498cebfb2312ce20e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.5
+      value: -2.5
       objectReference: {fileID: 0}
     - target: {fileID: 3819550435929995017, guid: adce8e9baabb326498cebfb2312ce20e, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2737,6 +2737,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: KnifeHilt
       objectReference: {fileID: 0}
+    - target: {fileID: 7032689624511658716, guid: 3ba13311088501641a1bceb2e4a6d189, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 1853f702dc2fe0b4180a8a77e1f634cd, type: 3}
     - target: {fileID: 7032689624511658717, guid: 3ba13311088501641a1bceb2e4a6d189, type: 3}
       propertyPath: m_RootOrder
       value: 11

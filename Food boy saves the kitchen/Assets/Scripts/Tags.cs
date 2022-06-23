@@ -101,4 +101,14 @@ public class Tags : MonoBehaviour
     {
         return objectTags[4] == "Cut";
     }
+
+    public string[] sendTags()
+    {
+        return objectTags;
+    }
+    
+    public void receiveTags(string[] tags)
+    {
+        objectTags = tags;
+    }
 }

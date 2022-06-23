@@ -11,12 +11,13 @@ public class PlayerManager : MonoBehaviour
     public float playerSpeed = 10f;
     public Transform destination;
     private float spriteSize;
+    private List<MoveLogs> moveLogs;
 
-    // Start is called before the first frame update
     void Start()
     {
         destination.SetParent(null);
         spriteSize = gameObject.GetComponent<SpriteRenderer>().bounds.size.x;
+        moveLogs = new List<MoveLogs>();
     }
 
     // Update is called once per frame
@@ -24,9 +25,10 @@ public class PlayerManager : MonoBehaviour
     {
         // Receive input from InputManager only when objects are at their destination. Only update
         // destination position
-        
+
         if (GetComponent<Tags>().isPlayer() && !isChild())
         {
+
             transform.position = Vector3.MoveTowards(transform.position, destination.position, spriteSize * Time.deltaTime * playerSpeed);
             if (isAtDestination())
             {
@@ -38,6 +40,7 @@ public class PlayerManager : MonoBehaviour
                     Vector2 direction = new Vector2(horizontalMove, 0f);
                     if (GetComponent<ObstacleManager>().allowedToMove(direction))
                     {
+                        RecordMove(gameObject, GetComponent<Tags>().sendTags());
                         //Needs to move itself and the other food items in front of it
                         destination.position += new Vector3(horizontalMove, 0f, 0f);
                     }
@@ -47,15 +50,18 @@ public class PlayerManager : MonoBehaviour
                     Vector2 direction = new Vector2(0f, verticalMove);
                     if (GetComponent<ObstacleManager>().allowedToMove(direction))
                     {
+                        RecordMove(gameObject, GetComponent<Tags>().sendTags());
                         //Needs to move itself and the other food items in front of it
                         destination.position += new Vector3(0f, verticalMove, 0f);
                     }
                 }
-            } else
+            }
+            else
             {
                 GetComponent<Timer>().startTimer(0.2f);
             }
-        } 
+        }
+
     }
 
     public bool isAtDestination()
@@ -81,4 +87,46 @@ public class PlayerManager : MonoBehaviour
          */
         return transform.parent != null;
     }
+
+    //adds an entry to movelogs
+    public void RecordMove(GameObject gameObject, string[] tags)
+    {
+        string[] copytag = new string[tags.Length];
+        for (int i = 0; i < tags.Length; i += 1)
+        {
+            copytag[i] = tags[i];
+        }
+        MoveLogs addLog = new MoveLogs(GameObject.Find("Canvas").GetComponent<PastMovesManager>().turn + 1, gameObject.transform.position, copytag);
+        moveLogs.Add(addLog);
+    }
+
+    //reverts back to previous move
+    public void Undo()
+    {
+        foreach (MoveLogs log in moveLogs)
+        {
+            if (log.specifiedTurn == GameObject.Find("Canvas").GetComponent<PastMovesManager>().turn)
+            {
+                transform.position = log.prevPosition;
+                destination.position = log.prevPosition;
+                GetComponent<Tags>().receiveTags(log.tags);
+            }
+        }
+        moveLogs.RemoveAll(log => log.specifiedTurn == GameObject.Find("Canvas").GetComponent<PastMovesManager>().turn);
+    }
+}
+
+public class MoveLogs
+{
+    public int specifiedTurn;
+    public Vector3 prevPosition;
+    public string[] tags;
+
+    public MoveLogs(int specifiedTurn, Vector3 prevPosition, string[] tags)
+    {
+        this.specifiedTurn = specifiedTurn;
+        this.prevPosition = prevPosition;
+        this.tags = tags;
+    }
+
 }
