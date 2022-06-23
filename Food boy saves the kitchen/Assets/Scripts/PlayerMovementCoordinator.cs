@@ -19,9 +19,7 @@ public class PlayerMovementCoordinator : MonoBehaviour
         players = new List<GameObject>();
         foreach (GameObject youTile in youTiles)
         {
-            GameObject onYouTile = youTile.GetComponent<YouManager>().currentObjectOnYouTile();
-            GameObject[] sameTag = GameObject.FindGameObjectsWithTag(onYouTile.GetComponent<Tags>().getFoodName());
-            players.AddRange(sameTag);
+            players.AddRange(youTile.GetComponent<YouManager>().playersAttached());
         }
         checkedMove = false;
     }
@@ -31,7 +29,7 @@ public class PlayerMovementCoordinator : MonoBehaviour
         checkedMove = true;
     }
 
-    public void addAndRemovePlayers(GameObject[] foods)
+    public void addAndRemovePlayers(List<GameObject> foods)
     {
         /* To call to add and remove items from players that are no longer players.
          */

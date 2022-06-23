@@ -90,6 +90,15 @@ public class PushObstacleManager : MonoBehaviour
             if (foreFront.GetComponent<Tags>().isSharp())
             {
                 foreFrontOfPlayer.GetComponent<Tags>().enableIsCut();
+                //Further check if is player. If so, cut the object in front as well.
+                if (foreFront.GetComponent<Tags>().isPlayer())
+                {
+                    Collider2D inFrontOfKnife = Physics2D.OverlapPoint(directionPush * (i + 1) + startPosition, push);
+                    if (inFrontOfKnife != null)
+                    {
+                        inFrontOfKnife.GetComponent<Tags>().enableIsCut();
+                    }
+                }
             }
             foreFrontOfPlayer = foreFront.gameObject;
             if (foreFrontOfPlayer.GetComponent<Tags>().isKnife() &&

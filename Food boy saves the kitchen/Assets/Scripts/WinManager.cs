@@ -125,8 +125,9 @@ public class WinManager : MonoBehaviour
             for (int col = 0; col < winConfig.GetLength(1); col++)
             {
                 Collider2D foodConfig = Physics2D.OverlapPoint(foodCoord + new Vector2(col, row), push);
-                if (foodConfig == null || winConfig[row, col].GetComponent<Tags>().getFoodName() != 
-                    foodConfig.GetComponent<Tags>().getFoodName())
+                if (foodConfig == null || 
+                    winConfig[row, col].GetComponent<Tags>().getFoodName() != foodConfig.GetComponent<Tags>().getFoodName() || 
+                    winConfig[row, col].GetComponent<Tags>().isCut() != foodConfig.GetComponent<Tags>().isCut())
                 {
                     //Configuration is wrong
                     return false;

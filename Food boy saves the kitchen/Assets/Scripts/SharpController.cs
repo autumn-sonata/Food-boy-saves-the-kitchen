@@ -13,7 +13,7 @@ public class SharpController : MonoBehaviour
     private GameObject otherComponent; //either the hilt or the blade, whichever is opposite of this
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         LayerMask push = LayerMask.GetMask("Push");
         Vector2 otherCompCoordinate;
