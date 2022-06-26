@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class ObstacleManager : MonoBehaviour
 {
@@ -16,6 +17,9 @@ public class ObstacleManager : MonoBehaviour
         /* Does a check on whether the player is able to move in that direction.
          */
         GetComponent<PushObstacleManager>().updateDirection(direction);
-        return !GetComponent<HeavyObstacleManager>().isTouchingHeavy(GetComponent<PushObstacleManager>().PosInfrontOfPushQueue(direction));
+
+        return GetComponent<PushObstacleManager>().allOtherComponentsCanMove() &&
+            !GetComponent<HeavyObstacleManager>()
+                .isTouchingHeavy(GetComponent<PushObstacleManager>().PosInfrontOfPushQueue());
     }
 }

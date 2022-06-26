@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 7522633865444887058}
   - component: {fileID: 7522633865444887069}
   - component: {fileID: 7522633865444887056}
+  - component: {fileID: 3479536396914015561}
+  - component: {fileID: 2206653149715289939}
   m_Layer: 0
   m_Name: YouTile
   m_TagString: You
@@ -73,8 +75,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1433403323
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: f475e376be708864e8d956b476085090, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -111,7 +113,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.5, y: 0.5}
+  m_Size: {x: 0.75, y: 0.75}
   m_EdgeRadius: 0
 --- !u!114 &7522633865444887069
 MonoBehaviour:
@@ -125,7 +127,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06c598b9fcbcb6c4ab24dcd6da81dfb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  foodItemName: 
 --- !u!114 &7522633865444887056
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -136,5 +137,29 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7685a7859f7499347a133a7c1b12a0f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3479536396914015561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7522633865444887062}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 366c1a7ecc09fdf4d8fba5c5c9a409b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2206653149715289939
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7522633865444887062}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 538ea4a9613566c4d92db6ab77fe0a8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

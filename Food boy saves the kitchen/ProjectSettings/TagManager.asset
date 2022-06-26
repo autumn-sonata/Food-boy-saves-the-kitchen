@@ -9,6 +9,9 @@ TagManager:
   - Olive
   - You
   - Win
+  - KnifeBlade
+  - KnifeHilt
+  - Knife
   layers:
   - Default
   - TransparentFX
