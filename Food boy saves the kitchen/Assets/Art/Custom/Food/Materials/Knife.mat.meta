@@ -1,12 +1,8 @@
 fileFormatVersion: 2
-<<<<<<<< HEAD:Food boy saves the kitchen/Assets/Art/Custom/Tiles/Levels/Tile palette/Level-1.asset.meta
-guid: f1e30fbee43825d45b9e6796f9d1c70c
-========
 guid: d3f5533f2ba9366439b1b78865ed562f
->>>>>>>> undo_restart_sharp:Food boy saves the kitchen/Assets/Art/Custom/Food/Materials/Knife.mat.meta
 NativeFormatImporter:
   externalObjects: {}
-  mainObjectFileID: 11400000
+  mainObjectFileID: 2100000
   userData: 
   assetBundleName: 
   assetBundleVariant: 

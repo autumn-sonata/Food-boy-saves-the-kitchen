@@ -98,10 +98,12 @@ public class PlayerMovementCoordinator : MonoBehaviour
          */
         if (playerType.Contains("Knife"))
         {
+            if (!playerTypes.ContainsKey("Knife")) playerTypes.Add("Knife", 0);
             playerTypes["Knife"]++; //Moves the same object
         }
         else
         {
+            if (!playerTypes.ContainsKey(playerType)) playerTypes.Add(playerType, 0);
             playerTypes[playerType]++;
         }
     }
@@ -149,8 +151,7 @@ public class PlayerMovementCoordinator : MonoBehaviour
         {
             players.UnionWith(youTile.playersAttached());
             string tagOnYouTile = youTile.youFoodTag();
-            if (playerTypes.ContainsKey(tagOnYouTile)) incrementPlayer(tagOnYouTile);
-            else playerTypes.Add(tagOnYouTile, 1);
+            incrementPlayer(tagOnYouTile);
         }
     }
 
