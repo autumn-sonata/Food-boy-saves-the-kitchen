@@ -16,18 +16,19 @@ public class WinManager : MonoBehaviour
     private LayerMask push;
     private GameObject playerCoordinator;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
+        push = LayerMask.GetMask("Push");
+        playerCoordinator = GameObject.Find("Main Camera");
+
         /* Prepare for reading the original win configuration.
          */
-        push = LayerMask.GetMask("Push");
         foodSameTagTopLeft = new List<GameObject>();
 
         int x = (int)Math.Ceiling(GetComponent<BoxCollider2D>().size.x);
         int y = (int)Math.Ceiling(GetComponent<BoxCollider2D>().size.y);
         winConfig = new GameObject[y, x];
-        topLeftCenteredCoord = new Vector2(transform.position.x - x / 2f, 
+        topLeftCenteredCoord = new Vector2(transform.position.x - x / 2f,
             transform.position.y + y / 2f) + new Vector2(0.5f, -0.5f);
 
         GameObject topLeft = Physics2D.OverlapPoint(topLeftCenteredCoord, push).gameObject;
@@ -49,24 +50,16 @@ public class WinManager : MonoBehaviour
                 foodSameTagTopLeft.Add(food);
             }
         }
-
-        playerCoordinator = GameObject.Find("Main Camera");
     }
 
-    // Update is called once per frame
-    void Update()
+    public void moveExecuted()
     {
-        if (playerCoordinator.GetComponent<PlayerMovementCoordinator>().hasMoved())
-        {
-            PastMovesManager.instance.AddTurn();
-
-            /* 1) Get winning configuration on win tile.
-             * 2) Search board for winning states.
-             */
-            updateWinCondition();
-            checkIfWin();
-            playerCoordinator.GetComponent<PlayerMovementCoordinator>().hasCheckedMove();
-        }
+        /* What to run when a move is being done.
+         * 1) Get winning configuration on win tile.
+         * 2) Search board for winning states.
+         */
+        updateWinCondition();
+        checkIfWin();
     }
 
     private void updateWinCondition()
@@ -126,7 +119,7 @@ public class WinManager : MonoBehaviour
             {
                 Collider2D foodConfig = Physics2D.OverlapPoint(foodCoord + new Vector2(col, row), push);
                 if (foodConfig == null || 
-                    winConfig[row, col].GetComponent<Tags>().getFoodName() != foodConfig.GetComponent<Tags>().getFoodName() || 
+                    winConfig[row, col].tag != foodConfig.tag || 
                     winConfig[row, col].GetComponent<Tags>().isCut() != foodConfig.GetComponent<Tags>().isCut())
                 {
                     //Configuration is wrong
@@ -144,7 +137,7 @@ public class WinManager : MonoBehaviour
          */
         foodSameTagTopLeft.Clear();
 
-        foreach (GameObject food in GameObject.FindGameObjectsWithTag(topLeft.GetComponent<Tags>().getFoodName()))
+        foreach (GameObject food in GameObject.FindGameObjectsWithTag(topLeft.tag))
         {
             if (!food.GetComponent<Tags>().isInWinTile())
             {

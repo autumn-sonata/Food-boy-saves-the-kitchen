@@ -1,0 +1,95 @@
+using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PastMovesRecords : MonoBehaviour
+{
+    /* Stores all the past records of this object.
+     * Past moves are to be used by the undo function.
+     */
+    private class MoveLogs
+    {
+        private int turn;
+        private Vector3 prevPosition;
+        private List<string> tags;
+
+        public MoveLogs(int turn, Vector3 prevPosition, List<string> tags)
+        {
+            this.turn = turn;
+            this.prevPosition = prevPosition;
+            this.tags = tags;
+        }
+
+        public int getTurn()
+        {
+            return turn;
+        }
+
+        public Vector3 getPrevPosition()
+        {
+            return prevPosition;
+        }
+
+        public List<string> getTags()
+        {
+            return tags;
+        }
+    }
+
+    private Stack<MoveLogs> moveLogs;
+    private PastMovesManager moveManager; //higher in hierarchy
+    private PastMovesSameTag sameTagManager; //lower in hierarchy. For you tile.
+ 
+    // Start is called before the first frame update
+    private void Awake()
+    {
+        moveLogs = new Stack<MoveLogs>();
+        moveManager = GameObject.Find("Canvas").GetComponent<PastMovesManager>();
+        sameTagManager = GetComponent<PastMovesSameTag>();
+    }
+
+    public void RecordMove()
+    {
+        /* Adds entry to moveLogs stack.
+         */
+    
+        moveLogs.Push(new MoveLogs(turnNumber(), transform.position, 
+            new List<string>(GetComponent<Tags>().getTags().ToList())));
+
+        if (isYouTile()) sameTagManager.RecordMove(turnNumber());
+    }
+
+    public void Undo()
+    {
+        /* Undo the move done by this object.
+         */
+        if (GetComponent<DetachChildren>())
+            GetComponent<DetachChildren>().detachAllChildren();
+        if (moveLogs.Count > 0)
+        {
+            MoveLogs top = moveLogs.Pop();
+            while (top.getTurn() > turnNumber()) top = moveLogs.Pop();
+            moveLogs.Push(top);
+
+            //Update to previous iteration
+            transform.position = top.getPrevPosition();
+            if (GetComponent<PlayerManager>())
+                GetComponent<PlayerManager>().updateDestinationToCurrPosition();
+            GetComponent<Tags>().setTags(top.getTags().ToArray());
+
+            if (isYouTile()) sameTagManager.Undo(turnNumber());
+        }
+    }
+
+    private int turnNumber()
+    {
+        return moveManager.getTurn();
+    } 
+
+    private bool isYouTile()
+    {
+        return sameTagManager != null;
+    }
+}

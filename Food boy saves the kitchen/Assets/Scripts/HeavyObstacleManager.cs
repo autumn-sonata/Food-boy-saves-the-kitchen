@@ -8,7 +8,7 @@ public class HeavyObstacleManager : MonoBehaviour
      * Is linked to the player.
      */
     private LayerMask heavy;
-    private void Start()
+    private void Awake()
     {
         heavy = LayerMask.GetMask("Heavy");
     }

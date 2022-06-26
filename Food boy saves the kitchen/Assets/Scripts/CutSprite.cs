@@ -9,7 +9,7 @@ public class CutSprite : MonoBehaviour
     public Sprite cutObject;
     private bool called;
 
-    private void Start()
+    private void Awake()
     {
         called = false;
     }

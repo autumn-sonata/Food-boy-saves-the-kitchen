@@ -11,38 +11,32 @@ public class YouManager : MonoBehaviour
     private List<GameObject> foodSameTag; //To change the player tags.
     private Collider2D oldCol;
 
-    private GameObject playerCoordinator; //the main camera
+    private PlayerMovementCoordinator playerCoordinator; //the main camera
 
     private void Awake()
     {
-        playerCoordinator = GameObject.Find("Main Camera");
+        playerCoordinator = GameObject.Find("Main Camera").GetComponent<PlayerMovementCoordinator>();
+        //Find gameObject on You tile.
+        Vector2 youTilePosition = new Vector2(transform.position.x, transform.position.y);
+        col = Physics2D.OverlapPoint(youTilePosition, LayerMask.GetMask("Push")); //Look for any pushable object on You Tile.
     }
 
     private void Start()
     {
-        //Find gameObject on You tile.
-        Vector2 youTilePosition = new Vector2(transform.position.x, transform.position.y);
-        col = Physics2D.OverlapPoint(youTilePosition, LayerMask.GetMask("Push")); //Look for any pushable object on You Tile.
         if (col != null)
         {
-            if (col.GetComponent<Tags>().isKnife())
-            {
-                //col is a knife. Make both of them as if they are on the you tile.
-                GameObject other = col.GetComponent<SharpController>().getOtherComponent();
-                other.GetComponent<Tags>().enableYouTileTag();
-            }
+            if (col.GetComponent<Tags>().isKnife()) col.GetComponent<SharpController>().enableOtherYouTileTag();
             col.GetComponent<Tags>().enableYouTileTag();
 
-            foodSameTag = GameObject.FindGameObjectsWithTag(col.GetComponent<Tags>().getFoodName()).ToList(); //Call "Knife" if it is Knife object.
+            foodSameTag = GameObject.FindGameObjectsWithTag(col.tag).ToList();
             List<GameObject> additionalForKnife = new List<GameObject>();
             foreach (GameObject food in foodSameTag)
             {
                 food.GetComponent<Tags>().enablePlayerTag();
                 if (food.GetComponent<Tags>().isKnife())
                 {
-                    GameObject other = food.GetComponent<SharpController>().getOtherComponent();
-                    other.GetComponent<Tags>().enablePlayerTag();
-                    additionalForKnife.Add(other); //foodSameTag has both KnifeHilt and KnifeBlade types.
+                    food.GetComponent<SharpController>().enableOtherPlayerTag();
+                    additionalForKnife.Add(food.GetComponent<SharpController>().getOtherComponent()); //foodSameTag has both KnifeHilt and KnifeBlade types.
                 }
             }
             foodSameTag.AddRange(additionalForKnife);
@@ -50,68 +44,108 @@ public class YouManager : MonoBehaviour
         }
     }
 
-    void Update()
+    public void ChangeYouObject()
     {
-        if (col != null)
+        if (col != null && isOnTopOfTile())
         {
-            if (isOnTopOfTile())
-            {
-                /* There is a change in food items on the You tile.
-                 * Pass info to PlayerMovementCoordinator.
-                 * Wait until parent of col is at destination, then
-                 * update all oldCol children destinations to their transform position.
-                 */
+           /* There is a change in food items on the You tile.
+            * Not to be run every single frame, it is expensive!
+            * Pass info to PlayerMovementCoordinator.
+            * Wait until parent of col is at destination, then
+            * update all oldCol children destinations to their transform position.
+            */
 
-                //Update all the Player and You tags, foodSameTag and destination of all objects.
+            //Tell player movement coordinator about the change in you tile object.
+            playerCoordinator.decrementPlayer(oldCol.tag);
+
+            //Update all the Player and You tags, foodSameTag and destination of all objects.
+            if (!playerCoordinator.isPlayer(oldCol.tag))
+            {
                 foreach (GameObject food in foodSameTag)
                 {
                     food.GetComponent<DetachChildren>().detachAllChildren();
                     food.GetComponent<Tags>().disablePlayerTag();
-                }
-                oldCol.GetComponent<Tags>().disableYouTileTag();
-                if (oldCol.GetComponent<Tags>().isKnife())
-                {
-                    oldCol.GetComponent<SharpController>().getOtherComponent().GetComponent<Tags>().disableYouTileTag();
-                }
-
-                col.GetComponent<Tags>().enableYouTileTag();
-                if (col.GetComponent<Tags>().isKnife())
-                {
-                    col.GetComponent<SharpController>().getOtherComponent().GetComponent<Tags>().enableYouTileTag();
-                }
-                foodSameTag = GameObject.FindGameObjectsWithTag(col.GetComponent<Tags>().getFoodName()).ToList();
-                List<GameObject> additionalForKnife = new List<GameObject>();
-                foreach (GameObject food in foodSameTag)
-                {
-                    food.GetComponent<Tags>().enablePlayerTag();
                     if (food.GetComponent<Tags>().isKnife())
                     {
-                        GameObject other = food.GetComponent<SharpController>().getOtherComponent();
-                        other.GetComponent<Tags>().enablePlayerTag();
-                        additionalForKnife.Add(other); //foodSameTag has both KnifeHilt and KnifeBlade types.
+                        food.GetComponent<SharpController>().getOtherComponent().GetComponent<DetachChildren>().detachAllChildren();
+                        food.GetComponent<SharpController>().disableOtherPlayerTag();
                     }
                 }
-                foodSameTag.AddRange(additionalForKnife);
-                playerCoordinator.GetComponent<PlayerMovementCoordinator>().addAndRemovePlayers(foodSameTag);
-                oldCol = col; //run this statement once every You tile food object change.
             }
-            if (playerCoordinator.GetComponent<PlayerMovementCoordinator>().hasMoved())
+            oldCol.GetComponent<Tags>().disableYouTileTag();
+            if (oldCol.GetComponent<Tags>().isKnife()) oldCol.GetComponent<SharpController>().disableOtherYouTileTag();
+
+
+            //Update to new collider
+            playerCoordinator.incrementPlayer(col.tag);
+            col.GetComponent<Tags>().enableYouTileTag();
+            col.GetComponent<DetachChildren>().detachAllChildren();
+            if (col.GetComponent<Tags>().isKnife()) col.GetComponent<SharpController>().enableOtherYouTileTag();
+
+            foodSameTag = GameObject.FindGameObjectsWithTag(col.tag).ToList();
+            List<GameObject> additionalForKnife = new List<GameObject>();
+            foreach (GameObject food in foodSameTag)
             {
-                //Update foodSameTag if there are any cut foods, and abandon them.
-                foodSameTag.FindAll(food => !food.GetComponent<Tags>().isKnife() && food.GetComponent<Tags>().isCut())
-                    .ForEach(food =>
-                    {
-                        food.GetComponent<DetachChildren>().detachAllChildren();
-                        food.GetComponent<Tags>().disablePlayerTag();
-                    });
-                foodSameTag = foodSameTag.FindAll(food => !food.GetComponent<Tags>().isCut() || food.GetComponent<Tags>().isKnife());
+                food.GetComponent<Tags>().enablePlayerTag();
+                if (food.GetComponent<Tags>().isKnife())
+                {
+                    food.GetComponent<SharpController>().enableOtherPlayerTag();
+                    //foodSameTag has both KnifeHilt and KnifeBlade types.
+                    additionalForKnife.Add(food.GetComponent<SharpController>().getOtherComponent()); 
+                }
             }
+            foodSameTag.AddRange(additionalForKnife);
+            playerCoordinator.addAndRemovePlayers(foodSameTag);
+            oldCol = col; //run this statement once every You tile food object change.
         }
+    }
+
+    public void moveExecuted()
+    {
+        //Update foodSameTag if there are any cut foods, and abandon them (exclude from foodSameTag)
+        foodSameTag.FindAll(food => !food.GetComponent<Tags>().isKnife() && food.GetComponent<Tags>().isCut())
+            .ForEach(food =>
+            {
+                food.GetComponent<DetachChildren>().detachAllChildren();
+                food.GetComponent<Tags>().disablePlayerTag();
+            });
+        foodSameTag = foodSameTag.FindAll(food => !food.GetComponent<Tags>().isCut() || food.GetComponent<Tags>().isKnife());
     }
 
     public List<GameObject> playersAttached()
     {
+        return foodSameTag == null ? new List<GameObject>() : foodSameTag;
+    }
+
+    public string youFoodTag()
+    {
+        return col.tag;
+    }
+
+    public List<GameObject> getFoodSameTag()
+    {
+        /* Gets all foods with tag similar to col.
+         */
         return foodSameTag;
+    }
+
+    public Collider2D getCol()
+    {
+        return col;
+    }
+
+    public Collider2D getOldCol()
+    {
+        return oldCol;
+    }
+
+    public void Undo(List<GameObject> prev, Collider2D collider, Collider2D oldCollider)
+    {
+        /* Updates foodSameTag.
+         */
+        foodSameTag = prev;
+        col = collider;
+        oldCol = oldCollider;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

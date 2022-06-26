@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,79 +8,97 @@ using UnityEngine.SceneManagement;
 
 public class PastMovesManager : MonoBehaviour
 {
-    public static PastMovesManager instance;
+    private static string prefix = "Moves: ";
+    private static float undoCooldownDuration = 0.3f;
+
     public TMP_Text moveText;
 
-    //int representing number of moves after start of the scene
-    [HideInInspector] public int turn;
-    [HideInInspector] public int timer;
+    private int turn; //int representing number of moves after start of the scene
+    private bool canUndo; //cooldown before another key from undo/restart can be activated
+    private List<PastMovesRecords> pastRecords; //remembers all components of PastMovesRecords.
+    private PlayerMovementCoordinator movementCoordinator;
 
-    //Creates instance
-    private void Awake()
+    private void Awake()    
     {
-        instance = this;
-    }
-
-    void Start()    
-    {
-        moveText.text = "Moves: " + turn.ToString();
-        timer = 0;
+        moveText.text = prefix + turn.ToString();
         turn = -1;
+        canUndo = true;
+        pastRecords = new List<PastMovesRecords>();
+        movementCoordinator = 
+            GameObject.Find("Main Camera").GetComponent<PlayerMovementCoordinator>();
     }
 
-    private void Update()
+    private void Start()
     {
-        if (timer > 0)
+        GameObject[] movableObjects = FindObjectsOfType<GameObject>();
+        foreach (GameObject obj in movableObjects)
         {
-            timer--;
-        }
-
-        DoUndo();
-        RestartLevel();
-        moveText.text = "Moves: " + turn.ToString();
-    }
-
-    //increments moves and updates text
-    public void AddTurn()
-    {
-        turn += 1;
-    }
-
-
-
-    private void DoUndo()
-    {
-        if (Input.GetKey("z") && timer == 0 && turn > 0)
-        {
-            //Note to Eric: hard coding this for simplicity for now, would u prefer I change this to find all gameobjects
-            callUndoForObjectWithTag("Tomato");
-
-            turn -= 1;
-            timer = 70;
-        }
-
-    }
-
-    //restarts level after "r" key
-    private void RestartLevel()
-    {
-        if (Input.GetKey("r"))
-        {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-            turn = 0;
+            if (obj.GetComponent<PastMovesRecords>()) 
+                pastRecords.Add(obj.GetComponent<PastMovesRecords>());
         }
     }
 
-    private void callUndoForObjectWithTag(string Tag)
+    public int getTurn()
     {
-        GameObject[] allObjects = GameObject.FindGameObjectsWithTag(Tag);
-        foreach (GameObject go in allObjects)
-            if (go.activeInHierarchy)
-            {
-                go.GetComponent<PlayerManager>().Undo();
-            }
+        return turn;
     }
 
+    public void RecordThisMove()
+    {
+        /* A turn has passed.
+         */
+        turn++;
+        foreach (PastMovesRecords record in pastRecords)
+        {
+            record.RecordMove();
+        }
+        changeMoveText();
+    }
+
+    private void changeMoveText()
+    {
+        /* Changes the Moves count on screen.
+         */
+        moveText.text = prefix + turn.ToString();
+    }
+
+    public void DoUndo()
+    {
+        if (canUndo && turn > 0)
+        {
+            canUndo = false;
+            turn--;
+            callUndoForObjectWithTag();
+            changeMoveText();
+            StartCoroutine(undoCooldownTimer());
+        }
+
+    }
+
+    public void RestartLevel()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    private void callUndoForObjectWithTag()
+    {
+        /* Handles undo of all player objects.
+         * https://answers.unity.com/questions/454590/c-how-to-check-if-a-gameobject-contains-a-certain.html
+         */
+        foreach (PastMovesRecords component in pastRecords)
+        {
+            component.Undo();
+        }
+    }
+
+    private IEnumerator undoCooldownTimer()
+    {
+        /* Waits for undoCooldownDuration seconds before being able to undo again
+         * https://foxxthom.medium.com/making-a-simple-and-efficient-cool-down-timer-in-unity-137efcbb8dce
+         */
+        yield return new WaitForSeconds(undoCooldownDuration);
+        canUndo = true;
+    }
 }
 
 

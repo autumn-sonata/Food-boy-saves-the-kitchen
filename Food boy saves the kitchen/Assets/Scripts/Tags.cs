@@ -14,16 +14,10 @@ public class Tags : MonoBehaviour
      * If the tag e.g Player is not found at the current moment, then disable Player behaviour.
      */
     private string[] objectTags = new string[5];
-    public string itemName; //Name of the food item eg Cheese, Tomato etc
-
-    public string getFoodName()
-    {
-        return itemName;
-    }
 
     public bool isKnife()
     {
-        return itemName == "KnifeHilt" || itemName == "KnifeBlade";
+        return gameObject.tag == "KnifeHilt" || gameObject.tag == "KnifeBlade";
     }
     public bool isPlayer()
     {
@@ -100,13 +94,17 @@ public class Tags : MonoBehaviour
         return objectTags[4] == "Cut";
     }
 
-    public string[] sendTags()
+    public string[] getTags()
     {
+        /* To record tags for undo.
+         */
         return objectTags;
     }
     
-    public void receiveTags(string[] tags)
+    public void setTags(string[] tags)
     {
+        /* To set tag in the case of undo
+         */
         objectTags = tags;
     }
 }

@@ -16,7 +16,7 @@ public class SharpController : MonoBehaviour
     void Awake()
     {
         LayerMask push = LayerMask.GetMask("Push");
-        Vector2 otherCompCoordinate;
+        Vector2 otherCompCoordinate = new Vector2(0f, 0f);
         Vector2 thisPosition = transform.position;
         switch (componentDirection)
         {
@@ -29,8 +29,11 @@ public class SharpController : MonoBehaviour
             case 3:
                 otherCompCoordinate = thisPosition + new Vector2(0, -1);
                 break;
-            default:
+            case 4:
                 otherCompCoordinate = thisPosition + new Vector2(-1, 0);
+                break;
+            default:
+                Debug.LogError("Invalid number for direction. Refer to SharpController script.");
                 break;
         }
 
@@ -48,6 +51,26 @@ public class SharpController : MonoBehaviour
     public GameObject getOtherComponent()
     {
         return otherComponent;
+    }
+
+    public void enableOtherYouTileTag()
+    {
+        otherComponent.GetComponent<Tags>().enableYouTileTag();
+    }
+
+    public void disableOtherYouTileTag()
+    {
+        otherComponent.GetComponent<Tags>().disableYouTileTag();
+    }
+
+    public void enableOtherPlayerTag()
+    {
+        otherComponent.GetComponent<Tags>().enablePlayerTag();
+    }
+
+    public void disableOtherPlayerTag()
+    {
+        otherComponent.GetComponent<Tags>().disablePlayerTag();
     }
 
     public bool canMove(Vector2 directionPush)

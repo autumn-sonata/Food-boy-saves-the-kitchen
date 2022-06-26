@@ -14,7 +14,7 @@ public class PushObstacleManager : MonoBehaviour
     private List<GameObject> otherForeFrontParents; //store other forefront parents that come from eg knife.
 
     // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
         foreFrontOfPlayer = gameObject;
         push = LayerMask.GetMask("Push");
@@ -62,9 +62,9 @@ public class PushObstacleManager : MonoBehaviour
          */
         foreFrontOfPlayer = gameObject;
         directionPush = direction;
-        detachFoodFromPlayer();
+        detachFoodFromPlayer(); //TODO maybe something to do with otherComponent not detaching?
 
-        foreFrontUpdate(directionPush + new Vector2(transform.position.x, transform.position.y));
+        foreFrontUpdate(directionPush + new Vector2(transform.position.x, transform.position.y), true);
         attachFoodToPlayer();
     }
 
@@ -75,11 +75,11 @@ public class PushObstacleManager : MonoBehaviour
          * update foreFrontOfPlayer and inFront list accordingly.
          */
 
-        foreFrontUpdate(PosInfrontOfPushQueue());
+        foreFrontUpdate(PosInfrontOfPushQueue(), false);
         attachFoodToPlayer();
     }
 
-    private void foreFrontUpdate(Vector2 startPosition)
+    private void foreFrontUpdate(Vector2 startPosition, bool changeDir)
     {
         /* Update the foreFrontOfPlayer and inFront list.
          */
@@ -87,19 +87,19 @@ public class PushObstacleManager : MonoBehaviour
         Collider2D foreFront = Physics2D.OverlapPoint(startPosition, push);
         while (foreFront)
         {
+            if (changeDir) UpdateChildPlayer(foreFront);
             if (foreFront.GetComponent<Tags>().isSharp())
             {
+                //Make food that pushed into the blade cut.
                 foreFrontOfPlayer.GetComponent<Tags>().enableIsCut();
-                //Further check if is player. If so, cut the object in front as well.
-                if (foreFront.GetComponent<Tags>().isPlayer())
-                {
-                    Collider2D inFrontOfKnife = Physics2D.OverlapPoint(directionPush * (i + 1) + startPosition, push);
-                    if (inFrontOfKnife != null)
-                    {
-                        inFrontOfKnife.GetComponent<Tags>().enableIsCut();
-                    }
-                }
             }
+
+            if (foreFrontOfPlayer.GetComponent<Tags>().isPlayer() && foreFrontOfPlayer.GetComponent<Tags>().isSharp())
+            {
+                //Make food in front of the player blade cut.
+                foreFront.GetComponent<Tags>().enableIsCut();
+            }
+
             foreFrontOfPlayer = foreFront.gameObject;
             if (foreFrontOfPlayer.GetComponent<Tags>().isKnife() &&
                 !foreFrontOfPlayer.GetComponent<SharpController>().sameOrientation(directionPush))
@@ -152,5 +152,13 @@ public class PushObstacleManager : MonoBehaviour
         /* Checks whether the player is moving in the same direction as previous move.
          */
         return directionPush == newDirection;
+    }
+
+    private void UpdateChildPlayer(Collider2D foreFront)
+    {
+        /* Update direction of pushes of inner players (including foods attached to them)
+         */
+        if (foreFront.GetComponent<Tags>().isPlayer())
+            foreFront.GetComponent<PushObstacleManager>().updateDirection(directionPush);
     }
 }
