@@ -69,7 +69,7 @@ public class PlayerMovementCoordinator : MonoBehaviour
         if (inputManager.KeyPressUndo())
         {
             moveManager.DoUndo();
-            executeWinManagers(); //update Win Manager.
+            executeWinManagers(); //update Win Manager to previous state.
 
             players.Clear();
             playerTypes.Clear();
@@ -149,9 +149,13 @@ public class PlayerMovementCoordinator : MonoBehaviour
          */
         foreach (YouManager youTile in youTiles)
         {
+            youTile.Initialise();
             players.UnionWith(youTile.playersAttached());
-            string tagOnYouTile = youTile.youFoodTag();
-            incrementPlayer(tagOnYouTile);
+            if (youTile.hasFoodOnYouTile())
+            {
+                string tagOnYouTile = youTile.youFoodTag();
+                incrementPlayer(tagOnYouTile);
+            }
         }
     }
 

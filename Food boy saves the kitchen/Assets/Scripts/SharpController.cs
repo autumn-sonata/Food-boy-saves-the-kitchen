@@ -73,6 +73,16 @@ public class SharpController : MonoBehaviour
         otherComponent.GetComponent<Tags>().disablePlayerTag();
     }
 
+    public void enableOtherWinTileTag()
+    {
+        otherComponent.GetComponent<Tags>().enableWinTileTag();
+    }
+
+    public void disableOtherWinTileTag()
+    {
+        otherComponent.GetComponent<Tags>().disableWinTileTag();
+    }
+
     public bool canMove(Vector2 directionPush)
     {
         return GetComponent<ObstacleManager>().allowedToMove(directionPush);

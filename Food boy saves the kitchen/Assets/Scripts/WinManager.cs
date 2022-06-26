@@ -38,6 +38,8 @@ public class WinManager : MonoBehaviour
             {
                 GameObject withinWinTile = Physics2D.OverlapPoint(topLeftCenteredCoord + new Vector2(j, i), push).gameObject;
                 withinWinTile.GetComponent<Tags>().enableWinTileTag();
+                if (withinWinTile.GetComponent<Tags>().isKnife())
+                    withinWinTile.GetComponent<SharpController>().enableOtherWinTileTag();
                 winConfig[i, j] = withinWinTile;
             }
         }
@@ -149,10 +151,14 @@ public class WinManager : MonoBehaviour
     private void OnTriggerExit2D(Collider2D collision)
     {
         collision.GetComponent<Tags>().disableWinTileTag();
+        if (collision.GetComponent<Tags>().isKnife())
+            collision.GetComponent<SharpController>().disableOtherWinTileTag();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         collision.GetComponent<Tags>().enableWinTileTag();
+        if (collision.GetComponent<Tags>().isKnife()) 
+            collision.GetComponent<SharpController>().enableOtherWinTileTag();
     }
 }

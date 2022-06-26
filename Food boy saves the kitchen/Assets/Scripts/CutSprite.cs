@@ -7,20 +7,22 @@ public class CutSprite : MonoBehaviour
     /* Stores the cut state of the food item.
      */
     public Sprite cutObject;
-    private bool called;
+    private Sprite startState; //Remember the sprite when level begins.
 
     private void Awake()
     {
-        called = false;
+        startState = GetComponent<SpriteRenderer>().sprite;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!called && GetComponent<Tags>().isCut())
+        if (GetComponent<Tags>().isCut())
         {
-            called = true; //called only once during gameObject's lifetime
             GetComponent<SpriteRenderer>().sprite = cutObject;
+        } else
+        {
+            GetComponent<SpriteRenderer>().sprite = startState;
         }
     }
 }

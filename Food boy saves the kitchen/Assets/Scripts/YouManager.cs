@@ -15,13 +15,15 @@ public class YouManager : MonoBehaviour
 
     private void Awake()
     {
+        //Initialisation
         playerCoordinator = GameObject.Find("Main Camera").GetComponent<PlayerMovementCoordinator>();
         //Find gameObject on You tile.
         Vector2 youTilePosition = new Vector2(transform.position.x, transform.position.y);
         col = Physics2D.OverlapPoint(youTilePosition, LayerMask.GetMask("Push")); //Look for any pushable object on You Tile.
+        foodSameTag = new List<GameObject>(); 
     }
 
-    private void Start()
+    public void Initialise()
     {
         if (col != null)
         {
@@ -56,25 +58,27 @@ public class YouManager : MonoBehaviour
             */
 
             //Tell player movement coordinator about the change in you tile object.
-            playerCoordinator.decrementPlayer(oldCol.tag);
-
-            //Update all the Player and You tags, foodSameTag and destination of all objects.
-            if (!playerCoordinator.isPlayer(oldCol.tag))
+            if (oldCol != null)
             {
-                foreach (GameObject food in foodSameTag)
+                playerCoordinator.decrementPlayer(oldCol.tag);
+
+                //Update all the Player and You tags, foodSameTag and destination of all objects.
+                if (!playerCoordinator.isPlayer(oldCol.tag))
                 {
-                    food.GetComponent<DetachChildren>().detachAllChildren();
-                    food.GetComponent<Tags>().disablePlayerTag();
-                    if (food.GetComponent<Tags>().isKnife())
+                    foreach (GameObject food in foodSameTag)
                     {
-                        food.GetComponent<SharpController>().getOtherComponent().GetComponent<DetachChildren>().detachAllChildren();
-                        food.GetComponent<SharpController>().disableOtherPlayerTag();
+                        food.GetComponent<DetachChildren>().detachAllChildren();
+                        food.GetComponent<Tags>().disablePlayerTag();
+                        if (food.GetComponent<Tags>().isKnife())
+                        {
+                            food.GetComponent<SharpController>().getOtherComponent().GetComponent<DetachChildren>().detachAllChildren();
+                            food.GetComponent<SharpController>().disableOtherPlayerTag();
+                        }
                     }
                 }
+                oldCol.GetComponent<Tags>().disableYouTileTag();
+                if (oldCol.GetComponent<Tags>().isKnife()) oldCol.GetComponent<SharpController>().disableOtherYouTileTag();
             }
-            oldCol.GetComponent<Tags>().disableYouTileTag();
-            if (oldCol.GetComponent<Tags>().isKnife()) oldCol.GetComponent<SharpController>().disableOtherYouTileTag();
-
 
             //Update to new collider
             playerCoordinator.incrementPlayer(col.tag);
@@ -114,7 +118,14 @@ public class YouManager : MonoBehaviour
 
     public List<GameObject> playersAttached()
     {
-        return foodSameTag == null ? new List<GameObject>() : foodSameTag;
+        if (foodSameTag == null)
+            Debug.LogError("FoodSameTag in YouManager is not initialised!");
+        return foodSameTag;
+    }
+
+    public bool hasFoodOnYouTile()
+    {
+        return col != null;
     }
 
     public string youFoodTag()
@@ -154,16 +165,9 @@ public class YouManager : MonoBehaviour
          * Function runs when a new collider comes into contact with YouTile's collision box.
          * Delays change of foodSameTag array.
          */
-        if (col != null)
-        {
-            oldCol = col;
-            col = collision;
-        } else
-        {
-            //Initialisation
-            col = collision;
-            oldCol = col;
-        }
+
+        oldCol = col;
+        col = collision;
     }
 
     private bool isOnTopOfTile()
