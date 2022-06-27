@@ -12,6 +12,7 @@ TagManager:
   - KnifeBlade
   - KnifeHilt
   - Knife
+  - Saki
   layers:
   - Default
   - TransparentFX

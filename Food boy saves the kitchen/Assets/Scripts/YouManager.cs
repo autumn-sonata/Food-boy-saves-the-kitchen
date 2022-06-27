@@ -10,6 +10,7 @@ public class YouManager : MonoBehaviour
     private Collider2D col; //Food item that is within YouTile.
     private List<GameObject> foodSameTag; //To change the player tags.
     private Collider2D oldCol;
+    private bool triggerCalled; //True if any trigger is called.
 
     private PlayerMovementCoordinator playerCoordinator; //the main camera
 
@@ -18,9 +19,9 @@ public class YouManager : MonoBehaviour
         //Initialisation
         playerCoordinator = GameObject.Find("Main Camera").GetComponent<PlayerMovementCoordinator>();
         //Find gameObject on You tile.
-        Vector2 youTilePosition = new Vector2(transform.position.x, transform.position.y);
-        col = Physics2D.OverlapPoint(youTilePosition, LayerMask.GetMask("Push")); //Look for any pushable object on You Tile.
-        foodSameTag = new List<GameObject>(); 
+        UpdateColliderOnTile(); //Look for any pushable object on You Tile.
+        foodSameTag = new List<GameObject>();
+        triggerCalled = false;
     }
 
     public void Initialise()
@@ -48,14 +49,14 @@ public class YouManager : MonoBehaviour
 
     public void ChangeYouObject()
     {
-        if (col != null && isOnTopOfTile())
+        if (triggerCalled)
         {
-           /* There is a change in food items on the You tile.
-            * Not to be run every single frame, it is expensive!
-            * Pass info to PlayerMovementCoordinator.
-            * Wait until parent of col is at destination, then
-            * update all oldCol children destinations to their transform position.
-            */
+            /* There is a change in food items on the You tile.
+             * Not to be run every single frame, it is expensive!
+             * Pass info to PlayerMovementCoordinator.
+             * Wait until parent of col is at destination, then
+             * update all oldCol children destinations to their transform position.
+             */
 
             //Tell player movement coordinator about the change in you tile object.
             if (oldCol != null)
@@ -80,27 +81,36 @@ public class YouManager : MonoBehaviour
                 if (oldCol.GetComponent<Tags>().isKnife()) oldCol.GetComponent<SharpController>().disableOtherYouTileTag();
             }
 
-            //Update to new collider
-            playerCoordinator.incrementPlayer(col.tag);
-            col.GetComponent<Tags>().enableYouTileTag();
-            col.GetComponent<DetachChildren>().detachAllChildren();
-            if (col.GetComponent<Tags>().isKnife()) col.GetComponent<SharpController>().enableOtherYouTileTag();
-
-            foodSameTag = GameObject.FindGameObjectsWithTag(col.tag).ToList();
-            List<GameObject> additionalForKnife = new List<GameObject>();
-            foreach (GameObject food in foodSameTag)
+            if (col != null)
             {
-                food.GetComponent<Tags>().enablePlayerTag();
-                if (food.GetComponent<Tags>().isKnife())
+                //Update to new collider
+                playerCoordinator.incrementPlayer(col.tag);
+                col.GetComponent<Tags>().enableYouTileTag();
+                col.GetComponent<DetachChildren>().detachAllChildren();
+                if (col.GetComponent<Tags>().isKnife()) col.GetComponent<SharpController>().enableOtherYouTileTag();
+
+                foodSameTag = GameObject.FindGameObjectsWithTag(col.tag).ToList();
+                List<GameObject> additionalForKnife = new List<GameObject>();
+                foreach (GameObject food in foodSameTag)
                 {
-                    food.GetComponent<SharpController>().enableOtherPlayerTag();
-                    //foodSameTag has both KnifeHilt and KnifeBlade types.
-                    additionalForKnife.Add(food.GetComponent<SharpController>().getOtherComponent()); 
+                    food.GetComponent<Tags>().enablePlayerTag();
+                    if (food.GetComponent<Tags>().isKnife())
+                    {
+                        food.GetComponent<SharpController>().enableOtherPlayerTag();
+                        //foodSameTag has both KnifeHilt and KnifeBlade types.
+                        additionalForKnife.Add(food.GetComponent<SharpController>().getOtherComponent());
+                    }
                 }
+                foodSameTag.AddRange(additionalForKnife);
+            } else
+            {
+                //No new collider available, clear foodSameTag
+                foodSameTag.Clear();
             }
-            foodSameTag.AddRange(additionalForKnife);
+ 
             playerCoordinator.addAndRemovePlayers(foodSameTag);
-            oldCol = col; //run this statement once every You tile food object change.
+            oldCol = col; 
+            triggerCalled = false;
         }
     }
 
@@ -164,18 +174,34 @@ public class YouManager : MonoBehaviour
         /*
          * Function runs when a new collider comes into contact with YouTile's collision box.
          * Delays change of foodSameTag array.
+         * 
+         * Used for empty -> filled you tile.
          */
 
         oldCol = col;
         col = collision;
+        triggerCalled = true;
     }
 
-    private bool isOnTopOfTile()
+    private void OnTriggerExit2D(Collider2D collision)
     {
-        /* Function to tell when the player reaches its destination on top of You Tile
-         * and if this statement has been run before on the same gameObject.
+        /* Function runs when a collider leaves the you tile.
+         * 
+         * Used for filled -> empty you tile.
          */
 
-        return col.GetComponent<PlayerManager>().isAtDestination() && col != oldCol;
+        oldCol = collision;
+        //Additional check for whether there is anything left on you tile.
+        UpdateColliderOnTile();
+        triggerCalled = true;
+    }
+
+    private void UpdateColliderOnTile()
+    {
+        /* Find collider that is on top of the you tile.
+         */
+
+        Vector2 youTilePosition = new Vector2(transform.position.x, transform.position.y);
+        col = Physics2D.OverlapPoint(youTilePosition, LayerMask.GetMask("Push"));
     }
 }

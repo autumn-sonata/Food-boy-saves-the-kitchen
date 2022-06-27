@@ -8,7 +8,8 @@ public class PlayerManager : MonoBehaviour
      * Does this by reading the input of the player only at their destination
      */
 
-    public float playerSpeed = 7f;
+    private const float MoveDelay = 0.2f;
+    public const float PlayerSpeed = 7f;
     public Transform destination;
     private float spriteSize;
 
@@ -19,14 +20,14 @@ public class PlayerManager : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    public void Update()
     {
         // Receive input from InputManager only when objects are at their destination. Only update
         // destination position
 
         if (GetComponent<Tags>().isPlayer() && !isChild())
         {
-            transform.position = Vector3.MoveTowards(transform.position, destination.position, spriteSize * Time.deltaTime * playerSpeed);
+            MoveTowardsDest();
             if (isAtDestination())
             {
                 //poll for a new destination location.
@@ -49,20 +50,23 @@ public class PlayerManager : MonoBehaviour
             }
             else
             {
-                GetComponent<Timer>().startTimer(0.2f);
+                GetComponent<Timer>().startTimer(MoveDelay);
             }
         }
 
     }
 
+    public void MoveTowardsDest()
+    {
+        transform.position = Vector3.MoveTowards(transform.position, destination.position, spriteSize * Time.deltaTime * PlayerSpeed);
+    }
+
     public bool isAtDestination()
     {
-        /* Checks if the player has finished moving one tile movement, via parent or itself (if is player).
+        /* Checks if the player has finished moving one tile movement, via most senior parent or itself (if is player).
          */
-        if (isChild())
-            return transform.parent.GetComponent<PlayerManager>().destination.position ==
-                transform.parent.transform.position;
-        return destination.position == transform.position;
+        return transform.root.GetComponent<PlayerManager>().destination.position ==
+            transform.root.transform.position;
     }
 
     public void updateDestinationToCurrPosition()
@@ -74,6 +78,6 @@ public class PlayerManager : MonoBehaviour
     {
         /* True if the gameObject is a child of another gameObject.
          */
-        return transform.parent != null;
+        return transform.root != transform;
     }
 }

@@ -44,25 +44,35 @@ public class PlayerMovementCoordinator : MonoBehaviour
     {
         /* Central call to all other managers.
          */
-        foreach (YouManager youTile in youTiles)
-        {
-            youTile.ChangeYouObject();
-        }
 
-        if (hasMoved())
+        if (allMovementsComplete())
         {
-            //WinManager updates
-            executeWinManagers();
+            //Players can only update moves after everyone reaches destination.
+            //foreach (GameObject player in players)
+            //{
+            //    player.GetComponent<PlayerManager>().MoveObjectDest();
+            //}
 
-            //YouManager updates
-            foreach (YouManager youTile in youTiles)
+            if (hasMoved())
             {
-                youTile.moveExecuted();
-            }
+                foreach (YouManager youTile in youTiles)
+                {
+                    youTile.ChangeYouObject();
+                }
 
-            //ask moveManager to make all PastMovesRecords to record their moves.
-            moveManager.RecordThisMove();
-            checkedMove = true;
+                //WinManager updates
+                executeWinManagers();
+
+                //YouManager updates
+                foreach (YouManager youTile in youTiles)
+                {
+                    youTile.moveExecuted();
+                }
+
+                //ask moveManager to make all PastMovesRecords to record their moves.
+                moveManager.RecordThisMove();
+                checkedMove = true;
+            }
         }
 
         //Undo and restart
@@ -164,12 +174,16 @@ public class PlayerMovementCoordinator : MonoBehaviour
         /* Checks whether the moves for all moving players are complete
          * by checking whether they are all at their destination.
          */
-        if (players.Count() == 0)
+        if (players.Count() == 0 && playerTypes.Values.All(numPlayer => numPlayer == 0))
         {
             //No players, force stop music and undo/reset
             //Placeholder:
-            Debug.LogError("No players detected!");
+            Debug.LogError("No players detected! Game over.");
         }
+        //foreach (var food in players)
+        //{
+        //    Debug.Log(food + " " + food.GetComponent<PlayerManager>().isAtDestination());
+        //}
         return !players.Any(food => !food.GetComponent<PlayerManager>().isAtDestination());
     }
 }
