@@ -12,12 +12,12 @@ public class YouManager : MonoBehaviour
     private Collider2D oldCol;
     private bool triggerCalled; //True if any trigger is called.
 
-    private PlayerMovementCoordinator playerCoordinator; //the main camera
+    private Coordinator playerCoordinator; //the main camera
 
     private void Awake()
     {
         //Initialisation
-        playerCoordinator = GameObject.Find("Main Camera").GetComponent<PlayerMovementCoordinator>();
+        playerCoordinator = GameObject.Find("Main Camera").GetComponent<Coordinator>();
         //Find gameObject on You tile.
         UpdateColliderOnTile(); //Look for any pushable object on You Tile.
         foodSameTag = new List<GameObject>();
@@ -53,7 +53,7 @@ public class YouManager : MonoBehaviour
         {
             /* There is a change in food items on the You tile.
              * Not to be run every single frame, it is expensive!
-             * Pass info to PlayerMovementCoordinator.
+             * Pass info to Coordinator.
              * Wait until parent of col is at destination, then
              * update all oldCol children destinations to their transform position.
              */

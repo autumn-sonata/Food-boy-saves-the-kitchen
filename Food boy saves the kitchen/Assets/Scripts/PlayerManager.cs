@@ -20,7 +20,7 @@ public class PlayerManager : MonoBehaviour
     }
 
     // Update is called once per frame
-    public void Update()
+    public void MoveObject()
     {
         // Receive input from InputManager only when objects are at their destination. Only update
         // destination position
@@ -58,7 +58,8 @@ public class PlayerManager : MonoBehaviour
 
     public void MoveTowardsDest()
     {
-        transform.position = Vector3.MoveTowards(transform.position, destination.position, spriteSize * Time.deltaTime * PlayerSpeed);
+        if (GetComponent<Tags>().isPlayer() && !isChild())
+            transform.position = Vector3.MoveTowards(transform.position, destination.position, spriteSize * Time.deltaTime * PlayerSpeed);
     }
 
     public bool isAtDestination()

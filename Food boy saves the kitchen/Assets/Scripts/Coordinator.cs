@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class PlayerMovementCoordinator : MonoBehaviour
+public class Coordinator : MonoBehaviour
 {
     /* Coordinates all player movements to be in sync. Only allows
      * for next set of movements once all players have finished moving.
@@ -44,35 +44,37 @@ public class PlayerMovementCoordinator : MonoBehaviour
     {
         /* Central call to all other managers.
          */
+        //foreach (GameObject player in players)
+        //{
+        //    player.GetComponent<PlayerManager>().MoveTowardsDest();
+        //}
 
-        if (allMovementsComplete())
+        /* Destination for all players can be updated.
+            */
+        foreach (GameObject player in players)
         {
-            //Players can only update moves after everyone reaches destination.
-            //foreach (GameObject player in players)
-            //{
-            //    player.GetComponent<PlayerManager>().MoveObjectDest();
-            //}
+            player.GetComponent<PlayerManager>().MoveObject();
+        }
 
-            if (hasMoved())
+        if (hasMoved())
+        {
+            foreach (YouManager youTile in youTiles)
             {
-                foreach (YouManager youTile in youTiles)
-                {
-                    youTile.ChangeYouObject();
-                }
-
-                //WinManager updates
-                executeWinManagers();
-
-                //YouManager updates
-                foreach (YouManager youTile in youTiles)
-                {
-                    youTile.moveExecuted();
-                }
-
-                //ask moveManager to make all PastMovesRecords to record their moves.
-                moveManager.RecordThisMove();
-                checkedMove = true;
+                youTile.ChangeYouObject();
             }
+
+            //WinManager updates
+            executeWinManagers();
+
+            //YouManager updates
+            foreach (YouManager youTile in youTiles)
+            {
+                youTile.moveExecuted();
+            }
+
+            //ask moveManager to make all PastMovesRecords to record their moves.
+            moveManager.RecordThisMove();
+            checkedMove = true;
         }
 
         //Undo and restart

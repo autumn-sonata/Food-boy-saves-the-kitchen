@@ -16,7 +16,7 @@ public class PastMovesManager : MonoBehaviour
     private int turn; //int representing number of moves after start of the scene
     private bool canUndo; //cooldown before another key from undo/restart can be activated
     private List<PastMovesRecords> pastRecords; //remembers all components of PastMovesRecords.
-    private PlayerMovementCoordinator movementCoordinator;
+    private Coordinator movementCoordinator;
 
     private void Awake()    
     {
@@ -25,7 +25,7 @@ public class PastMovesManager : MonoBehaviour
         canUndo = true;
         pastRecords = new List<PastMovesRecords>();
         movementCoordinator = 
-            GameObject.Find("Main Camera").GetComponent<PlayerMovementCoordinator>();
+            GameObject.Find("Main Camera").GetComponent<Coordinator>();
     }
 
     private void Start()
