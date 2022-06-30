@@ -14,12 +14,10 @@ public class WinManager : MonoBehaviour
     private Vector2 topLeftCenteredCoord;
 
     private LayerMask push;
-    private GameObject playerCoordinator;
 
     private void Awake()
     {
         push = LayerMask.GetMask("Push");
-        playerCoordinator = GameObject.Find("Main Camera");
 
         /* Prepare for reading the original win configuration.
          */

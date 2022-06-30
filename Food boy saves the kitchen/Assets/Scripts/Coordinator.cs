@@ -10,10 +10,13 @@ public class Coordinator : MonoBehaviour
      * 
      * Also coordinates which food items are to be players among you tiles.
      */
+    private const float MoveDelay = 0.2f;
+
     private HashSet<GameObject> players; //stores every single player on the level
     private Dictionary<string, int> playerTypes; //stores the food types of players on the level
     private bool checkedMove;
 
+    private Timer timer;
     private PastMovesManager moveManager;
     private InputManager inputManager;
     private List<WinManager> winTiles; //All instances of winTiles.
@@ -24,6 +27,7 @@ public class Coordinator : MonoBehaviour
         players = new HashSet<GameObject>();
         playerTypes = new Dictionary<string, int>();
 
+        timer = GetComponent<Timer>();
         moveManager = GameObject.Find("Canvas").GetComponent<PastMovesManager>();
         inputManager = GetComponent<InputManager>();
         winTiles = GameObject.FindGameObjectsWithTag("Win")
@@ -44,17 +48,7 @@ public class Coordinator : MonoBehaviour
     {
         /* Central call to all other managers.
          */
-        //foreach (GameObject player in players)
-        //{
-        //    player.GetComponent<PlayerManager>().MoveTowardsDest();
-        //}
-
-        /* Destination for all players can be updated.
-            */
-        foreach (GameObject player in players)
-        {
-            player.GetComponent<PlayerManager>().MoveObject();
-        }
+        PlayerRoutine();
 
         if (hasMoved())
         {
@@ -171,7 +165,7 @@ public class Coordinator : MonoBehaviour
         }
     }
 
-    private bool allMovementsComplete()
+    public bool allMovementsComplete()
     {
         /* Checks whether the moves for all moving players are complete
          * by checking whether they are all at their destination.
@@ -182,10 +176,56 @@ public class Coordinator : MonoBehaviour
             //Placeholder:
             Debug.LogError("No players detected! Game over.");
         }
-        //foreach (var food in players)
-        //{
-        //    Debug.Log(food + " " + food.GetComponent<PlayerManager>().isAtDestination());
-        //}
+
         return !players.Any(food => !food.GetComponent<PlayerManager>().isAtDestination());
+    }
+
+    private void PlayerRoutine()
+    {
+        if (allMovementsComplete())
+        {
+            //Everyone has stopped movement, poll for new move through input.
+            float horizontalMove = inputManager.KeyDirectionHorz();
+            float verticalMove = inputManager.KeyDirectionVert();
+
+            var list = new List<KeyValuePair<PlayerManager, Vector3>>();
+            //Allow players that are not children to update their destination.
+            foreach (GameObject player in players)
+            {
+                if (Mathf.Abs(horizontalMove) == 1f && timer.countdownFinished() && !player.GetComponent<Tags>().isInAnyTile())
+                {
+                    Vector2 direction = new Vector2(horizontalMove, 0f);
+                    if (player.GetComponent<ObstacleManager>().allowedToMove(direction))
+                        /* Needs to move itself and the other food items in front of it.
+                            * Only done when all other destinations have been reached.
+                            */
+                        list.Add(new KeyValuePair<PlayerManager, Vector3>
+                            (player.GetComponent<PlayerManager>(), new Vector3(horizontalMove, 0f, 0f)));
+                }
+                else if (Mathf.Abs(verticalMove) == 1f && timer.countdownFinished() && !player.GetComponent<Tags>().isInAnyTile())
+                {
+                    Vector2 direction = new Vector2(0f, verticalMove);
+                    if (player.GetComponent<ObstacleManager>().allowedToMove(direction))
+                        /* Needs to move itself and the other food items in front of it.
+                            * Only done when all other destinations have been reached.
+                            */
+                        list.Add(new KeyValuePair<PlayerManager, Vector3>
+                            (player.GetComponent<PlayerManager>(), new Vector3(0f, verticalMove, 0f)));
+                }
+            }
+
+            foreach (var kvp in list)
+            {
+                PlayerManager player = kvp.Key;
+                Vector3 direction = kvp.Value;
+                if (!player.isChild())
+                {
+                    player.moveDestination(direction);
+                }
+            }
+        } else
+        {
+            timer.startTimer(MoveDelay);
+        }
     }
 }
