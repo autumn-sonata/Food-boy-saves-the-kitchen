@@ -17,37 +17,39 @@ public class WinManager : MonoBehaviour
 
     private void Awake()
     {
-        push = LayerMask.GetMask("Push");
-
         /* Prepare for reading the original win configuration.
          */
+        push = LayerMask.GetMask("Push");
         foodSameTagTopLeft = new List<GameObject>();
-
         int x = (int)Math.Ceiling(GetComponent<BoxCollider2D>().size.x);
         int y = (int)Math.Ceiling(GetComponent<BoxCollider2D>().size.y);
         winConfig = new GameObject[y, x];
         topLeftCenteredCoord = new Vector2(transform.position.x - x / 2f,
             transform.position.y + y / 2f) + new Vector2(0.5f, -0.5f);
-
-        GameObject topLeft = Physics2D.OverlapPoint(topLeftCenteredCoord, push).gameObject;
+        
         for (int i = 0; i < y; i++)
         {
             for (int j = 0; j < x; j++)
             {
-                GameObject withinWinTile = Physics2D.OverlapPoint(topLeftCenteredCoord + new Vector2(j, i), push).gameObject;
-                withinWinTile.GetComponent<Tags>().enableWinTileTag();
-                if (withinWinTile.GetComponent<Tags>().isKnife())
-                    withinWinTile.GetComponent<SharpController>().enableOtherWinTileTag();
-                winConfig[i, j] = withinWinTile;
+                Collider2D withinWinTile = Physics2D.OverlapPoint(topLeftCenteredCoord + new Vector2(j, i), push);
+                if (withinWinTile)
+                {
+                    withinWinTile.GetComponent<Tags>().enableWinTileTag();
+                    winConfig[i, j] = withinWinTile.gameObject;
+                }
             }
         }
 
-        GameObject[] topLeftFoods = GameObject.FindGameObjectsWithTag(topLeft.tag);
-        foreach (GameObject food in topLeftFoods)
+        Collider2D topLeft = Physics2D.OverlapPoint(topLeftCenteredCoord, push);
+        if (topLeft)
         {
-            if (!food.GetComponent<Tags>().isInWinTile())
+            GameObject[] topLeftFoods = GameObject.FindGameObjectsWithTag(topLeft.tag);
+            foreach (GameObject food in topLeftFoods)
             {
-                foodSameTagTopLeft.Add(food);
+                if (!food.GetComponent<Tags>().isInWinTile())
+                {
+                    foodSameTagTopLeft.Add(food);
+                }
             }
         }
     }
@@ -76,16 +78,19 @@ public class WinManager : MonoBehaviour
         {
             for (int col = 0; col < winConfig.GetLength(1); col++)
             {
-                Vector2 currPosition = winConfig[row, col].transform.position;
-                if (currPosition != topLeftCenteredCoord + new Vector2(col, row))
+                if (winConfig[row, col])
                 {
-                    //Only replace if found that there is a different food there.
-                    GameObject updatedFood = 
-                        Physics2D.OverlapPoint(topLeftCenteredCoord + new Vector2(col, row), push).gameObject;
-                    winConfig[row, col] = updatedFood;
-                    if (row == 0 && col == 0)
+                    Vector2 currPosition = winConfig[row, col].transform.position;
+                    if (currPosition != topLeftCenteredCoord + new Vector2(col, row))
                     {
-                        updateFoodSameTagTopLeft(updatedFood);
+                        //Only replace if found that there is a different food there.
+                        GameObject updatedFood =
+                            Physics2D.OverlapPoint(topLeftCenteredCoord + new Vector2(col, row), push).gameObject;
+                        winConfig[row, col] = updatedFood;
+                        if (row == 0 && col == 0)
+                        {
+                            updateFoodSameTagTopLeft(updatedFood);
+                        }
                     }
                 }
             }
@@ -108,19 +113,23 @@ public class WinManager : MonoBehaviour
         }
     }
 
-    private bool matchWinConfig(GameObject food)
+    private bool matchWinConfig(GameObject foodTopLeft)
     {
         /* Matches win configuration using the food name of each item.
+         * Note that the win tile must be completely full before a winning condition 
          */
-        Vector2 foodCoord = food.transform.position;
+        Vector2 foodCoord = foodTopLeft.transform.position;
         for (int row = 0; row < winConfig.GetLength(0); row++)
         {
             for (int col = 0; col < winConfig.GetLength(1); col++)
             {
                 Collider2D foodConfig = Physics2D.OverlapPoint(foodCoord + new Vector2(col, row), push);
-                if (foodConfig == null || 
+                if (!winConfig[row, col] || !foodConfig ||
                     winConfig[row, col].tag != foodConfig.tag || 
-                    winConfig[row, col].GetComponent<Tags>().isCut() != foodConfig.GetComponent<Tags>().isCut())
+                    winConfig[row, col].GetComponent<Tags>().isCut() != foodConfig.GetComponent<Tags>().isCut() ||
+                    winConfig[row, col].GetComponent<Tags>().isHot() != foodConfig.GetComponent<Tags>().isHot() ||
+                    winConfig[row, col].GetComponent<Tags>().isCold() != foodConfig.GetComponent<Tags>().isCold() ||
+                    winConfig[row, col].GetComponent<Tags>().isCooked() != foodConfig.GetComponent<Tags>().isCooked())
                 {
                     //Configuration is wrong
                     return false;
@@ -149,14 +158,10 @@ public class WinManager : MonoBehaviour
     private void OnTriggerExit2D(Collider2D collision)
     {
         collision.GetComponent<Tags>().disableWinTileTag();
-        if (collision.GetComponent<Tags>().isKnife())
-            collision.GetComponent<SharpController>().disableOtherWinTileTag();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         collision.GetComponent<Tags>().enableWinTileTag();
-        if (collision.GetComponent<Tags>().isKnife()) 
-            collision.GetComponent<SharpController>().enableOtherWinTileTag();
     }
 }

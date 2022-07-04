@@ -9,10 +9,9 @@ TagManager:
   - Olive
   - You
   - Win
-  - KnifeBlade
-  - KnifeHilt
   - Knife
-  - Saki
+  - Cold
+  - Hot
   layers:
   - Default
   - TransparentFX
@@ -22,7 +21,7 @@ TagManager:
   - UI
   - Heavy
   - Push
-  - 
+  - Sprite
   - 
   - 
   - 

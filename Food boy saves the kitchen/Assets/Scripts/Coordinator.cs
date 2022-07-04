@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,29 +13,43 @@ public class Coordinator : MonoBehaviour
      */
     private const float MoveDelay = 0.2f;
 
-    private HashSet<GameObject> players; //stores every single player on the level
+    private HashSet<GameObject> players; //stores every single player on the level. Managed by YouManager
     private Dictionary<string, int> playerTypes; //stores the food types of players on the level
     private bool checkedMove;
+    private bool isInitialise;
 
     private Timer timer;
     private PastMovesManager moveManager;
     private InputManager inputManager;
+    private List<SpriteManager> sprites;
     private List<WinManager> winTiles; //All instances of winTiles.
     private List<YouManager> youTiles; //All instances of youTiles.
+    private List<ColdManager> coldTiles; //All instances of coldTiles.
+    private List<HotManager> hotTiles; //All instances of hotTiles.
+    private List<TileManager> tiles; //All tiles excluding winTiles.
 
     private void Awake()
     {
+        //Initialisation of players and playerTypes
         players = new HashSet<GameObject>();
         playerTypes = new Dictionary<string, int>();
 
         timer = GetComponent<Timer>();
         moveManager = GameObject.Find("Canvas").GetComponent<PastMovesManager>();
         inputManager = GetComponent<InputManager>();
+        sprites = GetAllSprites();
         winTiles = GameObject.FindGameObjectsWithTag("Win")
             .Select(winTile => winTile.GetComponent<WinManager>()).ToList();
         youTiles = GameObject.FindGameObjectsWithTag("You")
             .Select(youTile => youTile.GetComponent<YouManager>()).ToList();
+        coldTiles = GameObject.FindGameObjectsWithTag("Cold")
+            .Select(coldTile => coldTile.GetComponent<ColdManager>()).ToList();
+        hotTiles = GameObject.FindGameObjectsWithTag("Hot")
+            .Select(hotTile => hotTile.GetComponent<HotManager>()).ToList();
+        tiles = new List<TileManager>();
+        tiles = tiles.Concat(youTiles).Concat(coldTiles).Concat(hotTiles).ToList();
         checkedMove = false;
+        isInitialise = true;
     }
 
     // Start is called before the first frame update
@@ -52,23 +67,63 @@ public class Coordinator : MonoBehaviour
 
         if (hasMoved())
         {
-            foreach (YouManager youTile in youTiles)
+            //COMBINE ALL?
+
+            //at this point, moved to new, oldCol is the one to reenable.
+            //col is all updated already. just ask to change oldCol hot/cold 
+            //properties immediately.
+
+            //Dictionary parameters -> [Tag name: [isCold?, isHot?]]
+            Dictionary<string, bool[]> hotCold = new Dictionary<string, bool[]>();
+
+            foreach (TileManager hotTile in hotTiles)
             {
-                youTile.ChangeYouObject();
+                if (!String.IsNullOrEmpty(hotTile.colFoodTag()))
+                    AddOrUpdateDict(hotCold, hotTile.colFoodTag(), new bool[] { false, true });
             }
 
-            //WinManager updates
+            foreach (TileManager coldTile in coldTiles)
+            {
+                if (!String.IsNullOrEmpty(coldTile.colFoodTag()))
+                    AddOrUpdateDict(hotCold, coldTile.colFoodTag(), new bool[] { true, false });
+            }
+
+            if (!isInitialise)
+            {
+                foreach (TileManager tile in tiles)
+                {
+                    //matches tile to hotCold dictionary.
+                    tile.EnableHotColdOnTile(hotCold);
+                }
+  
+                //You tile updates
+                foreach (TileManager youTile in youTiles)
+                {
+                    youTile.ChangeObject();
+                }
+
+                //Cold tile updates
+                foreach (TileManager coldTile in coldTiles)
+                {
+                    coldTile.ChangeObject();
+                }
+
+                //Hot tile updates
+                foreach (TileManager hotTile in hotTiles)
+                {
+                    hotTile.ChangeObject();
+                }
+            }
+
+            SpriteUpdate();
+
+            //Win tile updates
             executeWinManagers();
-
-            //YouManager updates
-            foreach (YouManager youTile in youTiles)
-            {
-                youTile.moveExecuted();
-            }
 
             //ask moveManager to make all PastMovesRecords to record their moves.
             moveManager.RecordThisMove();
             checkedMove = true;
+            isInitialise = false;
         }
 
         //Undo and restart
@@ -76,7 +131,9 @@ public class Coordinator : MonoBehaviour
         {
             moveManager.DoUndo();
             executeWinManagers(); //update Win Manager to previous state.
+            SpriteUpdate();
 
+            //update players and playerTypes to previous state
             players.Clear();
             playerTypes.Clear();
             UpdatePlayerAttrInfo();
@@ -88,30 +145,15 @@ public class Coordinator : MonoBehaviour
     {
         /* Decrements value of playerType by 1 in playerTypes hashmap.
          */
-        if (playerType.Contains("Knife"))
-        {
-            playerTypes["Knife"]--; //Moves the same object
-        }
-        else
-        {
-            playerTypes[playerType]--;
-        }
+        playerTypes[playerType]--;
     }
 
     public void incrementPlayer(string playerType)
     {
         /* Increments value of playerType by 1 in playerTypes hashmap.
          */
-        if (playerType.Contains("Knife"))
-        {
-            if (!playerTypes.ContainsKey("Knife")) playerTypes.Add("Knife", 0);
-            playerTypes["Knife"]++; //Moves the same object
-        }
-        else
-        {
-            if (!playerTypes.ContainsKey(playerType)) playerTypes.Add(playerType, 0);
+        if (!playerTypes.ContainsKey(playerType)) playerTypes.Add(playerType, 0);
             playerTypes[playerType]++;
-        }
     }
 
     public bool isPlayer(string playerType)
@@ -119,8 +161,6 @@ public class Coordinator : MonoBehaviour
         /* Checks whether the playerType is still a valid player
          * (due to other you tiles having the object on it)
          */
-        if (playerType.Contains("Knife"))
-            return playerTypes["Knife"] > 0;
         return playerTypes[playerType] > 0;
     }
 
@@ -130,6 +170,21 @@ public class Coordinator : MonoBehaviour
          */
         players.RemoveWhere(food => !food.GetComponent<Tags>().isPlayer());
         players.UnionWith(foods); //player tag already enabled
+    }
+
+    public bool allMovementsComplete()
+    {
+        /* Checks whether the moves for all moving players are complete
+         * by checking whether they are all at their destination.
+         */
+        if (players.Count() == 0 && playerTypes.Values.All(numPlayer => numPlayer == 0))
+        {
+            //No players, force stop music and undo/reset
+            //Placeholder:
+            Debug.LogError("No players detected! Game over.");
+        }
+
+        return !players.Any(food => !food.GetComponent<PlayerManager>().isAtDestination());
     }
 
     private bool hasMoved()
@@ -153,31 +208,34 @@ public class Coordinator : MonoBehaviour
     {
         /* Updates players hashset and playerTypes hashmap.
          */
-        foreach (YouManager youTile in youTiles)
+        foreach (TileManager tile in tiles)
         {
-            youTile.Initialise();
+            tile.Initialise();
+        }
+
+        foreach (TileManager youTile in youTiles)
+        {
             players.UnionWith(youTile.playersAttached());
             if (youTile.hasFoodOnYouTile())
             {
-                string tagOnYouTile = youTile.youFoodTag();
-                incrementPlayer(tagOnYouTile);
+                incrementPlayer(youTile.colFoodTag());
             }
         }
     }
 
-    public bool allMovementsComplete()
+    private List<SpriteManager> GetAllSprites()
     {
-        /* Checks whether the moves for all moving players are complete
-         * by checking whether they are all at their destination.
-         */
-        if (players.Count() == 0 && playerTypes.Values.All(numPlayer => numPlayer == 0))
-        {
-            //No players, force stop music and undo/reset
-            //Placeholder:
-            Debug.LogError("No players detected! Game over.");
-        }
+        SpriteManager[] allObjects = FindObjectsOfType<SpriteManager>();
+        return allObjects.ToList();
+    }
 
-        return !players.Any(food => !food.GetComponent<PlayerManager>().isAtDestination());
+    private void SpriteUpdate()
+    {
+        //Update sprites
+        foreach (SpriteManager sprite in sprites)
+        {
+            sprite.UpdateSprites();
+        }
     }
 
     private void PlayerRoutine()
@@ -218,7 +276,7 @@ public class Coordinator : MonoBehaviour
             {
                 PlayerManager player = kvp.Key;
                 Vector3 direction = kvp.Value;
-                if (!player.isChild())
+                if (!player.isChild() && player.GetComponent<Tags>().isPlayer())
                 {
                     player.moveDestination(direction);
                 }
@@ -226,6 +284,28 @@ public class Coordinator : MonoBehaviour
         } else
         {
             timer.startTimer(MoveDelay);
+        }
+    }
+
+    private static void AddOrUpdateDict(Dictionary<string, bool[]> dict, string key, bool[] value)
+    {
+        if (dict.ContainsKey(key))
+        {
+            bool[] lst = dict[key];
+            if (lst.Length != value.Length)
+            {
+                Debug.LogError
+                    ("Dictionary bool[] and provided value array length is not the same.");
+            }
+
+            for (int i = 0; i < lst.Length; i++)
+            {
+                if (!lst[i])
+                    dict[key][i] = value[i];
+            }
+        } else
+        {
+            dict.Add(key, value);
         }
     }
 }

@@ -11,7 +11,6 @@ public class PushObstacleManager : MonoBehaviour
     private LayerMask push;
     private Vector2 directionPush;
     private List<GameObject> inFront; //Does not include the player themselves.
-    private List<GameObject> otherForeFrontParents; //store other forefront parents that come from eg knife.
 
     // Start is called before the first frame update
     private void Awake()
@@ -20,15 +19,6 @@ public class PushObstacleManager : MonoBehaviour
         push = LayerMask.GetMask("Push");
         directionPush = new Vector2(0f, 0f);
         inFront = new List<GameObject>();
-        otherForeFrontParents = new List<GameObject>();
-    }
-
-    public bool hasPushInFront()
-    {
-        /* Checks whether there is any food objects in front of the player 
-         * that is pushed by the player.
-         */
-        return inFront.Count != 0;
     }
 
     public void updateDirection(Vector2 direction)
@@ -40,46 +30,27 @@ public class PushObstacleManager : MonoBehaviour
          * 3) inFront list
          */
 
-        //forget previous inFront list
-
-        if (isSameDirection(direction))
-        {
-            // No need to attach or detach food unless there is suddenly something in front of 
-            // foreFrontOfPlayer that is a push object.
-            foreFrontUpdateSameDir(); //handles foreFrontOfPlayer and inFront list.
-        } else
-        {
-            //There is a change of direction, disassociate what children currently handling and 
-            //attach potential new children to the player.
-            foreFrontUpdateDiffDir(direction);
-        }
-    }
-
-    private void foreFrontUpdateDiffDir(Vector2 direction)
-    {
-        /* Function handles detachment of old children, and updates PushObstacleManager
-         * variables with new information.
-         */
         foreFrontOfPlayer = gameObject;
         directionPush = direction;
-        detachFoodFromPlayer(); //TODO maybe something to do with otherComponent not detaching?
+        detachFoodFromPlayer();
 
-        foreFrontUpdate(directionPush + new Vector2(transform.position.x, transform.position.y), true);
-        attachFoodToPlayer();
-    }
-
-    private void foreFrontUpdateSameDir()
-    {
-        /* Function to run when a same direction is pressed.
-         * Checks whether there are any objects in front of foreFront that can be added and 
+        /* Checks whether there are any objects in front of foreFront that can be added and 
          * update foreFrontOfPlayer and inFront list accordingly.
          */
-
-        foreFrontUpdate(PosInfrontOfPushQueue(), false);
+        foreFrontUpdate(directionPush + new Vector2(transform.position.x, transform.position.y));
         attachFoodToPlayer();
     }
 
-    private void foreFrontUpdate(Vector2 startPosition, bool changeDir)
+    public Vector2 PosInfrontOfPushQueue()
+    {
+        /* Returns the position that is in front
+         * of the front object that the player is pushing.
+         */
+
+        return new Vector2(foreFrontOfPlayer.transform.position.x, foreFrontOfPlayer.transform.position.y) + directionPush;
+    }
+
+    private void foreFrontUpdate(Vector2 startPosition)
     {
         /* Update the foreFrontOfPlayer and inFront list.
          */
@@ -87,27 +58,9 @@ public class PushObstacleManager : MonoBehaviour
         Collider2D foreFront = Physics2D.OverlapPoint(startPosition, push);
         while (foreFront)
         {
-            if (changeDir) UpdateChildPlayer(foreFront);
-            if (foreFront.GetComponent<Tags>().isSharp())
-            {
-                //Make food that pushed into the blade cut.
-                foreFrontOfPlayer.GetComponent<Tags>().enableIsCut();
-            }
-
-            if (foreFrontOfPlayer.GetComponent<Tags>().isPlayer() && foreFrontOfPlayer.GetComponent<Tags>().isSharp())
-            {
-                //Make food in front of the player blade cut.
-                foreFront.GetComponent<Tags>().enableIsCut();
-            }
-
+            UpdateSharp(foreFront);
+            UpdateHotCold(foreFront, i, startPosition);
             foreFrontOfPlayer = foreFront.gameObject;
-            if (foreFrontOfPlayer.GetComponent<Tags>().isKnife() &&
-                !foreFrontOfPlayer.GetComponent<SharpController>().sameOrientation(directionPush))
-            {
-                //Attach entirety of other component and its pushables to this object.
-                foreFrontOfPlayer.GetComponent<SharpController>().makeParentOfOtherComponent();
-                otherForeFrontParents.Add(foreFrontOfPlayer.GetComponent<SharpController>().getOtherComponent());
-            }
 
             inFront.Add(foreFrontOfPlayer);
             foreFront = Physics2D.OverlapPoint(directionPush * ++i + startPosition, push);
@@ -124,41 +77,97 @@ public class PushObstacleManager : MonoBehaviour
         }
     }
 
-    public void detachFoodFromPlayer()
+    private void detachFoodFromPlayer()
     {
         //Clear the inFrontOfPlayer list and detach all children. Update all their
         //destination position to its current transform position as well.
         GetComponent<DetachChildren>().detachAllChildren();
         inFront.Clear();
-        otherForeFrontParents.Clear();
     }
 
-    public Vector2 PosInfrontOfPushQueue()
+    private void UpdateSharp(Collider2D foreFront)
     {
-        /* Returns the position that is in front
-         * of the front object that the player is pushing.
+        /* Updates the food to become cut if there is a sharp object.
          */
 
-        return new Vector2(foreFrontOfPlayer.transform.position.x, foreFrontOfPlayer.transform.position.y) + directionPush;
+        if (foreFront.GetComponent<Tags>().isSharp())
+        {
+            //Make food that pushed into the knife cut.
+            foreFrontOfPlayer.GetComponent<Tags>().enableIsCut();
+        }
+
+        if (foreFrontOfPlayer.GetComponent<Tags>().isSharp())
+        {
+            //Make food in front of the player knife cut.
+            foreFront.GetComponent<Tags>().enableIsCut();
+        }
     }
 
-    public bool allOtherComponentsCanMove()
+    private void UpdateHotCold(Collider2D foreFront, int indexPos, Vector2 startPosition)
     {
-        return otherForeFrontParents.All(parent => parent.GetComponent<SharpController>().canMove(directionPush));
-    }
-
-    private bool isSameDirection(Vector2 newDirection)
-    {
-        /* Checks whether the player is moving in the same direction as previous move.
+        /* Updates the food to become hot/cold. 
+         * If there are both hot and cold adjacent to it, then it will be uncooked.
+         * 
+         * indexPos: Index of the position in the foods that are being pushed by the player,
+         * starting from the foods closest to the player.
          */
-        return directionPush == newDirection;
+
+        //Get item 2 items back (positionally), if there is, else null
+        Collider2D prevByTwo = Physics2D.OverlapPoint(startPosition + directionPush * (indexPos - 2), push);
+
+        //Look at 
+        if (foreFront.GetComponent<Tags>().isHot())
+        {
+            if (foreFrontOfPlayer.GetComponent<Tags>().isCold())
+            {
+                DestroyRoutine(foreFront);
+            } 
+            else if ((indexPos > 0 && prevByTwo.GetComponent<Tags>().isCold()) ||
+                (indexPos == 0 && prevByTwo && prevByTwo.GetComponent<Tags>().isCold() &&
+                prevByTwo.GetComponent<Tags>().isPlayer()))
+            {
+                //Middle becomes uncooked.
+                foreFrontOfPlayer.GetComponent<Tags>().disableCooked();   
+            } 
+            else
+            {
+                foreFrontOfPlayer.GetComponent<Tags>().enableCooked();
+            }
+        } else if (foreFront.GetComponent<Tags>().isCold())
+        {
+            if (foreFrontOfPlayer.GetComponent<Tags>().isHot())
+            {
+                DestroyRoutine(foreFront);
+            } else
+            {
+                foreFrontOfPlayer.GetComponent<Tags>().disableCooked();
+            }
+        } else
+        {
+            //foreFront is neither hot or cold. Temporarily assume to be the status of prev
+            if (foreFrontOfPlayer.GetComponent<Tags>().isHot())
+            {
+                foreFront.GetComponent<Tags>().enableCooked();
+            } else if (foreFrontOfPlayer.GetComponent<Tags>().isCold())
+            {
+                foreFront.GetComponent<Tags>().disableCooked();
+            }
+        }
     }
 
-    private void UpdateChildPlayer(Collider2D foreFront)
+    private void DestroyRoutine(Collider2D foreFront)
     {
-        /* Update direction of pushes of inner players (including foods attached to them)
-         */
-        if (foreFront.GetComponent<Tags>().isPlayer())
-            foreFront.GetComponent<PushObstacleManager>().updateDirection(directionPush);
+        foreFront.gameObject.SetActive(false); //Just deactivated so undo can reactivate it
+        foreFrontOfPlayer.gameObject.SetActive(false);
+
+        if (inFront.Any())
+        {
+            inFront.RemoveAt(inFront.Count - 1);
+            foreFrontOfPlayer = inFront[inFront.Count - 1];
+        }
+        else
+        {
+            Debug.LogError("Player that is pushing should have already been destroyed!");
+        }
     }
 }

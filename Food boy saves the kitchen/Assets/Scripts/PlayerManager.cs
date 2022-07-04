@@ -22,6 +22,7 @@ public class PlayerManager : MonoBehaviour
     {
         if (GetComponent<Tags>().isPlayer() && !isChild())
         {
+            //Constantly moves players that are supposed to move to their destination.
             transform.position = Vector3.MoveTowards(transform.position, destination.position, spriteSize * Time.deltaTime * PlayerSpeed);
         }
     }

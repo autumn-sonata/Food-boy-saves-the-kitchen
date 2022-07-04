@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PastMovesSameTag : MonoBehaviour
 {
-    /* Records the player changes in foodSameTag[] of YouManager.
+    /* Records the player changes in foodSameTag[] of TileManager.
      * To be attached to all You Tile game objects.
      */
 
@@ -45,13 +45,13 @@ public class PastMovesSameTag : MonoBehaviour
     }
 
     private Stack<MoveLogs> moveLogs;
-    private YouManager youTile;
+    private TileManager tile;
 
     // Start is called before the first frame update
     private void Awake()
     {
         moveLogs = new Stack<MoveLogs>();
-        youTile = GetComponent<YouManager>();
+        tile = SelectTileType();
     }
 
     public void RecordMove(int turn)
@@ -59,8 +59,8 @@ public class PastMovesSameTag : MonoBehaviour
         /* Adds entry to moveLogs stack.
          */
 
-        moveLogs.Push(new MoveLogs(turn, new List<GameObject>(youTile.getFoodSameTag()), 
-            youTile.getCol(), youTile.getOldCol()));
+        moveLogs.Push(new MoveLogs(turn, new List<GameObject>(tile.getFoodSameTag()), 
+            tile.getCol(), tile.getOldCol()));
     }
 
     public void Undo(int turn)
@@ -74,7 +74,25 @@ public class PastMovesSameTag : MonoBehaviour
             moveLogs.Push(top);
 
             //Update to previous iteration
-            youTile.Undo(top.getFoodSameTag(), top.getCol(), top.getOldCol());
+            tile.Undo(top.getFoodSameTag(), top.getCol(), top.getOldCol());
         }
+    }
+
+    private TileManager SelectTileType()
+    {
+        /* Choose between the different tile types.
+         */
+
+        if (GetComponent<YouManager>())
+        {
+            return GetComponent<YouManager>();
+        } else if (GetComponent<HotManager>()){
+            return GetComponent<HotManager>();
+        } else if (GetComponent<ColdManager>())
+        {
+            return GetComponent<ColdManager>();
+        }
+        Debug.LogError("Manager not found in PastMovesSameTag.");
+        return null;
     }
 }
