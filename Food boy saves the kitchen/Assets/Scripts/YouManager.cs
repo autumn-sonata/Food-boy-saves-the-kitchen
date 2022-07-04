@@ -36,17 +36,19 @@ public class YouManager : TileManager
     {
         //Update foodSameTag if there are any foods cut/uncut different from col,
         //and abandon them (exclude from foodSameTag)
-
-        bool colCut = col.GetComponent<Tags>().isCut();
-        if (!col.GetComponent<Tags>().isKnife())
+        if (col)
         {
-            foodSameTag.FindAll(food => food.GetComponent<Tags>().isCut() != colCut)
-            .ForEach(food =>
+            bool colCut = col.GetComponent<Tags>().isCut();
+            if (!col.GetComponent<Tags>().isKnife())
             {
-                food.GetComponent<DetachChildren>().detachAllChildren();
-                food.GetComponent<Tags>().disablePlayerTag();
-            });
-            foodSameTag = foodSameTag.FindAll(food => food.GetComponent<Tags>().isPlayer());
+                foodSameTag.FindAll(food => food.GetComponent<Tags>().isCut() != colCut)
+                .ForEach(food =>
+                {
+                    food.GetComponent<DetachChildren>().detachAllChildren();
+                    food.GetComponent<Tags>().disablePlayerTag();
+                });
+                foodSameTag = foodSameTag.FindAll(food => food.GetComponent<Tags>().isPlayer());
+            }
         }
     }
 

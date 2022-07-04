@@ -54,13 +54,13 @@ public abstract class TileManager: MonoBehaviour
              * update all oldCol children destinations to their transform position.
              */
 
-            if (oldCol != null)
+            if (oldCol)
             {
                 //Update foods of previous col and col's tags 
                 OldColRoutine();
             }
 
-            if (col != null)
+            if (col)
             {
                 //Update to new collider
                 NewColRoutine();
