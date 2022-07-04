@@ -4,9 +4,16 @@ using UnityEngine;
 
 public class DetachChildren : MonoBehaviour
 {
-    /* Detaches ALL children from this object using recursion.
+    /* Detaches ALL children that is not a spriterenderer type 
+     * from this object using recursion.
      * Updates all destinations to their current position as well.
      */
+    private int spriteLayer;
+
+    private void Awake()
+    {
+        spriteLayer = LayerMask.NameToLayer("Sprite");
+    }
 
     public void detachAllChildren()
     {
@@ -28,8 +35,11 @@ public class DetachChildren : MonoBehaviour
     {
         foreach (Transform child in children)
         {
-            child.SetParent(null);
-            child.GetComponent<PlayerManager>().updateDestinationToCurrPosition();
+            if (child.gameObject.layer != spriteLayer)
+            {
+                child.SetParent(null);
+                child.GetComponent<PlayerManager>().updateDestinationToCurrPosition();
+            }
         }
     }
 }

@@ -6,16 +6,9 @@ public class Tags : MonoBehaviour
 {
     /* objectTags stores all Tags. Tags control the behaviour of the object.
      * Tags include:
-     * 1) Player
+     * 1) Is player
      * 2) Part of winTile
      * 3) Part of youTile
-<<<<<<< Updated upstream
-     * 4) Is sharp
-     * 5) Is cut
-     * If the tag e.g Player is not found at the current moment, then disable Player behaviour.
-     */
-    private string[] objectTags = new string[5];
-=======
      * 4) Part of hotTile
      * 5) Part of coldTile
      * 6) Part of heavyTile
@@ -32,62 +25,54 @@ public class Tags : MonoBehaviour
     {
         return gameObject.tag == "Knife";
     }
->>>>>>> Stashed changes
 
-    public bool isKnife()
-    {
-        return gameObject.tag == "KnifeHilt" || gameObject.tag == "KnifeBlade";
-    }
     public bool isPlayer()
     {
-        return objectTags[0] == "Player";
+        return objectTags[0];
     }
 
     public void disablePlayerTag()
     {
-        objectTags[0] = null;
+        objectTags[0] = false;
     }
 
     public void enablePlayerTag()
     {
-        objectTags[0] = "Player";
+        objectTags[0] = true;
     }
 
     public void enableWinTileTag()
     {
-        objectTags[1] = "WinTile";
+        objectTags[1] = true;
     }
 
     public void disableWinTileTag()
     {
-        objectTags[1] = null;
+        objectTags[1] = false;
     }
 
     public bool isInWinTile()
     {
-        return objectTags[1] == "WinTile";
+        return objectTags[1];
     }
 
     public void enableYouTileTag()
     {
-        objectTags[2] = "YouTile";
+        objectTags[2] = true;
     }
 
     public void disableYouTileTag()
     {
-        objectTags[2] = null;
+        objectTags[2] = false;
     }
 
     public bool isInYouTile()
     {
-        return objectTags[2] == "YouTile";
+        return objectTags[2];
     }
 
     public bool isInAnyTile()
     {
-<<<<<<< Updated upstream
-        return objectTags[1] == "WinTile" || objectTags[2] == "YouTile";
-=======
         for (int i = 1; i < 6; i++)
         {
             if (objectTags[i])
@@ -109,26 +94,26 @@ public class Tags : MonoBehaviour
     public bool isInHotTile()
     {
         return objectTags[3];
->>>>>>> Stashed changes
     }
 
-    public void enableIsSharp()
+    public void enableColdTileTag()
     {
-        objectTags[3] = "Sharp";
+        objectTags[4] = true;
     }
 
-    public void disableIsSharp()
+    public void disableColdTileTag()
     {
-<<<<<<< Updated upstream
-        objectTags[3] = null;
-=======
+        objectTags[4] = false;
+    }
+
+    public bool isInColdTile()
+    {
         return objectTags[4];
     }
 
     public void enableHeavyTileTag()
     {
         objectTags[5] = true;
->>>>>>> Stashed changes
     }
 
     public void disableHeavyTileTag()
@@ -138,19 +123,16 @@ public class Tags : MonoBehaviour
 
     public bool isInHeavyTile()
     {
-        return objectTags[3] == "Sharp";
+        return objectTags[5];
     }
 
     public void enableIsSharp()
     {
-        objectTags[4] = "Cut";
+        objectTags[6] = true;
     }
 
     public bool isSharp()
     {
-<<<<<<< Updated upstream
-        return objectTags[4] == "Cut";
-=======
         return objectTags[6];
     }
 
@@ -207,17 +189,16 @@ public class Tags : MonoBehaviour
     public bool isCooked()
     {
         return objectTags[10];
->>>>>>> Stashed changes
     }
 
-    public string[] getTags()
+    public bool[] getTags()
     {
         /* To record tags for undo.
          */
         return objectTags;
     }
     
-    public void setTags(string[] tags)
+    public void setTags(bool[] tags)
     {
         /* To set tag in the case of undo
          */

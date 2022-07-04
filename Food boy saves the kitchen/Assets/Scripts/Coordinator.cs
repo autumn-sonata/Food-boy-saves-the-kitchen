@@ -21,36 +21,33 @@ public class Coordinator : MonoBehaviour
     private Timer timer;
     private PastMovesManager moveManager;
     private InputManager inputManager;
+    private List<SpriteManager> sprites;
     private List<WinManager> winTiles; //All instances of winTiles.
     private List<YouManager> youTiles; //All instances of youTiles.
-<<<<<<< Updated upstream
-=======
     private List<ColdManager> coldTiles; //All instances of coldTiles.
     private List<HotManager> hotTiles; //All instances of hotTiles.
     private List<TileManager> tiles; //All tiles excluding winTiles.
->>>>>>> Stashed changes
 
     private void Awake()
     {
+        //Initialisation of players and playerTypes
         players = new HashSet<GameObject>();
         playerTypes = new Dictionary<string, int>();
 
         timer = GetComponent<Timer>();
         moveManager = GameObject.Find("Canvas").GetComponent<PastMovesManager>();
         inputManager = GetComponent<InputManager>();
+        sprites = GetAllSprites();
         winTiles = GameObject.FindGameObjectsWithTag("Win")
             .Select(winTile => winTile.GetComponent<WinManager>()).ToList();
         youTiles = GameObject.FindGameObjectsWithTag("You")
             .Select(youTile => youTile.GetComponent<YouManager>()).ToList();
-<<<<<<< Updated upstream
-=======
         coldTiles = GameObject.FindGameObjectsWithTag("Cold")
             .Select(coldTile => coldTile.GetComponent<ColdManager>()).ToList();
         hotTiles = GameObject.FindGameObjectsWithTag("Hot")
             .Select(hotTile => hotTile.GetComponent<HotManager>()).ToList();
         tiles = new List<TileManager>();
         tiles = tiles.Concat(youTiles).Concat(coldTiles).Concat(hotTiles).ToList();
->>>>>>> Stashed changes
         checkedMove = false;
         isInitialise = true;
     }
@@ -70,20 +67,6 @@ public class Coordinator : MonoBehaviour
 
         if (hasMoved())
         {
-<<<<<<< Updated upstream
-            foreach (YouManager youTile in youTiles)
-            {
-                youTile.ChangeYouObject();
-            }
-
-            //WinManager updates
-            executeWinManagers();
-
-            //YouManager updates
-            foreach (YouManager youTile in youTiles)
-            {
-                youTile.moveExecuted();
-=======
             //COMBINE ALL?
 
             //at this point, moved to new, oldCol is the one to reenable.
@@ -130,8 +113,12 @@ public class Coordinator : MonoBehaviour
                 {
                     hotTile.ChangeObject();
                 }
->>>>>>> Stashed changes
             }
+
+            SpriteUpdate();
+
+            //Win tile updates
+            executeWinManagers();
 
             //ask moveManager to make all PastMovesRecords to record their moves.
             moveManager.RecordThisMove();
@@ -144,7 +131,9 @@ public class Coordinator : MonoBehaviour
         {
             moveManager.DoUndo();
             executeWinManagers(); //update Win Manager to previous state.
+            SpriteUpdate();
 
+            //update players and playerTypes to previous state
             players.Clear();
             playerTypes.Clear();
             UpdatePlayerAttrInfo();
@@ -156,30 +145,15 @@ public class Coordinator : MonoBehaviour
     {
         /* Decrements value of playerType by 1 in playerTypes hashmap.
          */
-        if (playerType.Contains("Knife"))
-        {
-            playerTypes["Knife"]--; //Moves the same object
-        }
-        else
-        {
-            playerTypes[playerType]--;
-        }
+        playerTypes[playerType]--;
     }
 
     public void incrementPlayer(string playerType)
     {
         /* Increments value of playerType by 1 in playerTypes hashmap.
          */
-        if (playerType.Contains("Knife"))
-        {
-            if (!playerTypes.ContainsKey("Knife")) playerTypes.Add("Knife", 0);
-            playerTypes["Knife"]++; //Moves the same object
-        }
-        else
-        {
-            if (!playerTypes.ContainsKey(playerType)) playerTypes.Add(playerType, 0);
+        if (!playerTypes.ContainsKey(playerType)) playerTypes.Add(playerType, 0);
             playerTypes[playerType]++;
-        }
     }
 
     public bool isPlayer(string playerType)
@@ -187,8 +161,6 @@ public class Coordinator : MonoBehaviour
         /* Checks whether the playerType is still a valid player
          * (due to other you tiles having the object on it)
          */
-        if (playerType.Contains("Knife"))
-            return playerTypes["Knife"] > 0;
         return playerTypes[playerType] > 0;
     }
 
@@ -236,41 +208,21 @@ public class Coordinator : MonoBehaviour
     {
         /* Updates players hashset and playerTypes hashmap.
          */
-<<<<<<< Updated upstream
-        foreach (YouManager youTile in youTiles)
-=======
         foreach (TileManager tile in tiles)
         {
             tile.Initialise();
         }
 
         foreach (TileManager youTile in youTiles)
->>>>>>> Stashed changes
         {
             players.UnionWith(youTile.playersAttached());
             if (youTile.hasFoodOnYouTile())
             {
-                string tagOnYouTile = youTile.youFoodTag();
-                incrementPlayer(tagOnYouTile);
+                incrementPlayer(youTile.colFoodTag());
             }
         }
     }
 
-<<<<<<< Updated upstream
-    public bool allMovementsComplete()
-    {
-        /* Checks whether the moves for all moving players are complete
-         * by checking whether they are all at their destination.
-         */
-        if (players.Count() == 0 && playerTypes.Values.All(numPlayer => numPlayer == 0))
-        {
-            //No players, force stop music and undo/reset
-            //Placeholder:
-            Debug.LogError("No players detected! Game over.");
-        }
-
-        return !players.Any(food => !food.GetComponent<PlayerManager>().isAtDestination());
-=======
     private List<SpriteManager> GetAllSprites()
     {
         SpriteManager[] allObjects = FindObjectsOfType<SpriteManager>();
@@ -284,7 +236,6 @@ public class Coordinator : MonoBehaviour
         {
             sprite.UpdateSprites();
         }
->>>>>>> Stashed changes
     }
 
     private void PlayerRoutine()
@@ -325,7 +276,7 @@ public class Coordinator : MonoBehaviour
             {
                 PlayerManager player = kvp.Key;
                 Vector3 direction = kvp.Value;
-                if (!player.isChild())
+                if (!player.isChild() && player.GetComponent<Tags>().isPlayer())
                 {
                     player.moveDestination(direction);
                 }

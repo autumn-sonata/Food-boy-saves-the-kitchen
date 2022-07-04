@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class SharpBlade : MonoBehaviour
 {
-    /* Script to be connected to the blade of the knife.
+    /* Determines that this object is sharp and is able to cut adjacent foods.
+     * Behaves exactly like a food object otherwise.
      */
 
-    // Start is called before the first frame update
     void Awake()
     {
         GetComponent<Tags>().enableIsSharp();

@@ -11,15 +11,17 @@ public class PastMovesRecords : MonoBehaviour
      */
     private class MoveLogs
     {
-        private int turn;
-        private Vector3 prevPosition;
-        private List<string> tags;
+        private readonly int turn;
+        private readonly Vector3 prevPosition;
+        private readonly List<bool> tags;
+        private readonly bool isActive;
 
-        public MoveLogs(int turn, Vector3 prevPosition, List<string> tags)
+        public MoveLogs(int turn, Vector3 prevPosition, List<bool> tags, bool isActive)
         {
             this.turn = turn;
             this.prevPosition = prevPosition;
             this.tags = tags;
+            this.isActive = isActive;
         }
 
         public int getTurn()
@@ -32,15 +34,20 @@ public class PastMovesRecords : MonoBehaviour
             return prevPosition;
         }
 
-        public List<string> getTags()
+        public List<bool> getTags()
         {
             return tags;
+        }
+
+        public bool getActive()
+        {
+            return isActive;
         }
     }
 
     private Stack<MoveLogs> moveLogs;
     private PastMovesManager moveManager; //higher in hierarchy
-    private PastMovesSameTag sameTagManager; //lower in hierarchy. For you tile.
+    private PastMovesSameTag sameTagManager; //lower in hierarchy. For tiles.
  
     // Start is called before the first frame update
     private void Awake()
@@ -56,9 +63,9 @@ public class PastMovesRecords : MonoBehaviour
          */
     
         moveLogs.Push(new MoveLogs(turnNumber(), transform.position, 
-            new List<string>(GetComponent<Tags>().getTags().ToList())));
+            new List<bool>(GetComponent<Tags>().getTags().ToList()), gameObject.activeInHierarchy));
 
-        if (isYouTile()) sameTagManager.RecordMove(turnNumber());
+        if (isTile()) sameTagManager.RecordMove(turnNumber());
     }
 
     public void Undo()
@@ -74,12 +81,16 @@ public class PastMovesRecords : MonoBehaviour
             moveLogs.Push(top);
 
             //Update to previous iteration
-            transform.position = top.getPrevPosition();
-            if (GetComponent<PlayerManager>())
-                GetComponent<PlayerManager>().updateDestinationToCurrPosition();
-            GetComponent<Tags>().setTags(top.getTags().ToArray());
+            if (top.getActive())
+            {
+                gameObject.SetActive(true);
+                transform.position = top.getPrevPosition();
+                if (GetComponent<PlayerManager>())
+                    GetComponent<PlayerManager>().updateDestinationToCurrPosition();
+                GetComponent<Tags>().setTags(top.getTags().ToArray());
 
-            if (isYouTile()) sameTagManager.Undo(turnNumber());
+                if (isTile()) sameTagManager.Undo(turnNumber());
+            }
         }
     }
 
@@ -88,7 +99,7 @@ public class PastMovesRecords : MonoBehaviour
         return moveManager.getTurn();
     } 
 
-    private bool isYouTile()
+    private bool isTile()
     {
         return sameTagManager != null;
     }
