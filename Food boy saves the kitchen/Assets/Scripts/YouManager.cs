@@ -12,6 +12,7 @@ public class YouManager : MonoBehaviour
     private Collider2D oldCol;
     private bool triggerCalled; //True if any trigger is called.
 
+<<<<<<< Updated upstream
     private Coordinator playerCoordinator; //the main camera
 
     private void Awake()
@@ -118,24 +119,73 @@ public class YouManager : MonoBehaviour
     {
         //Update foodSameTag if there are any cut foods, and abandon them (exclude from foodSameTag)
         foodSameTag.FindAll(food => !food.GetComponent<Tags>().isKnife() && food.GetComponent<Tags>().isCut())
+=======
+    protected override void OldColRoutine()
+    {
+        playerCoordinator.decrementPlayer(oldCol.tag);
+
+        //Update all the Player and You tags, foodSameTag and destination of all objects.
+        if (!playerCoordinator.isPlayer(oldCol.tag))
+        {
+            DisableFoodSameTagProperty();
+        }
+        disableTileProperty();
+    }
+
+    protected override void NewColRoutine()
+    {
+        //Update to new collider
+        playerCoordinator.incrementPlayer(col.tag);
+        enableTileProperty();
+    }
+
+    protected override void PlayerAdjustment()
+    {
+        playerCoordinator.addAndRemovePlayers(foodSameTag);
+    }
+
+    protected override void MoveExecuted()
+    {
+        //Update foodSameTag if there are any foods cut/uncut different from col,
+        //and abandon them (exclude from foodSameTag)
+
+        bool colCut = col.GetComponent<Tags>().isCut();
+        if (!col.GetComponent<Tags>().isKnife())
+        {
+            foodSameTag.FindAll(food => food.GetComponent<Tags>().isCut() != colCut)
+>>>>>>> Stashed changes
             .ForEach(food =>
             {
                 food.GetComponent<DetachChildren>().detachAllChildren();
                 food.GetComponent<Tags>().disablePlayerTag();
             });
+<<<<<<< Updated upstream
         foodSameTag = foodSameTag.FindAll(food => !food.GetComponent<Tags>().isCut() || food.GetComponent<Tags>().isKnife());
     }
 
     public List<GameObject> playersAttached()
+=======
+            foodSameTag = foodSameTag.FindAll(food => food.GetComponent<Tags>().isPlayer());
+        }
+    }
+
+    protected override void enableTileProperty()
+>>>>>>> Stashed changes
     {
         if (foodSameTag == null)
             Debug.LogError("FoodSameTag in YouManager is not initialised!");
         return foodSameTag;
     }
 
+<<<<<<< Updated upstream
     public bool hasFoodOnYouTile()
     {
         return col != null;
+=======
+    protected override void disableTileProperty()
+    {
+        oldCol.GetComponent<Tags>().disableYouTileTag();
+>>>>>>> Stashed changes
     }
 
     public string youFoodTag()
@@ -145,6 +195,7 @@ public class YouManager : MonoBehaviour
 
     public List<GameObject> getFoodSameTag()
     {
+<<<<<<< Updated upstream
         /* Gets all foods with tag similar to col.
          */
         return foodSameTag;
@@ -203,5 +254,12 @@ public class YouManager : MonoBehaviour
 
         Vector2 youTilePosition = new Vector2(transform.position.x, transform.position.y);
         col = Physics2D.OverlapPoint(youTilePosition, LayerMask.GetMask("Push"));
+=======
+        foreach (GameObject food in foodSameTag)
+        {
+            food.GetComponent<DetachChildren>().detachAllChildren();
+            food.GetComponent<Tags>().disablePlayerTag();
+        }
+>>>>>>> Stashed changes
     }
 }
