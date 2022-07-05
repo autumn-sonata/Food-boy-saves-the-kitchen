@@ -44,7 +44,7 @@ public abstract class TileManager: MonoBehaviour
     }
     public void ChangeObject()
     {
-        //called when the object on top of tile has been changed
+        //Called when the object on top of tile has been changed
         if (triggerCalled)
         {
             /* There is a change in items on the tile.
@@ -84,7 +84,75 @@ public abstract class TileManager: MonoBehaviour
         }
         MoveExecuted();
         PlayerAdjustment();
-    } 
+    }
+
+    public void EnableHotColdOnTile(Dictionary<string, bool[]> hotCold)
+    {
+        /* Enable hot cold property when stepping off a tile.
+         * 
+         * Check with Coordinator whether there are any of the same
+         * tag as oldCol in hot and cold. Enable hot/cold for oldCol
+         * accordingly.
+         */
+        if (oldCol && triggerCalled)
+        {
+            Tags oldColTags = oldCol.GetComponent<Tags>();
+            if (hotCold.ContainsKey(oldCol.tag) && !oldCol.GetComponent<Tags>().isInAnyTile())
+            {
+                bool[] enableHotCold = hotCold[oldCol.tag];
+                if (enableHotCold.Length != 2)
+                    Debug.LogError("hotCold dictionary bool[] is not of length 2.");
+
+                if (enableHotCold[0])
+                {
+                    oldColTags.enableCold();
+                }
+                else
+                {
+                    oldColTags.disableCold();
+                }
+
+                if (enableHotCold[1])
+                {
+                    oldColTags.enableHot();
+                }
+                else
+                {
+                    oldColTags.disableHot();
+                }
+            }
+            else
+            {
+                oldColTags.disableHot();
+                oldColTags.disableCold();
+            }
+        }
+    }
+
+    public void CheckHotCold(Dictionary<string, bool[]> hotCold)
+    {
+        /* If the same tag has both hot and cold, deactivate all objects that
+         * are not on tiles. Update foodSameTag accordingly.
+         */
+
+        if (hotCold.ContainsKey(col.tag) && hotCold[col.tag].All(qn => qn))
+        {
+            //Both hot and cold.
+            //Deactivate all food:
+            foreach (GameObject food in foodSameTag)
+            {
+                if (!food.GetComponent<Tags>().isInAnyTile())
+                {
+                    //Deactivate
+                    food.GetComponent<DetachChildren>().detachAllChildren();
+                    food.GetComponent<Tags>().enableInactive();
+                }
+            }
+
+            //Change foodSameTag to match
+            foodSameTag = foodSameTag.FindAll(food => !food.GetComponent<Tags>().isInactive());
+        }
+    }
 
     public List<GameObject> playersAttached()
     {
@@ -170,49 +238,6 @@ public abstract class TileManager: MonoBehaviour
         //Disable hot cold property when stepping into a tile.
         col.GetComponent<Tags>().disableCold();
         col.GetComponent<Tags>().disableHot();
-    }
-
-    public void EnableHotColdOnTile(Dictionary<string, bool[]> hotCold)
-    {
-        /* Enable hot cold property when stepping off a tile.
-         * 
-         * Check with Coordinator whether there are any of the same
-         * tag as oldCol in hot and cold. Enable hot/cold for oldCol
-         * accordingly.
-         */
-        if (oldCol && triggerCalled)
-        {
-            Tags oldColTags = oldCol.GetComponent<Tags>();
-            if (hotCold.ContainsKey(oldCol.tag) && !oldCol.GetComponent<Tags>().isInAnyTile())
-            {
-                bool[] enableHotCold = hotCold[oldCol.tag];
-                if (enableHotCold.Length != 2)
-                    Debug.LogError("hotCold dictionary bool[] is not of length 2.");
-
-                if (enableHotCold[0])
-                {
-                    oldColTags.enableCold();
-                }
-                else
-                {
-                    oldColTags.disableCold();
-                }
-
-                if (enableHotCold[1])
-                {
-                    oldColTags.enableHot();
-                }
-                else
-                {
-                    oldColTags.disableHot();
-                }
-            }
-            else
-            {
-                oldColTags.disableHot();
-                oldColTags.disableCold();
-            }
-        }
     }
 
     protected abstract void OldColRoutine(); //oldCol updates.

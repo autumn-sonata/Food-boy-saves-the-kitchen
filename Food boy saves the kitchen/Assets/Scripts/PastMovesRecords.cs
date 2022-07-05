@@ -83,7 +83,8 @@ public class PastMovesRecords : MonoBehaviour
             //Update to previous iteration
             if (top.getActive())
             {
-                gameObject.SetActive(true);
+
+                gameObject.SetActive(true); 
                 transform.position = top.getPrevPosition();
                 if (GetComponent<PlayerManager>())
                     GetComponent<PlayerManager>().updateDestinationToCurrPosition();

@@ -64,54 +64,43 @@ public class Coordinator : MonoBehaviour
         /* Central call to all other managers.
          */
         PlayerRoutine();
+        CheckInactive();
 
         if (hasMoved())
         {
-            //COMBINE ALL?
-
-            //at this point, moved to new, oldCol is the one to reenable.
+            //At this point, moved to new, oldCol is the one to reenable.
             //col is all updated already. just ask to change oldCol hot/cold 
             //properties immediately.
 
-            //Dictionary parameters -> [Tag name: [isCold?, isHot?]]
+            /* Dictionary parameters -> [Tag name: [isCold?, isHot?]]
+             * 
+             * The hotCold hashmap represents the objects on hot and cold 
+             * tiles and whether  
+             */
             Dictionary<string, bool[]> hotCold = new Dictionary<string, bool[]>();
 
-            foreach (TileManager hotTile in hotTiles)
-            {
-                if (!String.IsNullOrEmpty(hotTile.colFoodTag()))
-                    AddOrUpdateDict(hotCold, hotTile.colFoodTag(), new bool[] { false, true });
-            }
-
-            foreach (TileManager coldTile in coldTiles)
-            {
-                if (!String.IsNullOrEmpty(coldTile.colFoodTag()))
-                    AddOrUpdateDict(hotCold, coldTile.colFoodTag(), new bool[] { true, false });
-            }
+            UpdateHotColdPlayers(hotCold);
 
             if (!isInitialise)
             {
                 foreach (TileManager tile in tiles)
                 {
-                    //matches tile to hotCold dictionary.
+                    /* Enable hot/cold again for food 
+                     * items going out of tile
+                     */
                     tile.EnableHotColdOnTile(hotCold);
                 }
   
-                //You tile updates
-                foreach (TileManager youTile in youTiles)
+                //You, cold and hot tile tag + updates in case change of objects
+                foreach (TileManager tile in tiles)
                 {
-                    youTile.ChangeObject();
+                    tile.ChangeObject();
                 }
 
-                //Cold tile updates
-                foreach (TileManager coldTile in coldTiles)
+                //Deactivate objects if both hot and cold.
+                foreach (TileManager tile in tiles)
                 {
-                    coldTile.ChangeObject();
-                }
-
-                //Hot tile updates
-                foreach (TileManager hotTile in hotTiles)
-                {
-                    hotTile.ChangeObject();
+                    tile.CheckHotCold(hotCold);
                 }
             }
 
@@ -172,7 +161,7 @@ public class Coordinator : MonoBehaviour
         players.UnionWith(foods); //player tag already enabled
     }
 
-    public bool allMovementsComplete()
+    private bool allMovementsComplete()
     {
         /* Checks whether the moves for all moving players are complete
          * by checking whether they are all at their destination.
@@ -231,7 +220,18 @@ public class Coordinator : MonoBehaviour
 
     private void SpriteUpdate()
     {
-        //Update sprites
+        /* Update sprites to match tags.
+         * However, if gameObject isInactive, then first: 
+         * 1) Disable gameObjects
+         * 2) Update sprites list.
+         */
+
+        // PROBLEM: CHEESE (3, 4) NOT IN SPRITES
+        List<SpriteManager> toDisable = sprites.FindAll(sprite => 
+            sprite.GetComponent<Tags>().isInactive());
+        //sprites = sprites.FindAll(sprite => !sprite.GetComponent<Tags>().isInactive());
+        toDisable.ForEach(sprite => sprite.gameObject.SetActive(false));
+
         foreach (SpriteManager sprite in sprites)
         {
             sprite.UpdateSprites();
@@ -284,6 +284,45 @@ public class Coordinator : MonoBehaviour
         } else
         {
             timer.startTimer(MoveDelay);
+        }
+    }
+
+    private void CheckInactive()
+    {
+        players.RemoveWhere(player => player.GetComponent<Tags>().isInactive());
+    }
+
+    private void UpdateHotColdPlayers(Dictionary<string, bool[]> hotCold)
+    {
+        /* Initialises the hotCold hashmap.
+         * Updates players based on hotCold.
+         */
+        foreach (TileManager hotTile in hotTiles)
+        {
+            if (!String.IsNullOrEmpty(hotTile.colFoodTag()))
+                AddOrUpdateDict(hotCold, hotTile.colFoodTag(), new bool[] { false, true });
+        }
+
+        foreach (TileManager coldTile in coldTiles)
+        {
+            if (!String.IsNullOrEmpty(coldTile.colFoodTag()))
+                AddOrUpdateDict(hotCold, coldTile.colFoodTag(), new bool[] { true, false });
+        }
+
+        List<GameObject> removeFromPlayer = new List<GameObject>();
+        //Update players if there are destroys due to same food item being on hot and cold tile.
+        foreach (GameObject player in players)
+        {
+            if (hotCold.ContainsKey(player.tag) && hotCold[player.tag].All(qn => qn))
+            {
+                //Both hot and cold. Remove from player from players.
+                removeFromPlayer.Add(player);
+            }
+        }
+
+        foreach (GameObject player in removeFromPlayer)
+        {
+            players.Remove(player);
         }
     }
 

@@ -29,7 +29,6 @@ public class PushObstacleManager : MonoBehaviour
          * 2) directionPush
          * 3) inFront list
          */
-
         foreFrontOfPlayer = gameObject;
         directionPush = direction;
         detachFoodFromPlayer();
@@ -37,7 +36,8 @@ public class PushObstacleManager : MonoBehaviour
         /* Checks whether there are any objects in front of foreFront that can be added and 
          * update foreFrontOfPlayer and inFront list accordingly.
          */
-        foreFrontUpdate(directionPush + new Vector2(transform.position.x, transform.position.y));
+        foreFrontUpdate(directionPush + 
+            new Vector2(transform.position.x, transform.position.y));
         attachFoodToPlayer();
     }
 
@@ -47,7 +47,8 @@ public class PushObstacleManager : MonoBehaviour
          * of the front object that the player is pushing.
          */
 
-        return new Vector2(foreFrontOfPlayer.transform.position.x, foreFrontOfPlayer.transform.position.y) + directionPush;
+        return new Vector2(foreFrontOfPlayer.transform.position.x, 
+            foreFrontOfPlayer.transform.position.y) + directionPush;
     }
 
     private void foreFrontUpdate(Vector2 startPosition)
@@ -114,8 +115,6 @@ public class PushObstacleManager : MonoBehaviour
 
         //Get item 2 items back (positionally), if there is, else null
         Collider2D prevByTwo = Physics2D.OverlapPoint(startPosition + directionPush * (indexPos - 2), push);
-
-        //Look at 
         if (foreFront.GetComponent<Tags>().isHot())
         {
             if (foreFrontOfPlayer.GetComponent<Tags>().isCold())
@@ -157,17 +156,15 @@ public class PushObstacleManager : MonoBehaviour
 
     private void DestroyRoutine(Collider2D foreFront)
     {
-        foreFront.gameObject.SetActive(false); //Just deactivated so undo can reactivate it
-        foreFrontOfPlayer.gameObject.SetActive(false);
+        foreFront.GetComponent<DetachChildren>().detachAllChildren();
+        foreFrontOfPlayer.GetComponent<DetachChildren>().detachAllChildren();
+        foreFront.GetComponent<Tags>().enableInactive(); //Just deactivated so undo can reactivate it
+        foreFrontOfPlayer.GetComponent<Tags>().enableInactive();
 
         if (inFront.Any())
         {
             inFront.RemoveAt(inFront.Count - 1);
             foreFrontOfPlayer = inFront[inFront.Count - 1];
-        }
-        else
-        {
-            Debug.LogError("Player that is pushing should have already been destroyed!");
         }
     }
 }
