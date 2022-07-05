@@ -17,6 +17,7 @@ public class Tags : MonoBehaviour
      * 9) Is hot
      * 10) Is cold
      * 11) Is cooked (cold is uncooked)
+     * 12) Is inactive (in the level)
      * If the tag e.g Player is not found at the current moment, then disable Player behaviour.
      */
     private bool[] objectTags = new bool[15];
@@ -189,6 +190,21 @@ public class Tags : MonoBehaviour
     public bool isCooked()
     {
         return objectTags[10];
+    }
+
+    public void enableInactive()
+    {
+        objectTags[11] = true;
+    }
+
+    public void disableInactive()
+    {
+        objectTags[11] = false;
+    }
+
+    public bool isInactive()
+    {
+        return objectTags[11];
     }
 
     public bool[] getTags()

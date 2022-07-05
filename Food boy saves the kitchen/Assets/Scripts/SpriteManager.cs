@@ -46,6 +46,7 @@ public class SpriteManager : MonoBehaviour
     public void UpdateSprites()
     {
         /* Updates the sprites based on the tags.
+         * If the object is supposed to be inactive, disable the gameObject.
          */
         Tags tag = GetComponent<Tags>();
 
@@ -59,9 +60,9 @@ public class SpriteManager : MonoBehaviour
         }
 
         //Hot or cold?
-        if (tag.isCold() && tag.isHot())
+        if (tag.isCold() && tag.isHot() && !tag.isInactive())
         {
-            Debug.LogError("Cannot be hot and cold at the same time, destroy.");
+            Debug.LogError(gameObject + " was supposed to be destroyed.");
         }
         else if (tag.isCold())
         {
