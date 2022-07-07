@@ -236,4 +236,23 @@ public class Tags : MonoBehaviour
          */
         objectTags = tags;
     }
+
+    public void printTags()
+    {
+        /* Prints out the tags for debugging purposes.
+         */
+        Debug.Log("1) Is player " + objectTags[0] +
+                  "\n2) Part of winTile " + objectTags[1] +
+                  "\n3) Part of youTile " + objectTags[2] +
+                  "\n4) Part of hotTile " + objectTags[3] +
+                  "\n5) Part of coldTile " + objectTags[4] +
+                  "\n6) Part of heavyTile " + objectTags[5] +
+                  "\n7) Is heavy " + objectTags[6] +
+                  "\n8) Is sharp " + objectTags[7] +
+                  "\n9) Is cut " + objectTags[8] +
+                  "\n10) Is hot " + objectTags[9] +
+                  "\n11) Is cold " + objectTags[10] +
+                  "\n12) Is cooked " + objectTags[11] +
+                  "\n13) Is inactive " + objectTags[12]);
+    }
 }
