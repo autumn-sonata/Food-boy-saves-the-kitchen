@@ -35,7 +35,6 @@ public abstract class TileManager: MonoBehaviour
         {
             //Initialise tags of col.
             enableTileProperty();
-            DisableHotColdOnTile();
 
             //Initialise tags of foodSameTag
             foodSameTag = GameObject.FindGameObjectsWithTag(col.tag).ToList();
@@ -44,6 +43,22 @@ public abstract class TileManager: MonoBehaviour
             //Initialise oldCol to be col
             oldCol = col;
         }
+    }
+
+    public void TriggerTile()
+    {
+        /* When movement is done, check whether there is any object on this tile.
+         * Then update accordingly.
+         */
+
+        UpdateColliderOnTile(); //updates col
+        if (col && col != oldCol)
+        {
+            //new col. col changed, oldCol already initialised to previous col OR
+            //tile is empty. col is empty, oldCol is still the previous collider.
+            triggerCalled = true;
+        }
+        //else same col, no change. Do nothing.
     }
 
     public void OldColUpdate()
@@ -72,9 +87,6 @@ public abstract class TileManager: MonoBehaviour
                 //Update foodSameTag
                 foodSameTag = GameObject.FindGameObjectsWithTag(col.tag).ToList();
                 EnableFoodSameTagProperty();
-
-                //Disable hot-cold tags 
-                DisableHotColdOnTile();
             }
             else
             {
@@ -83,14 +95,12 @@ public abstract class TileManager: MonoBehaviour
             }
 
             oldCol = col;
-            triggerCalled = false;
         }
         MoveExecuted();
         PlayerAdjustment();
     }
 
-    public void ActivateDormantProperties(Dictionary<string, bool[]> hotCold,
-        List<HeavyManager> heavyTiles)
+    public void ActivateDormantHotCold(Dictionary<string, bool[]> hotCold)
     {
         /* Enable hot cold property when stepping off a tile.
          * 
@@ -134,28 +144,33 @@ public abstract class TileManager: MonoBehaviour
         }
     }
 
-    public void DeactivateDormantProperties(Dictionary<string, bool[]> hotCold)
+    public void DeactivateDormantHotCold(Dictionary<string, bool[]> hotCold)
     {
         /* If the same tag has both hot and cold, deactivate all objects that
          * are not on tiles. Update foodSameTag accordingly.
          */
 
-        if (col && hotCold.ContainsKey(col.tag) && hotCold[col.tag].All(qn => qn))
+        if (triggerCalled && col)
         {
             //Both hot and cold.
             //Deactivate all food:
-            foreach (GameObject food in foodSameTag)
-            {
-                if (!food.GetComponent<Tags>().isInAnyTile())
-                {
-                    //Deactivate
-                    food.GetComponent<DetachChildren>().detachAllChildren();
-                    food.GetComponent<Tags>().enableInactive();
-                }
-            }
 
-            //Change foodSameTag to match
-            foodSameTag = foodSameTag.FindAll(food => !food.GetComponent<Tags>().isInactive());
+            if (hotCold.ContainsKey(col.tag) && hotCold[col.tag].All(qn => qn))
+            {
+                foreach (GameObject food in foodSameTag)
+                {
+                    if (!food.GetComponent<Tags>().isInAnyTile())
+                    {
+                        //Deactivate
+                        food.GetComponent<DetachChildren>().detachAllChildren();
+                        food.GetComponent<Tags>().enableInactive();
+                    }
+                }
+
+                //Change foodSameTag to match
+                foodSameTag = foodSameTag.FindAll(food => !food.GetComponent<Tags>().isInactive());
+            }
+            triggerCalled = false;
         }
     }
 
@@ -202,35 +217,12 @@ public abstract class TileManager: MonoBehaviour
         oldCol = oldCollider;
     }
 
-    public void TriggerTile()
-    {
-        /* When movement is done, check whether there is any object on this tile.
-         * Then update accordingly.
-         */
-
-        UpdateColliderOnTile();
-        if ((col && col != oldCol) || !col)
-        {
-            //new col. col changed, oldCol already initialised to previous col OR
-            //tile is empty. col is empty, oldCol is still the previous collider.
-            triggerCalled = true;
-        }
-        //else same col, no change. Do nothing.
-    }
-
     private void UpdateColliderOnTile()
     {
         /* Find collider that is on top of the tile.
          */
 
         col = Physics2D.OverlapPoint(transform.position, push);
-    }
-
-    protected void DisableHotColdOnTile()
-    {
-        //Disable hot cold property when stepping into a tile.
-        col.GetComponent<Tags>().disableCold();
-        col.GetComponent<Tags>().disableHot();
     }
 
     protected abstract void OldColRoutine(); //oldCol updates.

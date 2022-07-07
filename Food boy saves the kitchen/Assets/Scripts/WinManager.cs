@@ -13,6 +13,9 @@ public class WinManager : MonoBehaviour
     private List<GameObject> foodSameTagTopLeft; //stores all foods that are the same tag as topLeft that is not on the win tile.
     private Vector2 topLeftCenteredCoord;
 
+    private Vector2 topLeftCorner;
+    private Vector2 bottomRightCorner;
+
     private LayerMask push;
 
     private void Awake()
@@ -24,6 +27,7 @@ public class WinManager : MonoBehaviour
         int x = (int)Math.Ceiling(GetComponent<BoxCollider2D>().size.x);
         int y = (int)Math.Ceiling(GetComponent<BoxCollider2D>().size.y);
         winConfig = new GameObject[y, x];
+        UpdateTileCorners();
         topLeftCenteredCoord = new Vector2(transform.position.x - x / 2f,
             transform.position.y + y / 2f) + new Vector2(0.5f, -0.5f);
         
@@ -155,13 +159,55 @@ public class WinManager : MonoBehaviour
         }
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
+    private void UpdateTileCorners()
     {
-        collision.GetComponent<Tags>().disableWinTileTag();
+        topLeftCorner = new Vector2(transform.position.x - winConfig.GetLength(1) / 2f,
+            transform.position.y + winConfig.GetLength(0) / 2f);
+        bottomRightCorner = new Vector2(transform.position.x + winConfig.GetLength(1) / 2f,
+            transform.position.y - winConfig.GetLength(0) / 2f);
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    public void ExitTrigger()
     {
-        collision.GetComponent<Tags>().enableWinTileTag();
+        /* Checks if any winConfig elements exited the win tile.
+         * If so, disable the win tile tag. Re-enable heavy and hot/cold
+         * as necessary.
+         * 
+         * Current winConfig is outdated during execution of this function.
+         */
+        UpdateTileCorners();
+        for (int row = 0; row < winConfig.GetLength(0); row++)
+        {
+            for (int col = 0; col < winConfig.GetLength(1); col++)
+            {
+                if (winConfig[row, col])
+                {
+                    Vector2 currPosition = winConfig[row, col].transform.position;
+                    if (currPosition.x < topLeftCorner.x || bottomRightCorner.x < currPosition.x ||
+                        currPosition.y > topLeftCorner.y || bottomRightCorner.y < currPosition.y)
+                    {
+                        //out of win tile.
+                        winConfig[row, col].GetComponent<Tags>().disableWinTileTag();
+                    }
+                }
+            }
+        }
+    }
+
+    public void EnterTrigger()
+    {
+        /* Checks if any new object is now in the win tile. 
+         * If so, enable the win tile tag and remove children.
+         * Disable heavy and hot/cold as necessary.
+         */
+        Collider2D[] winTileObj = 
+            Physics2D.OverlapAreaAll(topLeftCorner + new Vector2(0.5f, -0.5f), 
+            bottomRightCorner + new Vector2(-0.5f, 0.5f), push);
+
+        foreach (Collider2D collider in winTileObj)
+        {
+            collider.GetComponent<Tags>().enableWinTileTag();
+            collider.GetComponent<DetachChildren>().detachAllChildren();
+        }
     }
 }

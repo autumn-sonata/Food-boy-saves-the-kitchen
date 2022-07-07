@@ -71,7 +71,7 @@ public class Coordinator : MonoBehaviour
         {
             foreach (TileManager tile in tiles)
             {
-                tile.TriggerTile();
+                tile.TriggerTile(); //update collider
             }
 
             //At this point, moved to new, oldCol is the one to reenable.
@@ -94,13 +94,24 @@ public class Coordinator : MonoBehaviour
                     /* Enable hot/cold and heavy again for food 
                      * items going out of tile
                      */
-                    tile.ActivateDormantProperties(hotCold, heavyTiles);
+                    tile.ActivateDormantHotCold(hotCold);
                 }
   
                 //You, cold and hot tile tag + updates in case change of objects
                 foreach (TileManager tile in tiles)
                 {
                     tile.OldColUpdate(); //run all old col updates before new ones.
+                }
+
+                foreach (WinManager winTile in winTiles)
+                {
+                    winTile.ExitTrigger();
+                }
+                
+                //Tag updates for new objects that stepped into different tiles
+                foreach (WinManager winTile in winTiles)
+                {
+                    winTile.EnterTrigger();
                 }
 
                 foreach (TileManager tile in tiles)
@@ -111,12 +122,12 @@ public class Coordinator : MonoBehaviour
                 //Deactivate objects if both hot and cold.
                 foreach (TileManager tile in tiles)
                 {
-                    tile.DeactivateDormantProperties(hotCold);
+                    tile.DeactivateDormantHotCold(hotCold);
                 }
             }
 
             HeavyActivation();
-            SpriteUpdate();
+            SpriteUpdate(); //deactivates gameobject if tags are appropriate.
 
             //Win tile updates
             executeWinManagers();
@@ -258,6 +269,7 @@ public class Coordinator : MonoBehaviour
 
             var list = new List<KeyValuePair<PlayerManager, Vector3>>();
             //Allow players that are not children to update their destination.
+
             foreach (GameObject player in players)
             {
                 if (Mathf.Abs(horizontalMove) == 1f && timer.countdownFinished() && !player.GetComponent<Tags>().isInAnyTile())
