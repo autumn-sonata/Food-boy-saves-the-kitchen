@@ -28,6 +28,7 @@ public class Coordinator : MonoBehaviour
     private List<HotManager> hotTiles; //All instances of hotTiles.
     private List<HeavyManager> heavyTiles; //All instances of heavyTiles.
     private List<TileManager> tiles; //All tiles excluding winTiles.
+    private List<ConveyerBeltManager> conveyerBelts; //All conveyer belts.
 
     private void Awake()
     {
@@ -39,19 +40,15 @@ public class Coordinator : MonoBehaviour
         moveManager = GameObject.Find("Canvas").GetComponent<PastMovesManager>();
         inputManager = GetComponent<InputManager>();
         sprites = GetAllSprites();
-        winTiles = GameObject.FindGameObjectsWithTag("Win")
-            .Select(winTile => winTile.GetComponent<WinManager>()).ToList();
-        youTiles = GameObject.FindGameObjectsWithTag("You")
-            .Select(youTile => youTile.GetComponent<YouManager>()).ToList();
-        coldTiles = GameObject.FindGameObjectsWithTag("Cold")
-            .Select(coldTile => coldTile.GetComponent<ColdManager>()).ToList();
-        hotTiles = GameObject.FindGameObjectsWithTag("Hot")
-            .Select(hotTile => hotTile.GetComponent<HotManager>()).ToList();
-        heavyTiles = GameObject.FindGameObjectsWithTag("Heavy")
-            .Select(heavyTile => heavyTile.GetComponent<HeavyManager>()).ToList();
+        winTiles = FindObjectsOfType<WinManager>().ToList();
+        youTiles = FindObjectsOfType<YouManager>().ToList();
+        coldTiles = FindObjectsOfType<ColdManager>().ToList();
+        hotTiles = FindObjectsOfType<HotManager>().ToList();
+        heavyTiles = FindObjectsOfType<HeavyManager>().ToList();
         tiles = new List<TileManager>();
         tiles = tiles.Concat(youTiles).Concat(coldTiles).Concat(hotTiles)
             .Concat(heavyTiles).ToList();
+        conveyerBelts = FindObjectsOfType<ConveyerBeltManager>().ToList();
         checkedMove = false;
         isInitialise = true;
     }
@@ -72,6 +69,11 @@ public class Coordinator : MonoBehaviour
 
         if (hasMoved())
         {
+            foreach (TileManager tile in tiles)
+            {
+                tile.TriggerTile();
+            }
+
             //At this point, moved to new, oldCol is the one to reenable.
             //col is all updated already. just ask to change oldCol hot/cold 
             //properties immediately.
@@ -81,10 +83,10 @@ public class Coordinator : MonoBehaviour
              * The hotCold hashmap represents the objects on hot and cold 
              * tiles and whether  
              */
-            Dictionary<string, bool[]> hotCold = new Dictionary<string, bool[]>();
+            Dictionary<string, bool[]> hotCold = new();
 
             UpdateHotColdPlayers(hotCold);
-
+ 
             if (!isInitialise)
             {
                 foreach (TileManager tile in tiles)
@@ -98,7 +100,12 @@ public class Coordinator : MonoBehaviour
                 //You, cold and hot tile tag + updates in case change of objects
                 foreach (TileManager tile in tiles)
                 {
-                    tile.ChangeObject();
+                    tile.OldColUpdate(); //run all old col updates before new ones.
+                }
+
+                foreach (TileManager tile in tiles)
+                {
+                    tile.NewColUpdate();
                 }
 
                 //Deactivate objects if both hot and cold.

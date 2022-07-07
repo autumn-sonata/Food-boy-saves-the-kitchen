@@ -13,11 +13,13 @@ public abstract class TileManager: MonoBehaviour
     protected bool triggerCalled; //True if any trigger is called.
 
     protected Coordinator playerCoordinator; //the main camera
+    private LayerMask push;
 
     private void Awake()
     {
         //Initialisation
         playerCoordinator = GameObject.Find("Main Camera").GetComponent<Coordinator>();
+        push = LayerMask.GetMask("Push");
         //Find gameObject on tile.
         UpdateColliderOnTile(); //Look for any pushable object on tile. Initialise col.
         foodSameTag = new List<GameObject>();
@@ -26,9 +28,10 @@ public abstract class TileManager: MonoBehaviour
 
     public void Initialise()
     {
-        /* Initialises foodSameTag and oldCol.
+        /* Initialises foodSameTag, col and oldCol.
          */
-        if (col != null)
+        col = Physics2D.OverlapPoint(transform.position, push);
+        if (col)
         {
             //Initialise tags of col.
             enableTileProperty();
@@ -42,23 +45,23 @@ public abstract class TileManager: MonoBehaviour
             oldCol = col;
         }
     }
-    public void ChangeObject()
+
+    public void OldColUpdate()
     {
-        //Called when the object on top of tile has been changed
+        if (triggerCalled && oldCol)
+            OldColRoutine();
+    }
+
+    public void NewColUpdate()
+    {
         if (triggerCalled)
         {
             /* There is a change in items on the tile.
              * Not to be run every single frame, it is expensive!
              * 1) Pass info to Coordinator.
-             * 2) Wait until parent of col is at destination, then
+             * 2) Col is at destination, then
              * update all oldCol children destinations to their transform position.
              */
-
-            if (oldCol)
-            {
-                //Update foods of previous col and col's tags 
-                OldColRoutine();
-            }
 
             if (col)
             {
@@ -72,13 +75,13 @@ public abstract class TileManager: MonoBehaviour
 
                 //Disable hot-cold tags 
                 DisableHotColdOnTile();
-            } else
+            }
+            else
             {
                 //No new collider available, clear foodSameTag
                 foodSameTag.Clear();
             }
 
-            //PlayerAdjustment();
             oldCol = col;
             triggerCalled = false;
         }
@@ -199,31 +202,20 @@ public abstract class TileManager: MonoBehaviour
         oldCol = oldCollider;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    public void TriggerTile()
     {
-        /*
-         * Function runs when a new collider comes into contact with tile's collision box.
-         * Delays change of foodSameTag array.
-         * 
-         * Used for empty -> filled tile.
+        /* When movement is done, check whether there is any object on this tile.
+         * Then update accordingly.
          */
 
-        oldCol = col;
-        col = collision;
-        triggerCalled = true;
-    }
-
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        /* Function runs when a collider leaves the tile.
-         * 
-         * Used for filled -> empty tile.
-         */
-
-        oldCol = collision;
-        //Additional check for whether there is anything left on tile.
         UpdateColliderOnTile();
-        triggerCalled = true;
+        if ((col && col != oldCol) || !col)
+        {
+            //new col. col changed, oldCol already initialised to previous col OR
+            //tile is empty. col is empty, oldCol is still the previous collider.
+            triggerCalled = true;
+        }
+        //else same col, no change. Do nothing.
     }
 
     private void UpdateColliderOnTile()
@@ -231,8 +223,7 @@ public abstract class TileManager: MonoBehaviour
         /* Find collider that is on top of the tile.
          */
 
-        Vector2 youTilePosition = new Vector2(transform.position.x, transform.position.y);
-        col = Physics2D.OverlapPoint(youTilePosition, LayerMask.GetMask("Push"));
+        col = Physics2D.OverlapPoint(transform.position, push);
     }
 
     protected void DisableHotColdOnTile()
