@@ -86,7 +86,8 @@ public abstract class TileManager: MonoBehaviour
         PlayerAdjustment();
     }
 
-    public void EnableHotColdOnTile(Dictionary<string, bool[]> hotCold)
+    public void ActivateDormantProperties(Dictionary<string, bool[]> hotCold,
+        List<HeavyManager> heavyTiles)
     {
         /* Enable hot cold property when stepping off a tile.
          * 
@@ -97,6 +98,7 @@ public abstract class TileManager: MonoBehaviour
         if (oldCol && triggerCalled)
         {
             Tags oldColTags = oldCol.GetComponent<Tags>();
+
             if (hotCold.ContainsKey(oldCol.tag) && !oldCol.GetComponent<Tags>().isInAnyTile())
             {
                 bool[] enableHotCold = hotCold[oldCol.tag];
@@ -129,13 +131,13 @@ public abstract class TileManager: MonoBehaviour
         }
     }
 
-    public void CheckHotCold(Dictionary<string, bool[]> hotCold)
+    public void DeactivateDormantProperties(Dictionary<string, bool[]> hotCold)
     {
         /* If the same tag has both hot and cold, deactivate all objects that
          * are not on tiles. Update foodSameTag accordingly.
          */
 
-        if (hotCold.ContainsKey(col.tag) && hotCold[col.tag].All(qn => qn))
+        if (col && hotCold.ContainsKey(col.tag) && hotCold[col.tag].All(qn => qn))
         {
             //Both hot and cold.
             //Deactivate all food:
@@ -242,7 +244,6 @@ public abstract class TileManager: MonoBehaviour
 
     protected abstract void OldColRoutine(); //oldCol updates.
     protected abstract void NewColRoutine(); //Col updates.
-
     protected abstract void PlayerAdjustment();
 
     protected abstract void MoveExecuted();

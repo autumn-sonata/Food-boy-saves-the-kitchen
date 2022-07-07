@@ -12,6 +12,7 @@ TagManager:
   - Knife
   - Cold
   - Hot
+  - Heavy
   layers:
   - Default
   - TransparentFX

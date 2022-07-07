@@ -11,6 +11,7 @@ public class PushObstacleManager : MonoBehaviour
     private LayerMask push;
     private Vector2 directionPush;
     private List<GameObject> inFront; //Does not include the player themselves.
+    private bool hasHeavy;
 
     // Start is called before the first frame update
     private void Awake()
@@ -19,6 +20,7 @@ public class PushObstacleManager : MonoBehaviour
         push = LayerMask.GetMask("Push");
         directionPush = new Vector2(0f, 0f);
         inFront = new List<GameObject>();
+        hasHeavy = false;
     }
 
     public void updateDirection(Vector2 direction)
@@ -28,9 +30,11 @@ public class PushObstacleManager : MonoBehaviour
          * 1) foreFrontOfPlayer
          * 2) directionPush
          * 3) inFront list
+         * 4) hasHeavy
          */
         foreFrontOfPlayer = gameObject;
         directionPush = direction;
+        hasHeavy = false;
         detachFoodFromPlayer();
 
         /* Checks whether there are any objects in front of foreFront that can be added and 
@@ -51,6 +55,11 @@ public class PushObstacleManager : MonoBehaviour
             foreFrontOfPlayer.transform.position.y) + directionPush;
     }
 
+    public bool HasHeavyInFront()
+    {
+        return hasHeavy;
+    }
+
     private void foreFrontUpdate(Vector2 startPosition)
     {
         /* Update the foreFrontOfPlayer and inFront list.
@@ -61,6 +70,7 @@ public class PushObstacleManager : MonoBehaviour
         {
             UpdateSharp(foreFront);
             UpdateHotCold(foreFront, i, startPosition);
+            UpdateHasHeavy(foreFront);
             foreFrontOfPlayer = foreFront.gameObject;
 
             inFront.Add(foreFrontOfPlayer);
@@ -152,6 +162,13 @@ public class PushObstacleManager : MonoBehaviour
                 foreFront.GetComponent<Tags>().disableCooked();
             }
         }
+    }
+
+    private void UpdateHasHeavy(Collider2D foreFront)
+    {
+        Tags foreFrontTags = foreFront.GetComponent<Tags>();
+        if (foreFrontTags.isHeavy() && !foreFrontTags.isPlayer() &&
+            !foreFrontTags.isInAnyTile()) hasHeavy = true;
     }
 
     private void DestroyRoutine(Collider2D foreFront)

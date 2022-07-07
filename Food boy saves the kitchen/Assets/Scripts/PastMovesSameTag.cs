@@ -91,6 +91,9 @@ public class PastMovesSameTag : MonoBehaviour
         } else if (GetComponent<ColdManager>())
         {
             return GetComponent<ColdManager>();
+        } else if (GetComponent<HeavyManager>())
+        {
+            return GetComponent<HeavyManager>();
         }
         Debug.LogError("Manager not found in PastMovesSameTag.");
         return null;

@@ -6,6 +6,8 @@ public class HeavyObstacleManager : MonoBehaviour
 {
     /* Set rules for interaction between obstacles and food items (including player)
      * Is linked to the player.
+     * 
+     * Prevents the player from moving in a certain direction if there is a wall.
      */
     private LayerMask heavy;
     private void Awake()
@@ -13,9 +15,8 @@ public class HeavyObstacleManager : MonoBehaviour
         heavy = LayerMask.GetMask("Heavy");
     }
 
-    public bool isTouchingHeavy(Vector2 position)
+    public bool isTouchingHeavy(Vector2 position, Vector2 direction)
     {
-        //checks whether an object is touching this heavy object.
         return Physics2D.OverlapCircle(position, 0.3f, heavy, 0f, 0f);
     }
 }

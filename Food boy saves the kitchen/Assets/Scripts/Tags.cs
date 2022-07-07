@@ -12,12 +12,13 @@ public class Tags : MonoBehaviour
      * 4) Part of hotTile
      * 5) Part of coldTile
      * 6) Part of heavyTile
-     * 7) Is sharp
-     * 8) Is cut
-     * 9) Is hot
-     * 10) Is cold
-     * 11) Is cooked (cold is uncooked)
-     * 12) Is inactive (in the level)
+     * 7) Is heavy
+     * 8) Is sharp
+     * 9) Is cut
+     * 10) Is hot
+     * 11) Is cold
+     * 12) Is cooked (cold is uncooked)
+     * 13) Is inactive (in the level)
      * If the tag e.g Player is not found at the current moment, then disable Player behaviour.
      */
     private bool[] objectTags = new bool[15];
@@ -127,84 +128,99 @@ public class Tags : MonoBehaviour
         return objectTags[5];
     }
 
-    public void enableIsSharp()
+    public void enableHeavy()
     {
         objectTags[6] = true;
     }
 
-    public bool isSharp()
+    public void disableHeavy()
+    {
+        objectTags[6] = false;
+    }
+
+    public bool isHeavy()
     {
         return objectTags[6];
     }
 
-    public void enableIsCut()
+    public void enableIsSharp()
     {
         objectTags[7] = true;
     }
 
-    public bool isCut()
+    public bool isSharp()
     {
         return objectTags[7];
     }
 
-    public void enableHot()
+    public void enableIsCut()
     {
         objectTags[8] = true;
     }
 
-    public void disableHot()
-    {
-        objectTags[8] = false;
-    }
-
-    public bool isHot()
+    public bool isCut()
     {
         return objectTags[8];
     }
 
-    public void enableCold()
+    public void enableHot()
     {
         objectTags[9] = true;
     }
 
-    public void disableCold()
+    public void disableHot()
     {
         objectTags[9] = false;
     }
 
-    public bool isCold()
+    public bool isHot()
     {
         return objectTags[9];
     }
 
-    public void enableCooked()
+    public void enableCold()
     {
         objectTags[10] = true;
     }
 
-    public void disableCooked()
+    public void disableCold()
     {
         objectTags[10] = false;
     }
 
-    public bool isCooked()
+    public bool isCold()
     {
         return objectTags[10];
     }
 
-    public void enableInactive()
+    public void enableCooked()
     {
         objectTags[11] = true;
     }
 
-    public void disableInactive()
+    public void disableCooked()
     {
         objectTags[11] = false;
     }
 
-    public bool isInactive()
+    public bool isCooked()
     {
         return objectTags[11];
+    }
+
+    public void enableInactive()
+    {
+        objectTags[12] = true;
+    }
+
+    public void disableInactive()
+    {
+        objectTags[12] = false;
+    }
+
+    public bool isInactive()
+    {
+        return objectTags[12];
     }
 
     public bool[] getTags()

@@ -26,6 +26,7 @@ public class Coordinator : MonoBehaviour
     private List<YouManager> youTiles; //All instances of youTiles.
     private List<ColdManager> coldTiles; //All instances of coldTiles.
     private List<HotManager> hotTiles; //All instances of hotTiles.
+    private List<HeavyManager> heavyTiles; //All instances of heavyTiles.
     private List<TileManager> tiles; //All tiles excluding winTiles.
 
     private void Awake()
@@ -46,8 +47,11 @@ public class Coordinator : MonoBehaviour
             .Select(coldTile => coldTile.GetComponent<ColdManager>()).ToList();
         hotTiles = GameObject.FindGameObjectsWithTag("Hot")
             .Select(hotTile => hotTile.GetComponent<HotManager>()).ToList();
+        heavyTiles = GameObject.FindGameObjectsWithTag("Heavy")
+            .Select(heavyTile => heavyTile.GetComponent<HeavyManager>()).ToList();
         tiles = new List<TileManager>();
-        tiles = tiles.Concat(youTiles).Concat(coldTiles).Concat(hotTiles).ToList();
+        tiles = tiles.Concat(youTiles).Concat(coldTiles).Concat(hotTiles)
+            .Concat(heavyTiles).ToList();
         checkedMove = false;
         isInitialise = true;
     }
@@ -85,10 +89,10 @@ public class Coordinator : MonoBehaviour
             {
                 foreach (TileManager tile in tiles)
                 {
-                    /* Enable hot/cold again for food 
+                    /* Enable hot/cold and heavy again for food 
                      * items going out of tile
                      */
-                    tile.EnableHotColdOnTile(hotCold);
+                    tile.ActivateDormantProperties(hotCold, heavyTiles);
                 }
   
                 //You, cold and hot tile tag + updates in case change of objects
@@ -100,10 +104,11 @@ public class Coordinator : MonoBehaviour
                 //Deactivate objects if both hot and cold.
                 foreach (TileManager tile in tiles)
                 {
-                    tile.CheckHotCold(hotCold);
+                    tile.DeactivateDormantProperties(hotCold);
                 }
             }
 
+            HeavyActivation();
             SpriteUpdate();
 
             //Win tile updates
@@ -226,10 +231,8 @@ public class Coordinator : MonoBehaviour
          * 2) Update sprites list.
          */
 
-        // PROBLEM: CHEESE (3, 4) NOT IN SPRITES
         List<SpriteManager> toDisable = sprites.FindAll(sprite => 
             sprite.GetComponent<Tags>().isInactive());
-        //sprites = sprites.FindAll(sprite => !sprite.GetComponent<Tags>().isInactive());
         toDisable.ForEach(sprite => sprite.gameObject.SetActive(false));
 
         foreach (SpriteManager sprite in sprites)
@@ -323,6 +326,29 @@ public class Coordinator : MonoBehaviour
         foreach (GameObject player in removeFromPlayer)
         {
             players.Remove(player);
+        }
+    }
+
+    private void HeavyActivation()
+    {
+        /* After update of other tags, update heavy tags.
+         */
+        Tags[] objWithTag = FindObjectsOfType<Tags>();
+        Dictionary<string, bool> heavyTags = new();
+        foreach (TileManager tile in heavyTiles)
+        {
+            heavyTags.Add(tile.colFoodTag(), true);
+        }
+
+        foreach (Tags obj in objWithTag)
+        {
+            if (heavyTags.ContainsKey(obj.tag) && !obj.isPlayer() && !obj.isInAnyTile()) 
+            {
+                obj.enableHeavy();
+            } else
+            {
+                obj.disableHeavy();
+            }
         }
     }
 

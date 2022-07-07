@@ -18,7 +18,8 @@ public class ObstacleManager : MonoBehaviour
          */
         GetComponent<PushObstacleManager>().updateDirection(direction);
 
-        return !GetComponent<HeavyObstacleManager>()
-                .isTouchingHeavy(GetComponent<PushObstacleManager>().PosInfrontOfPushQueue());
+        return !GetComponent<HeavyObstacleManager>().isTouchingHeavy
+            (GetComponent<PushObstacleManager>().PosInfrontOfPushQueue(), direction) &&
+            !GetComponent<PushObstacleManager>().HasHeavyInFront();
     }
 }
