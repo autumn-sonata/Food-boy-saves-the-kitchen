@@ -105,7 +105,7 @@ public class Coordinator : MonoBehaviour
 
                 foreach (WinManager winTile in winTiles)
                 {
-                    winTile.ExitTrigger();
+                    winTile.ExitTrigger(hotCold, heavyTiles);
                 }
                 
                 //Tag updates for new objects that stepped into different tiles
@@ -269,7 +269,7 @@ public class Coordinator : MonoBehaviour
 
             var list = new List<KeyValuePair<PlayerManager, Vector3>>();
             //Allow players that are not children to update their destination.
-
+            //GameObject.Find("Tomato (2)").GetComponent<Tags>().printTags();
             foreach (GameObject player in players)
             {
                 if (Mathf.Abs(horizontalMove) == 1f && timer.countdownFinished() && !player.GetComponent<Tags>().isInAnyTile())

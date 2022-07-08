@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -82,21 +83,23 @@ public class WinManager : MonoBehaviour
         {
             for (int col = 0; col < winConfig.GetLength(1); col++)
             {
-                if (winConfig[row, col])
+                if ((winConfig[row, col] && new Vector2(winConfig[row, col].transform.position.x, 
+                    winConfig[row, col].transform.position.y) != topLeftCenteredCoord + new Vector2(col, row)) ||
+                    !winConfig[row, col])
                 {
-                    Vector2 currPosition = winConfig[row, col].transform.position;
-                    if (currPosition != topLeftCenteredCoord + new Vector2(col, row))
+                    //Replace if found that there is a different food there or to update to a possible
+                    //new object from empty.
+                    Collider2D updatedFood =
+                        Physics2D.OverlapPoint(topLeftCenteredCoord + new Vector2(col, row), push);
+                    if (updatedFood)
                     {
-                        //Only replace if found that there is a different food there.
-                        GameObject updatedFood =
-                            Physics2D.OverlapPoint(topLeftCenteredCoord + new Vector2(col, row), push).gameObject;
-                        winConfig[row, col] = updatedFood;
-                        if (row == 0 && col == 0)
+                        winConfig[row, col] = updatedFood.gameObject;
+                        if (row == 0 && col == 0 && updatedFood)
                         {
                             updateFoodSameTagTopLeft(updatedFood);
                         }
                     }
-                }
+                } 
             }
         }
     }
@@ -144,7 +147,7 @@ public class WinManager : MonoBehaviour
         return true;
     }
 
-    private void updateFoodSameTagTopLeft(GameObject topLeft)
+    private void updateFoodSameTagTopLeft(Collider2D topLeft)
     {
         /* Update the foodSameTagTopLeft list to new top left food item since it has changed.
          */
@@ -167,7 +170,8 @@ public class WinManager : MonoBehaviour
             transform.position.y - winConfig.GetLength(0) / 2f);
     }
 
-    public void ExitTrigger()
+    public void ExitTrigger(Dictionary<string, bool[]> hotCold,
+        List<HeavyManager> heavyTiles)
     {
         /* Checks if any winConfig elements exited the win tile.
          * If so, disable the win tile tag. Re-enable heavy and hot/cold
@@ -186,8 +190,38 @@ public class WinManager : MonoBehaviour
                     if (currPosition.x < topLeftCorner.x || bottomRightCorner.x < currPosition.x ||
                         currPosition.y > topLeftCorner.y || bottomRightCorner.y < currPosition.y)
                     {
+                        GameObject movingOut = winConfig[row, col];
                         //out of win tile.
-                        winConfig[row, col].GetComponent<Tags>().disableWinTileTag();
+                        movingOut.GetComponent<Tags>().disableWinTileTag();
+
+                        //re-enable all the previous tags that it has.
+                        //Tags to re-enable include hot/cold, heavy, player
+                        if (hotCold.ContainsKey(movingOut.tag))
+                        {
+                            bool[] hotColdStatus = hotCold[movingOut.tag];
+                            if (hotColdStatus.All(status => status))
+                            {
+                                //Deactivate
+                                movingOut.GetComponent<Tags>().enableInactive();
+                            }
+                            else if (hotColdStatus[0])
+                            {
+                                //is cold.
+                                movingOut.GetComponent<Tags>().enableCold();
+                            }
+                            else if (hotColdStatus[1])
+                            {
+                                //is hot
+                                movingOut.GetComponent<Tags>().enableHot();
+                            } //otherwise stay disabled on hot and cold.
+                        }
+
+                        //re-enable heavy.
+                        foreach (HeavyManager heavyTile in heavyTiles)
+                        {
+                            if (movingOut.CompareTag(heavyTile.colFoodTag()))
+                                movingOut.GetComponent<Tags>().enableHeavy();
+                        }
                     }
                 }
             }
@@ -206,7 +240,11 @@ public class WinManager : MonoBehaviour
 
         foreach (Collider2D collider in winTileObj)
         {
-            collider.GetComponent<Tags>().enableWinTileTag();
+            Tags colTags = collider.GetComponent<Tags>();
+            colTags.enableWinTileTag();
+            colTags.disableHeavy();
+            colTags.disableHot();
+            colTags.disableCold();
             collider.GetComponent<DetachChildren>().detachAllChildren();
         }
     }
