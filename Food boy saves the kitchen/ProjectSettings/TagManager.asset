@@ -13,6 +13,9 @@ TagManager:
   - Cold
   - Hot
   - Heavy
+  - Saki
+  - Apple
+  - Meat
   layers:
   - Default
   - TransparentFX
