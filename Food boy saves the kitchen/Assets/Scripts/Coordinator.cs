@@ -203,9 +203,7 @@ public class Coordinator : MonoBehaviour
     {
         /* Ask if a move is done.
          */
-        bool movementsComplete = allMovementsComplete();
-        if (!movementsComplete) checkedMove = false;
-        return movementsComplete && !checkedMove;
+        return allMovementsComplete() && !checkedMove;
     }
 
     private void executeWinManagers()
@@ -269,11 +267,12 @@ public class Coordinator : MonoBehaviour
 
             var list = new List<KeyValuePair<PlayerManager, Vector3>>();
             //Allow players that are not children to update their destination.
-            //GameObject.Find("Tomato (2)").GetComponent<Tags>().printTags();
+
             foreach (GameObject player in players)
             {
                 if (Mathf.Abs(horizontalMove) == 1f && timer.countdownFinished() && !player.GetComponent<Tags>().isInAnyTile())
                 {
+                    checkedMove = false;
                     Vector2 direction = new Vector2(horizontalMove, 0f);
                     if (player.GetComponent<ObstacleManager>().allowedToMove(direction))
                         /* Needs to move itself and the other food items in front of it.
@@ -284,6 +283,7 @@ public class Coordinator : MonoBehaviour
                 }
                 else if (Mathf.Abs(verticalMove) == 1f && timer.countdownFinished() && !player.GetComponent<Tags>().isInAnyTile())
                 {
+                    checkedMove = false;
                     Vector2 direction = new Vector2(0f, verticalMove);
                     if (player.GetComponent<ObstacleManager>().allowedToMove(direction))
                         /* Needs to move itself and the other food items in front of it.
