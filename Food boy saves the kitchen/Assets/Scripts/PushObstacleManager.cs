@@ -72,10 +72,11 @@ public class PushObstacleManager : MonoBehaviour
             UpdateHotCold(foreFront, i, startPosition);
             UpdateHasHeavy(foreFront);
             foreFrontOfPlayer = foreFront.gameObject;
-
+            
             inFront.Add(foreFrontOfPlayer);
             foreFront = Physics2D.OverlapPoint(directionPush * ++i + startPosition, push);
         }
+        GameObject.Find("Cheese").GetComponent<Tags>().printTags();
     }
 
     private void attachFoodToPlayer()
