@@ -356,7 +356,8 @@ public class Coordinator : MonoBehaviour
         Dictionary<string, bool> heavyTags = new();
         foreach (TileManager tile in heavyTiles)
         {
-            heavyTags.Add(tile.colFoodTag(), true);
+            if (!String.IsNullOrEmpty(tile.colFoodTag()))
+                heavyTags.Add(tile.colFoodTag(), true);
         }
 
         foreach (Tags obj in objWithTag)
