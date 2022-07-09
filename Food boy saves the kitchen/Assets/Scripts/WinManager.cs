@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class WinManager : MonoBehaviour
 {
@@ -115,7 +116,8 @@ public class WinManager : MonoBehaviour
         {
             if (matchWinConfig(food))
             {
-                Debug.Log("You Win!");
+                //Debug.Log("You Win!");
+                SceneManager.LoadScene(2);
             }
         }
     }
