@@ -61,7 +61,6 @@ public class PastMovesRecords : MonoBehaviour
     {
         /* Adds entry to moveLogs stack.
          */
-    
         moveLogs.Push(new MoveLogs(turnNumber(), transform.position, 
             new List<bool>(GetComponent<Tags>().getTags().ToList()), gameObject.activeInHierarchy));
 

@@ -9,14 +9,13 @@ using UnityEngine.SceneManagement;
 public class PastMovesManager : MonoBehaviour
 {
     private static string prefix = "Moves: ";
-    private static float undoCooldownDuration = 0.3f;
+    private const float UndoCooldownDuration = 0.3f;
 
     public TMP_Text moveText;
 
     private int turn; //int representing number of moves after start of the scene
     private bool canUndo; //cooldown before another key from undo/restart can be activated
     private List<PastMovesRecords> pastRecords; //remembers all components of PastMovesRecords.
-    private Coordinator movementCoordinator;
 
     private void Awake()    
     {
@@ -24,8 +23,6 @@ public class PastMovesManager : MonoBehaviour
         turn = -1;
         canUndo = true;
         pastRecords = new List<PastMovesRecords>();
-        movementCoordinator = 
-            GameObject.Find("Main Camera").GetComponent<Coordinator>();
     }
 
     private void Start()
@@ -72,7 +69,6 @@ public class PastMovesManager : MonoBehaviour
             changeMoveText();
             StartCoroutine(undoCooldownTimer());
         }
-
     }
 
     public void RestartLevel()
@@ -94,9 +90,9 @@ public class PastMovesManager : MonoBehaviour
     private IEnumerator undoCooldownTimer()
     {
         /* Waits for undoCooldownDuration seconds before being able to undo again
-         * https://foxxthom.medium.com/making-a-simple-and-efficient-cool-down-timer-in-unity-137efcbb8dce
+         * https://foxxthom.medium.com/making-a-simple-and-efficient-cool-down-playerTimer-in-unity-137efcbb8dce
          */
-        yield return new WaitForSeconds(undoCooldownDuration);
+        yield return new WaitForSeconds(UndoCooldownDuration);
         canUndo = true;
     }
 }

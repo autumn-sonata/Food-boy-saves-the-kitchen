@@ -76,7 +76,6 @@ public class PushObstacleManager : MonoBehaviour
             inFront.Add(foreFrontOfPlayer);
             foreFront = Physics2D.OverlapPoint(directionPush * ++i + startPosition, push);
         }
-        GameObject.Find("Cheese").GetComponent<Tags>().printTags();
     }
 
     private void attachFoodToPlayer()

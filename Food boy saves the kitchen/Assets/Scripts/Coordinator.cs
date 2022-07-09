@@ -17,8 +17,9 @@ public class Coordinator : MonoBehaviour
     private Dictionary<string, int> playerTypes; //stores the food types of players on the level
     private bool checkedMove;
     private bool isInitialise;
+    private bool hasUndone;
 
-    private Timer timer;
+    private Timer playerTimer;
     private PastMovesManager moveManager;
     private InputManager inputManager;
     private List<SpriteManager> sprites;
@@ -36,7 +37,7 @@ public class Coordinator : MonoBehaviour
         players = new HashSet<GameObject>();
         playerTypes = new Dictionary<string, int>();
 
-        timer = GetComponent<Timer>();
+        playerTimer = GetComponent<Timer>();
         moveManager = GameObject.Find("Canvas").GetComponent<PastMovesManager>();
         inputManager = GetComponent<InputManager>();
         sprites = GetAllSprites();
@@ -51,6 +52,7 @@ public class Coordinator : MonoBehaviour
         conveyerBelts = FindObjectsOfType<ConveyerBeltManager>().ToList();
         checkedMove = false;
         isInitialise = true;
+        hasUndone = false;
     }
 
     // Start is called before the first frame update
@@ -66,6 +68,7 @@ public class Coordinator : MonoBehaviour
          */
         PlayerRoutine();
         CheckInactive();
+        CheckUndo();
 
         if (hasMoved())
         {
@@ -141,14 +144,21 @@ public class Coordinator : MonoBehaviour
         //Undo and restart
         if (inputManager.KeyPressUndo())
         {
+            hasUndone = true;
             moveManager.DoUndo();
             executeWinManagers(); //update Win Manager to previous state.
             SpriteUpdate();
-
             //update players and playerTypes to previous state
             players.Clear();
             playerTypes.Clear();
-            UpdatePlayerAttrInfo();
+            foreach (TileManager youTile in youTiles)
+            {
+                players.UnionWith(youTile.playersAttached());
+                if (youTile.hasFoodOnYouTile())
+                {
+                    incrementPlayer(youTile.colFoodTag());
+                }
+            }
         }
         if (inputManager.KeyPressRestart()) moveManager.RestartLevel();
     }
@@ -218,6 +228,7 @@ public class Coordinator : MonoBehaviour
     {
         /* Updates players hashset and playerTypes hashmap.
          */
+
         foreach (TileManager tile in tiles)
         {
             tile.Initialise();
@@ -267,10 +278,9 @@ public class Coordinator : MonoBehaviour
 
             var list = new List<KeyValuePair<PlayerManager, Vector3>>();
             //Allow players that are not children to update their destination.
-
             foreach (GameObject player in players)
-            {
-                if (Mathf.Abs(horizontalMove) == 1f && timer.countdownFinished() && !player.GetComponent<Tags>().isInAnyTile())
+            { 
+                if (Mathf.Abs(horizontalMove) == 1f && playerTimer.countdownFinished() && !player.GetComponent<Tags>().isInAnyTile())
                 {
                     checkedMove = false;
                     Vector2 direction = new Vector2(horizontalMove, 0f);
@@ -281,7 +291,7 @@ public class Coordinator : MonoBehaviour
                         list.Add(new KeyValuePair<PlayerManager, Vector3>
                             (player.GetComponent<PlayerManager>(), new Vector3(horizontalMove, 0f, 0f)));
                 }
-                else if (Mathf.Abs(verticalMove) == 1f && timer.countdownFinished() && !player.GetComponent<Tags>().isInAnyTile())
+                else if (Mathf.Abs(verticalMove) == 1f && playerTimer.countdownFinished() && !player.GetComponent<Tags>().isInAnyTile())
                 {
                     checkedMove = false;
                     Vector2 direction = new Vector2(0f, verticalMove);
@@ -293,7 +303,7 @@ public class Coordinator : MonoBehaviour
                             (player.GetComponent<PlayerManager>(), new Vector3(0f, verticalMove, 0f)));
                 }
             }
-
+            
             foreach (var kvp in list)
             {
                 PlayerManager player = kvp.Key;
@@ -305,13 +315,26 @@ public class Coordinator : MonoBehaviour
             }
         } else
         {
-            timer.startTimer(MoveDelay);
+            playerTimer.startTimer(MoveDelay);
         }
     }
 
     private void CheckInactive()
     {
         players.RemoveWhere(player => player.GetComponent<Tags>().isInactive());
+    }
+
+    private void CheckUndo()
+    {
+        if (hasUndone)
+        {
+            hasUndone = false;
+            //update tiles
+            foreach (TileManager tile in tiles)
+            {
+                tile.Initialise();
+            }
+        }
     }
 
     private void UpdateHotColdPlayers(Dictionary<string, bool[]> hotCold)
