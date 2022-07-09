@@ -47,16 +47,18 @@ public class SpriteManager : MonoBehaviour
     {
         /* Updates the sprites based on the tags.
          * If the object is supposed to be inactive, disable the gameObject.
+         * 
+         * Returns bool on whether sprite has been updated in any form
          */
         Tags tag = GetComponent<Tags>();
-
+        SpriteRenderer render = GetComponent<SpriteRenderer>();
         if (tag.isCut())
         {
-            GetComponent<SpriteRenderer>().sprite = sprites[cut].sprite;
+            render.sprite = sprites[cut].sprite;
         }
         else
         {
-            GetComponent<SpriteRenderer>().sprite = sprites[original].sprite;
+            render.sprite = sprites[original].sprite;
         }
 
         //Hot or cold?

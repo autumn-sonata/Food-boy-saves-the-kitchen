@@ -143,6 +143,8 @@ public class Coordinator : MonoBehaviour
             isInitialise = false;
         }
 
+        SpriteUpdate();
+
         //Undo and restart
         if (inputManager.KeyPressUndo())
         {
@@ -224,6 +226,8 @@ public class Coordinator : MonoBehaviour
     {
         /* Ask if a move is done.
          */
+        bool movementsComplete = allMovementsComplete();
+        if (!movementsComplete) checkedMove = false;
         return allMovementsComplete() && !checkedMove;
     }
 
@@ -268,7 +272,6 @@ public class Coordinator : MonoBehaviour
          * 1) Disable gameObjects
          * 2) Update sprites list.
          */
-
         List<SpriteManager> toDisable = sprites.FindAll(sprite => 
             sprite.GetComponent<Tags>().isInactive());
         toDisable.ForEach(sprite => sprite.gameObject.SetActive(false));
@@ -293,7 +296,6 @@ public class Coordinator : MonoBehaviour
             { 
                 if (Mathf.Abs(horizontalMove) == 1f && playerTimer.countdownFinished() && !player.GetComponent<Tags>().isInAnyTile())
                 {
-                    checkedMove = false;
                     Vector2 direction = new Vector2(horizontalMove, 0f);
                     if (player.GetComponent<ObstacleManager>().allowedToMove(direction))
                         /* Needs to move itself and the other food items in front of it.
@@ -304,7 +306,6 @@ public class Coordinator : MonoBehaviour
                 }
                 else if (Mathf.Abs(verticalMove) == 1f && playerTimer.countdownFinished() && !player.GetComponent<Tags>().isInAnyTile())
                 {
-                    checkedMove = false;
                     Vector2 direction = new Vector2(0f, verticalMove);
                     if (player.GetComponent<ObstacleManager>().allowedToMove(direction))
                         /* Needs to move itself and the other food items in front of it.
