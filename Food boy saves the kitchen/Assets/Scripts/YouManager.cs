@@ -38,10 +38,9 @@ public class YouManager : TileManager
         //and abandon them (exclude from foodSameTag)
         if (col)
         {
-            bool colCut = col.GetComponent<Tags>().isCut();
             if (!col.GetComponent<Tags>().isKnife())
             {
-                foodSameTag.FindAll(food => food.GetComponent<Tags>().isCut() != colCut)
+                foodSameTag.FindAll(food => food.GetComponent<Tags>().isCut())
                 .ForEach(food =>
                 {
                     food.GetComponent<DetachChildren>().detachAllChildren();
