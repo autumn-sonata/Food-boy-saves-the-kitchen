@@ -241,7 +241,8 @@ public class Tags : MonoBehaviour
     {
         /* Prints out the tags for debugging purposes.
          */
-        Debug.Log("1) Is player " + objectTags[0] +
+        Debug.Log(name +
+                  "\n1) Is player " + objectTags[0] +
                   "\n2) Part of winTile " + objectTags[1] +
                   "\n3) Part of youTile " + objectTags[2] +
                   "\n4) Part of hotTile " + objectTags[3] +
