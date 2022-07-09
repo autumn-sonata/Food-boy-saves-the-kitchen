@@ -90,7 +90,7 @@ public class WinManager : MonoBehaviour
                     //Replace if found that there is a different food there or to update to a possible
                     //new object from empty.
                     Collider2D updatedFood =
-                        Physics2D.OverlapPoint(topLeftCenteredCoord + new Vector2(col, row), push);
+                        Physics2D.OverlapPoint(topLeftCenteredCoord + new Vector2(col, -row), push);
                     if (updatedFood)
                     {
                         winConfig[row, col] = updatedFood.gameObject;
@@ -130,9 +130,9 @@ public class WinManager : MonoBehaviour
         {
             for (int col = 0; col < winConfig.GetLength(1); col++)
             {
-                Collider2D foodConfig = Physics2D.OverlapPoint(foodCoord + new Vector2(col, row), push);
-                if (!winConfig[row, col] || !foodConfig ||
-                    winConfig[row, col].tag != foodConfig.tag || 
+                Collider2D foodConfig = Physics2D.OverlapPoint(foodCoord + new Vector2(col, -row), push);
+                if (!winConfig[row, col] || !foodConfig || foodConfig.GetComponent<Tags>().isInWinTile() ||
+                    !foodConfig.CompareTag(winConfig[row, col].tag) || 
                     winConfig[row, col].GetComponent<Tags>().isCut() != foodConfig.GetComponent<Tags>().isCut() ||
                     winConfig[row, col].GetComponent<Tags>().isHot() != foodConfig.GetComponent<Tags>().isHot() ||
                     winConfig[row, col].GetComponent<Tags>().isCold() != foodConfig.GetComponent<Tags>().isCold() ||
