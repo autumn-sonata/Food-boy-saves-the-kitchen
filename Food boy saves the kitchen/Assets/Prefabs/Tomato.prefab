@@ -546,8 +546,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5511143ed8fc5444aa0db7ccb35256ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isCutAtStart: 1
-  isCookedAtStart: 1
+  isCutAtStart: 0
+  isCookedAtStart: 0
 --- !u!1 &8549697675494402086
 GameObject:
   m_ObjectHideFlags: 0
