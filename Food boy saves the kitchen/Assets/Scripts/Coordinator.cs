@@ -53,6 +53,7 @@ public class Coordinator : MonoBehaviour
         checkedMove = false;
         isInitialise = true;
         hasUndone = false;
+        InitialiseAllAttributes();
     }
 
     // Start is called before the first frame update
@@ -67,6 +68,7 @@ public class Coordinator : MonoBehaviour
         /* Central call to all other managers.
          */
         PlayerRoutine();
+        ConveyerBeltRoutine();
         CheckInactive();
         CheckUndo();
 
@@ -194,6 +196,15 @@ public class Coordinator : MonoBehaviour
         players.UnionWith(foods); //player tag already enabled
     }
 
+    private void InitialiseAllAttributes()
+    {
+        /* Initialise cut and cooked if stated.
+         */
+        foreach (AttributeInitialisation attr in FindObjectsOfType<AttributeInitialisation>())
+        {
+            attr.Initialise();
+        }
+    }
     private bool allMovementsComplete()
     {
         /* Checks whether the moves for all moving players are complete
@@ -317,6 +328,14 @@ public class Coordinator : MonoBehaviour
         {
             playerTimer.startTimer(MoveDelay);
         }
+    }
+
+    private void ConveyerBeltRoutine()
+    {
+        /* Mimics player movement on the conveyer belt.
+         * Applies same logic as moving an object as a player.
+         */
+
     }
 
     private void CheckInactive()

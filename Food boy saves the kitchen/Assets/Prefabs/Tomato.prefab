@@ -303,6 +303,7 @@ GameObject:
   - component: {fileID: 6270199392071397415}
   - component: {fileID: 1241466232817313629}
   - component: {fileID: 8187554893301158031}
+  - component: {fileID: 3555642969892340254}
   m_Layer: 7
   m_Name: Tomato
   m_TagString: Tomato
@@ -533,6 +534,20 @@ MonoBehaviour:
   - {fileID: 3610227533801225362}
   - {fileID: 734075961396225727}
   - {fileID: 6226674175091257576}
+--- !u!114 &3555642969892340254
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4267748108077695760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5511143ed8fc5444aa0db7ccb35256ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isCutAtStart: 0
+  isCookedAtStart: 0
 --- !u!1 &8549697675494402086
 GameObject:
   m_ObjectHideFlags: 0
