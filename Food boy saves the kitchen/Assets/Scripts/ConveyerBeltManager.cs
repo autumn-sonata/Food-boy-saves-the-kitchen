@@ -14,10 +14,14 @@ public class ConveyerBeltManager : MonoBehaviour
     //specifies the direction of movement of conveyer belt.
     public string direction; //either "left", "right", "up", down"
     private Vector2 directionPush; //specifies the direction of movement
-    private GameObject onBelt;
+    private Collider2D col;
+
+    private LayerMask push;
 
     private void Awake()
     {
+        push = LayerMask.GetMask("Push");
+
         //translate the direction of movement into directionPush.
         switch (direction)
         {
@@ -38,7 +42,7 @@ public class ConveyerBeltManager : MonoBehaviour
                 break;
         }
 
-        onBelt = new();
+        col = Physics2D.OverlapPoint(transform.position, push);
     }
 
     /* When movement is done, check whether there is any object on this tile.
