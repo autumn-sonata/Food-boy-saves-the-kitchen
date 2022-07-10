@@ -190,7 +190,7 @@ public class WinManager : MonoBehaviour
                 {
                     Vector2 currPosition = winConfig[row, col].transform.position;
                     if (currPosition.x < topLeftCorner.x || bottomRightCorner.x < currPosition.x ||
-                        currPosition.y > topLeftCorner.y || bottomRightCorner.y < currPosition.y)
+                        currPosition.y > topLeftCorner.y || bottomRightCorner.y > currPosition.y)
                     {
                         GameObject movingOut = winConfig[row, col];
                         //out of win tile.
