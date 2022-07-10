@@ -74,14 +74,15 @@ public class Coordinator : MonoBehaviour
 
         if (hasMoved())
         {
+            foreach (GameObject player in players)
+            {
+                player.GetComponent<DetachChildren>().detachAllChildren();
+            }
+
             foreach (TileManager tile in tiles)
             {
                 tile.TriggerTile(); //update collider
             }
-
-            //At this point, moved to new, oldCol is the one to reenable.
-            //col is all updated already. just ask to change oldCol hot/cold 
-            //properties immediately.
 
             /* Dictionary parameters -> [Tag name: [isCold?, isHot?]]
              * 
@@ -435,5 +436,14 @@ public class Coordinator : MonoBehaviour
         {
             dict.Add(key, value);
         }
+    }
+
+    private void DebugTags(string name)
+    {
+        /* For debugging tags. 
+         * 
+         * Parameters: name of object in scene
+         */
+        GameObject.Find(name).GetComponent<Tags>().printTags();
     }
 }
