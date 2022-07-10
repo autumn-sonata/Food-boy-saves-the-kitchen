@@ -15,6 +15,7 @@ public class Coordinator : MonoBehaviour
 
     private HashSet<GameObject> players; //stores every single player on the level. Managed by YouManager
     private Dictionary<string, int> playerTypes; //stores the food types of players on the level
+    private List<GameObject> invisibleCache; //stores items that are invisible when holding tab
     private bool checkedMove;
     private bool isInitialise;
     private bool hasUndone;
@@ -36,6 +37,7 @@ public class Coordinator : MonoBehaviour
         //Initialisation of players and playerTypes
         players = new HashSet<GameObject>();
         playerTypes = new Dictionary<string, int>();
+        invisibleCache = new List<GameObject>();
 
         playerTimer = GetComponent<Timer>();
         moveManager = GameObject.Find("Canvas").GetComponent<PastMovesManager>();
@@ -67,105 +69,122 @@ public class Coordinator : MonoBehaviour
     {
         /* Central call to all other managers.
          */
-        PlayerRoutine();
-        ConveyerBeltRoutine();
-        CheckInactive();
-        CheckUndo();
-
-        if (hasMoved())
+        if (inputManager.KeyHoldTab() && !invisibleCache.Any())
         {
-            foreach (GameObject player in players)
-            {
-                player.GetComponent<DetachChildren>().detachAllChildren();
-            }
-
-            foreach (TileManager tile in tiles)
-            {
-                tile.TriggerTile(); //update collider
-            }
-
-            /* Dictionary parameters -> [Tag name: [isCold?, isHot?]]
-             * 
-             * The hotCold hashmap represents the objects on hot and cold 
-             * tiles and whether  
+            /* Make all movable objects that are currently visible
+             * to be temporarily invisible as long as tab key is held.
              */
-            Dictionary<string, bool[]> hotCold = new();
-
-            UpdateHotColdPlayers(hotCold);
- 
-            if (!isInitialise)
-            {
-                foreach (TileManager tile in tiles)
-                {
-                    /* Enable hot/cold and heavy again for food 
-                     * items going out of tile
-                     */
-                    tile.ActivateDormantHotCold(hotCold);
-                }
-  
-                //You, cold and hot tile tag + updates in case change of objects
-                foreach (TileManager tile in tiles)
-                {
-                    tile.OldColUpdate(); //run all old col updates before new ones.
-                }
-
-                foreach (WinManager winTile in winTiles)
-                {
-                    winTile.ExitTrigger(hotCold, heavyTiles);
-                }
-                
-                //Tag updates for new objects that stepped into different tiles
-                foreach (WinManager winTile in winTiles)
-                {
-                    winTile.EnterTrigger();
-                }
-
-                foreach (TileManager tile in tiles)
-                {
-                    tile.NewColUpdate();
-                }
-
-                //Deactivate objects if both hot and cold.
-                foreach (TileManager tile in tiles)
-                {
-                    tile.DeactivateDormantHotCold(hotCold);
-                }
-            }
-
-            HeavyActivation();
-            SpriteUpdate(); //deactivates gameobject if tags are appropriate.
-
-            //Win tile updates
-            executeWinManagers();
-
-            //ask moveManager to make all PastMovesRecords to record their moves.
-            moveManager.RecordThisMove();
-            checkedMove = true;
-            isInitialise = false;
-        }
-
-        SpriteUpdate();
-
-        //Undo and restart
-        if (inputManager.KeyPressUndo())
+            int pushLayer = LayerMask.NameToLayer("Push");
+            invisibleCache = FindObjectsOfType<GameObject>().ToList()
+                .FindAll(obj => obj.layer == pushLayer);
+            invisibleCache.ForEach(obj => obj.SetActive(false));
+        } else if (!inputManager.KeyHoldTab())
         {
-            hasUndone = true;
-            moveManager.DoUndo();
-            executeWinManagers(); //update Win Manager to previous state.
-            SpriteUpdate();
-            //update players and playerTypes to previous state
-            players.Clear();
-            playerTypes.Clear();
-            foreach (TileManager youTile in youTiles)
+            if (invisibleCache.Any())
             {
-                players.UnionWith(youTile.playersAttached());
-                if (youTile.hasFoodOnYouTile())
+                invisibleCache.ForEach(obj => obj.SetActive(true));
+                invisibleCache.Clear();
+            }
+            PlayerRoutine();
+            ConveyerBeltRoutine();
+            CheckInactive();
+            CheckUndo();
+
+            if (hasMoved())
+            {
+                foreach (GameObject player in players)
                 {
-                    incrementPlayer(youTile.colFoodTag());
+                    player.GetComponent<DetachChildren>().detachAllChildren();
+                }
+
+                foreach (TileManager tile in tiles)
+                {
+                    tile.TriggerTile(); //update collider
+                }
+
+                /* Dictionary parameters -> [Tag name: [isCold?, isHot?]]
+                 * 
+                 * The hotCold hashmap represents the objects on hot and cold 
+                 * tiles and whether  
+                 */
+                Dictionary<string, bool[]> hotCold = new();
+
+                UpdateHotColdPlayers(hotCold);
+
+                if (!isInitialise)
+                {
+                    foreach (TileManager tile in tiles)
+                    {
+                        /* Enable hot/cold and heavy again for food 
+                         * items going out of tile
+                         */
+                        tile.ActivateDormantHotCold(hotCold);
+                    }
+
+                    //You, cold and hot tile tag + updates in case change of objects
+                    foreach (TileManager tile in tiles)
+                    {
+                        tile.OldColUpdate(); //run all old col updates before new ones.
+                    }
+
+                    foreach (WinManager winTile in winTiles)
+                    {
+                        winTile.ExitTrigger(hotCold, heavyTiles);
+                    }
+
+                    //Tag updates for new objects that stepped into different tiles
+                    foreach (WinManager winTile in winTiles)
+                    {
+                        winTile.EnterTrigger();
+                    }
+
+                    foreach (TileManager tile in tiles)
+                    {
+                        tile.NewColUpdate();
+                    }
+
+                    //Deactivate objects if both hot and cold.
+                    foreach (TileManager tile in tiles)
+                    {
+                        tile.DeactivateDormantHotCold(hotCold);
+                    }
+                }
+
+                HeavyActivation();
+                SpriteUpdate(); //deactivates gameobject if tags are appropriate.
+
+                //Win tile updates
+                executeWinManagers();
+
+                //ask moveManager to make all PastMovesRecords to record their moves.
+                moveManager.RecordThisMove();
+                checkedMove = true;
+                isInitialise = false;
+            }
+
+            SpriteUpdate();
+
+            //Undo and restart
+            if (inputManager.KeyPressUndo())
+            {
+                hasUndone = true;
+                moveManager.DoUndo();
+                executeWinManagers(); //update Win Manager to previous state.
+                SpriteUpdate();
+                //update players and playerTypes to previous state
+                players.Clear();
+                playerTypes.Clear();
+                foreach (TileManager youTile in youTiles)
+                {
+                    players.UnionWith(youTile.playersAttached());
+                    if (youTile.hasFoodOnYouTile())
+                    {
+                        incrementPlayer(youTile.colFoodTag());
+                    }
                 }
             }
+            if (inputManager.KeyPressRestart()) moveManager.RestartLevel();
         }
-        if (inputManager.KeyPressRestart()) moveManager.RestartLevel();
     }
 
     public void decrementPlayer(string playerType)
