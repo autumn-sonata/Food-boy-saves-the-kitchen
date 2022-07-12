@@ -8,7 +8,7 @@ public class PlayerManager : MonoBehaviour
      * Does this by reading the input of the player only at their destination
      */
 
-    public const float PlayerSpeed = 7f;
+    public const float PlayerSpeed = 10f;
     public Transform destination;
     private float spriteSize;
 
