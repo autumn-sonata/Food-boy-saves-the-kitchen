@@ -16,9 +16,11 @@ public class Coordinator : MonoBehaviour
     private HashSet<GameObject> players; //stores every single player on the level. Managed by YouManager
     private Dictionary<string, int> playerTypes; //stores the food types of players on the level
     private List<GameObject> invisibleCache; //stores items that are invisible when holding tab
+    private List<GameObject> tmpPlayers;
     private bool checkedMove;
     private bool isInitialise;
     private bool hasUndone;
+    private bool playerCanMove;
 
     private Timer playerTimer;
     private PastMovesManager moveManager;
@@ -35,9 +37,10 @@ public class Coordinator : MonoBehaviour
     private void Awake()
     {
         //Initialisation of players and playerTypes
-        players = new HashSet<GameObject>();
-        playerTypes = new Dictionary<string, int>();
-        invisibleCache = new List<GameObject>();
+        players = new();
+        playerTypes = new();
+        tmpPlayers = new();
+        invisibleCache = new();
 
         playerTimer = GetComponent<Timer>();
         moveManager = GameObject.Find("Canvas").GetComponent<PastMovesManager>();
@@ -55,14 +58,29 @@ public class Coordinator : MonoBehaviour
         checkedMove = false;
         isInitialise = true;
         hasUndone = false;
-        InitialiseAllAttributes();
+        playerCanMove = true;
+        InitialiseAllAttributes(); //initialise cooked and cut
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        //Get all players that can be moved.
-        UpdatePlayerAttrInfo();
+        /* Updates players hashset and playerTypes hashmap.
+         */
+
+        foreach (TileManager tile in tiles)
+        {
+            tile.Initialise();
+        }
+
+        foreach (TileManager youTile in youTiles)
+        {
+            players.UnionWith(youTile.playersAttached());
+            if (youTile.hasFoodOnYouTile())
+            {
+                incrementPlayer(youTile.colFoodTag());
+            }
+        }
     }
 
     private void Update()
@@ -85,105 +103,11 @@ public class Coordinator : MonoBehaviour
                 invisibleCache.ForEach(obj => obj.SetActive(true));
                 invisibleCache.Clear();
             }
+
             PlayerRoutine();
+            LevelTagPlayerUpdate(); //updates all the tags on the board.
             ConveyerBeltRoutine();
-            CheckInactive();
-            CheckUndo();
-
-            if (hasMoved())
-            {
-                foreach (GameObject player in players)
-                {
-                    player.GetComponent<DetachChildren>().detachAllChildren();
-                }
-
-                foreach (TileManager tile in tiles)
-                {
-                    tile.TriggerTile(); //update collider
-                }
-
-                /* Dictionary parameters -> [Tag name: [isCold?, isHot?]]
-                 * 
-                 * The hotCold hashmap represents the objects on hot and cold 
-                 * tiles and whether  
-                 */
-                Dictionary<string, bool[]> hotCold = new();
-
-                UpdateHotColdPlayers(hotCold);
-
-                if (!isInitialise)
-                {
-                    foreach (TileManager tile in tiles)
-                    {
-                        /* Enable hot/cold and heavy again for food 
-                         * items going out of tile
-                         */
-                        tile.ActivateDormantHotCold(hotCold);
-                    }
-
-                    //You, cold and hot tile tag + updates in case change of objects
-                    foreach (TileManager tile in tiles)
-                    {
-                        tile.OldColUpdate(); //run all old col updates before new ones.
-                    }
-
-                    foreach (WinManager winTile in winTiles)
-                    {
-                        winTile.ExitTrigger(hotCold, heavyTiles);
-                    }
-
-                    //Tag updates for new objects that stepped into different tiles
-                    foreach (WinManager winTile in winTiles)
-                    {
-                        winTile.EnterTrigger();
-                    }
-
-                    foreach (TileManager tile in tiles)
-                    {
-                        tile.NewColUpdate();
-                    }
-
-                    //Deactivate objects if both hot and cold.
-                    foreach (TileManager tile in tiles)
-                    {
-                        tile.DeactivateDormantHotCold(hotCold);
-                    }
-                }
-
-                HeavyActivation();
-                SpriteUpdate(); //deactivates gameobject if tags are appropriate.
-
-                //Win tile updates
-                executeWinManagers();
-
-                //ask moveManager to make all PastMovesRecords to record their moves.
-                moveManager.RecordThisMove();
-                checkedMove = true;
-                isInitialise = false;
-            }
-
-            SpriteUpdate();
-
-            //Undo and restart
-            if (inputManager.KeyPressUndo())
-            {
-                hasUndone = true;
-                moveManager.DoUndo();
-                executeWinManagers(); //update Win Manager to previous state.
-                SpriteUpdate();
-                //update players and playerTypes to previous state
-                players.Clear();
-                playerTypes.Clear();
-                foreach (TileManager youTile in youTiles)
-                {
-                    players.UnionWith(youTile.playersAttached());
-                    if (youTile.hasFoodOnYouTile())
-                    {
-                        incrementPlayer(youTile.colFoodTag());
-                    }
-                }
-            }
-            if (inputManager.KeyPressRestart()) moveManager.RestartLevel();
+            LevelTagBeltUpdate();
         }
     }
 
@@ -259,26 +183,6 @@ public class Coordinator : MonoBehaviour
         }
     }
 
-    private void UpdatePlayerAttrInfo()
-    {
-        /* Updates players hashset and playerTypes hashmap.
-         */
-
-        foreach (TileManager tile in tiles)
-        {
-            tile.Initialise();
-        }
-
-        foreach (TileManager youTile in youTiles)
-        {
-            players.UnionWith(youTile.playersAttached());
-            if (youTile.hasFoodOnYouTile())
-            {
-                incrementPlayer(youTile.colFoodTag());
-            }
-        }
-    }
-
     private List<SpriteManager> GetAllSprites()
     {
         SpriteManager[] allObjects = FindObjectsOfType<SpriteManager>();
@@ -304,8 +208,16 @@ public class Coordinator : MonoBehaviour
 
     private void PlayerRoutine()
     {
-        if (allMovementsComplete())
+        if (allMovementsComplete() && playerCanMove)
         {
+            if (tmpPlayers.Any())
+            {
+                tmpPlayers.ForEach(obj => {
+                    obj.GetComponent<Tags>().disablePlayerTag();
+                    obj.GetComponent<DetachChildren>().detachAllChildren();
+                });
+                players.RemoveWhere(player => !player.GetComponent<Tags>().isPlayer());
+            }
             //Everyone has stopped movement, poll for new move through input.
             float horizontalMove = inputManager.KeyDirectionHorz();
             float verticalMove = inputManager.KeyDirectionVert();
@@ -316,7 +228,7 @@ public class Coordinator : MonoBehaviour
             { 
                 if (Mathf.Abs(horizontalMove) == 1f && playerTimer.countdownFinished() && !player.GetComponent<Tags>().isInAnyTile())
                 {
-                    Vector2 direction = new Vector2(horizontalMove, 0f);
+                    Vector2 direction = new(horizontalMove, 0f);
                     if (player.GetComponent<ObstacleManager>().allowedToMove(direction))
                         /* Needs to move itself and the other food items in front of it.
                             * Only done when all other destinations have been reached.
@@ -326,7 +238,7 @@ public class Coordinator : MonoBehaviour
                 }
                 else if (Mathf.Abs(verticalMove) == 1f && playerTimer.countdownFinished() && !player.GetComponent<Tags>().isInAnyTile())
                 {
-                    Vector2 direction = new Vector2(0f, verticalMove);
+                    Vector2 direction = new(0f, verticalMove);
                     if (player.GetComponent<ObstacleManager>().allowedToMove(direction))
                         /* Needs to move itself and the other food items in front of it.
                             * Only done when all other destinations have been reached.
@@ -335,7 +247,7 @@ public class Coordinator : MonoBehaviour
                             (player.GetComponent<PlayerManager>(), new Vector3(0f, verticalMove, 0f)));
                 }
             }
-            
+
             foreach (var kvp in list)
             {
                 PlayerManager player = kvp.Key;
@@ -344,8 +256,9 @@ public class Coordinator : MonoBehaviour
                 {
                     player.moveDestination(direction);
                 }
+                playerCanMove = false;
             }
-        } else
+        } else if (!allMovementsComplete())
         {
             playerTimer.startTimer(MoveDelay);
         }
@@ -355,8 +268,55 @@ public class Coordinator : MonoBehaviour
     {
         /* Mimics player movement on the conveyer belt.
          * Applies same logic as moving an object as a player.
+         * 
+         * Uses "players" from playerConveyerBelt instead.
+         * Only runs when there is a player update.
          */
 
+        if (allMovementsComplete() && !playerCanMove && !isInitialise)
+        {
+            var list = new List<KeyValuePair<PlayerManager, Vector3>>();
+            tmpPlayers.Clear();
+            //Allow players that are not children to update their destination.
+            foreach (ConveyerBeltManager belt in conveyerBelts)
+            {
+                float horizontalMove = belt.getPushDirectionHorz();
+                float verticalMove = belt.getPushDirectionVert();
+                Collider2D objOnTop = belt.getObjOnTop();
+                if (Mathf.Abs(horizontalMove) == 1f)
+                {
+                    Vector2 direction = new(horizontalMove, 0f);
+                    if (objOnTop && objOnTop.GetComponent<ObstacleManager>().allowedToMove(direction))
+                        /* Needs to move itself and the other food items in front of it.
+                            * Only done when all other destinations have been reached.
+                            */
+                        list.Add(new KeyValuePair<PlayerManager, Vector3>
+                            (objOnTop.GetComponent<PlayerManager>(), new Vector3(horizontalMove, 0f, 0f)));
+                }
+                else if (Mathf.Abs(verticalMove) == 1f)
+                {
+                    Vector2 direction = new(0f, verticalMove);
+                    if (objOnTop && objOnTop.GetComponent<ObstacleManager>().allowedToMove(direction))
+                        /* Needs to move itself and the other food items in front of it.
+                            * Only done when all other destinations have been reached.
+                            */
+                        list.Add(new KeyValuePair<PlayerManager, Vector3>
+                            (objOnTop.GetComponent<PlayerManager>(), new Vector3(0f, verticalMove, 0f)));
+                }
+            }
+
+            foreach (var kvp in list)
+            {
+                PlayerManager player = kvp.Key;
+                Vector3 direction = kvp.Value;
+                //Unconditionally move this object as it is on a conveyer belt.
+                player.moveDestination(direction);
+                player.GetComponent<Tags>().enablePlayerTag();
+                players.Add(player.gameObject);
+            }
+            tmpPlayers = list.ConvertAll(obj => obj.Key.gameObject);
+            playerCanMove = true;
+        }
     }
 
     private void CheckInactive()
@@ -433,6 +393,128 @@ public class Coordinator : MonoBehaviour
                 obj.disableHeavy();
             }
         }
+    }
+
+    private void LevelTagPlayerUpdate()
+    {
+        CheckInactive();
+        CheckUndo();
+
+        if (hasMoved())
+        {
+            TagRecordRoutine();
+        }
+        SpriteUpdate();
+        executeWinManagers();
+        UndoRestartRoutine();
+    }
+
+    private void LevelTagBeltUpdate()
+    {
+        CheckInactive();
+        CheckUndo();
+
+        if (hasMoved())
+        {
+            TagRecordRoutine();
+            //ask moveManager to make all PastMovesRecords to record their moves.
+            moveManager.RecordThisMove();
+            checkedMove = true;
+            isInitialise = false;
+        }
+        SpriteUpdate();
+        UndoRestartRoutine();
+    }
+
+    private void TagRecordRoutine()
+    {
+        foreach (GameObject player in players)
+        {
+            player.GetComponent<DetachChildren>().detachAllChildren();
+        }
+
+        foreach (TileManager tile in tiles)
+        {
+            tile.TriggerTile(); //update collider
+        }
+
+        /* Dictionary parameters -> [Tag name: [isCold?, isHot?]]
+         * 
+         * The hotCold hashmap represents the objects on hot and cold 
+         * tiles and whether  
+         */
+        Dictionary<string, bool[]> hotCold = new();
+
+        UpdateHotColdPlayers(hotCold);
+
+        if (!isInitialise)
+        {
+            foreach (TileManager tile in tiles)
+            {
+                /* Enable hot/cold and heavy again for food 
+                 * items going out of tile
+                 */
+                tile.ActivateDormantHotCold(hotCold);
+            }
+
+            //You, cold and hot tile tag + updates in case change of objects
+            foreach (TileManager tile in tiles)
+            {
+                tile.OldColUpdate(); //run all old col updates before new ones.
+            }
+
+            foreach (WinManager winTile in winTiles)
+            {
+                winTile.ExitTrigger(hotCold, heavyTiles);
+            }
+
+            //Tag updates for new objects that stepped into different tiles
+            foreach (WinManager winTile in winTiles)
+            {
+                winTile.EnterTrigger();
+            }
+
+            foreach (TileManager tile in tiles)
+            {
+                tile.NewColUpdate();
+            }
+
+            //Deactivate objects if both hot and cold.
+            foreach (TileManager tile in tiles)
+            {
+                tile.DeactivateDormantHotCold(hotCold);
+            }
+        }
+
+        HeavyActivation();
+        SpriteUpdate(); //deactivates gameobject if tags are appropriate.
+
+        //Win tile updates
+        executeWinManagers();
+    }
+
+    private void UndoRestartRoutine()
+    {
+        //Undo and restart
+        if (inputManager.KeyPressUndo())
+        {
+            hasUndone = true;
+            moveManager.DoUndo();
+            executeWinManagers(); //update Win Manager to previous state.
+            SpriteUpdate();
+            //update players and playerTypes to previous state
+            players.Clear();
+            playerTypes.Clear();
+            foreach (TileManager youTile in youTiles)
+            {
+                players.UnionWith(youTile.playersAttached());
+                if (youTile.hasFoodOnYouTile())
+                {
+                    incrementPlayer(youTile.colFoodTag());
+                }
+            }
+        }
+        if (inputManager.KeyPressRestart()) moveManager.RestartLevel();
     }
 
     private static void AddOrUpdateDict(Dictionary<string, bool[]> dict, string key, bool[] value)

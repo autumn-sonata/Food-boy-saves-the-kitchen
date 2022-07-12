@@ -14,7 +14,6 @@ public class ConveyerBeltManager : MonoBehaviour
     //specifies the direction of movement of conveyer belt.
     public string direction; //either "left", "right", "up", down"
     private Vector2 directionPush; //specifies the direction of movement
-    private Collider2D col;
 
     private LayerMask push;
 
@@ -38,15 +37,29 @@ public class ConveyerBeltManager : MonoBehaviour
                 directionPush = new Vector2(0, -1);
                 break;
             default:
-                Debug.LogError("Invalid direction in ConveyerBeltManager.");
+                Debug.LogError("Invalid direction in ConveyerBeltManager. " +
+                    "Refer to ConveyerBeltManager for instructions.");
                 break;
         }
-
-        col = Physics2D.OverlapPoint(transform.position, push);
     }
 
     /* When movement is done, check whether there is any object on this tile.
      * Then update accordingly.
      */
+    public Collider2D getObjOnTop()
+    {
+        /* Gets the current element which is on top of the conveyer belt.
+         */
+        return Physics2D.OverlapPoint(transform.position, push);
+    }
 
+    public float getPushDirectionHorz()
+    {
+        return directionPush.x;
+    }
+
+    public float getPushDirectionVert()
+    {
+        return directionPush.y;
+    }
 }
