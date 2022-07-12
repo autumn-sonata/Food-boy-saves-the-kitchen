@@ -181,7 +181,7 @@ public class PushObstacleManager : MonoBehaviour
         if (inFront.Any())
         {
             inFront.RemoveAt(inFront.Count - 1);
-            foreFrontOfPlayer = inFront[inFront.Count - 1];
+            if (inFront.Any()) foreFrontOfPlayer = inFront[inFront.Count - 1];
         }
     }
 }
