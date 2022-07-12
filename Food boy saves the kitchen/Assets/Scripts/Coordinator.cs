@@ -103,6 +103,7 @@ public class Coordinator : MonoBehaviour
                 invisibleCache.ForEach(obj => obj.SetActive(true));
                 invisibleCache.Clear();
             }
+
             PlayerRoutine();
             LevelTagPlayerUpdate(); //updates all the tags on the board.
             ConveyerBeltRoutine();
@@ -404,6 +405,7 @@ public class Coordinator : MonoBehaviour
             TagRecordRoutine();
         }
         SpriteUpdate();
+        executeWinManagers();
         UndoRestartRoutine();
     }
 
