@@ -84,6 +84,8 @@ public abstract class TileManager: MonoBehaviour
                 //Update to new collider
                 NewColRoutine();
                 col.GetComponent<DetachChildren>().detachAllChildren();
+                col.GetComponent<Tags>().disableCold();
+                col.GetComponent<Tags>().disableHot();
 
                 //Update foodSameTag
                 foodSameTag = GameObject.FindGameObjectsWithTag(col.tag).ToList();

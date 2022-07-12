@@ -88,7 +88,6 @@ public class PastMovesRecords : MonoBehaviour
                 if (GetComponent<PlayerManager>())
                     GetComponent<PlayerManager>().updateDestinationToCurrPosition();
                 GetComponent<Tags>().setTags(top.getTags().ToArray());
-
                 if (isTile()) sameTagManager.Undo(turnNumber());
             }
         }

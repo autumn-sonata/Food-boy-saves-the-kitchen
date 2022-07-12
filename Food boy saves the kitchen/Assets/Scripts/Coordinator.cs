@@ -402,11 +402,10 @@ public class Coordinator : MonoBehaviour
 
         if (hasMoved())
         {
-            TagRecordRoutine();
+            TagRoutine();
         }
         SpriteUpdate();
         executeWinManagers();
-        UndoRestartRoutine();
     }
 
     private void LevelTagBeltUpdate()
@@ -416,17 +415,18 @@ public class Coordinator : MonoBehaviour
 
         if (hasMoved())
         {
-            TagRecordRoutine();
+            TagRoutine();
             //ask moveManager to make all PastMovesRecords to record their moves.
             moveManager.RecordThisMove();
             checkedMove = true;
             isInitialise = false;
         }
         SpriteUpdate();
+        executeWinManagers();
         UndoRestartRoutine();
     }
 
-    private void TagRecordRoutine()
+    private void TagRoutine()
     {
         foreach (GameObject player in players)
         {
