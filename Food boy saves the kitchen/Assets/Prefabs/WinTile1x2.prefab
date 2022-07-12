@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3933948252900507989}
   - component: {fileID: 3933948252900507988}
   - component: {fileID: 8128170032572481401}
-  m_Layer: 20
+  m_Layer: 9
   m_Name: WinTile1x2
   m_TagString: Win
   m_Icon: {fileID: 1206586993520771344, guid: 0000000000000000d000000000000000, type: 0}
@@ -161,7 +161,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3034583639433069764}
   - component: {fileID: 3034583639433069765}
-  m_Layer: 20
+  m_Layer: 9
   m_Name: Shadow
   m_TagString: Untagged
   m_Icon: {fileID: 0}

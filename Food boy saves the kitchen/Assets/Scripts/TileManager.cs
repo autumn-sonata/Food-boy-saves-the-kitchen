@@ -112,7 +112,7 @@ public abstract class TileManager: MonoBehaviour
         if (oldCol && triggerCalled)
         {
             Tags oldColTags = oldCol.GetComponent<Tags>();
-
+            if (NotOnAnyTile()) oldColTags.notOnAnyTile();
             if (hotCold.ContainsKey(oldCol.tag) && !oldCol.GetComponent<Tags>().isInAnyTile())
             {
                 bool[] enableHotCold = hotCold[oldCol.tag];
@@ -224,6 +224,14 @@ public abstract class TileManager: MonoBehaviour
          */
 
         col = Physics2D.OverlapPoint(transform.position, push);
+    }
+
+    private bool NotOnAnyTile()
+    {
+        /* Checks if oldCol is now standing on any tile.
+         */
+        return !Physics2D.OverlapPoint(oldCol.transform.position, 
+            LayerMask.NameToLayer("Tiles"));
     }
 
     protected abstract void OldColRoutine(); //oldCol updates.

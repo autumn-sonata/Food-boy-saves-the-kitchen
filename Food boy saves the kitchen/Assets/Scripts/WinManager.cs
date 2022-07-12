@@ -37,7 +37,7 @@ public class WinManager : MonoBehaviour
         {
             for (int j = 0; j < x; j++)
             {
-                Collider2D withinWinTile = Physics2D.OverlapPoint(topLeftCenteredCoord + new Vector2(j, i), push);
+                Collider2D withinWinTile = Physics2D.OverlapPoint(topLeftCenteredCoord + new Vector2(j, -i), push);
                 if (withinWinTile)
                 {
                     withinWinTile.GetComponent<Tags>().enableWinTileTag();
@@ -85,7 +85,7 @@ public class WinManager : MonoBehaviour
             for (int col = 0; col < winConfig.GetLength(1); col++)
             {
                 if ((winConfig[row, col] && new Vector2(winConfig[row, col].transform.position.x, 
-                    winConfig[row, col].transform.position.y) != topLeftCenteredCoord + new Vector2(col, row)) ||
+                    winConfig[row, col].transform.position.y) != topLeftCenteredCoord + new Vector2(col, -row)) ||
                     !winConfig[row, col])
                 {
                     //Replace if found that there is a different food there or to update to a possible

@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 5379518506200235453}
   - component: {fileID: 5379518506200235452}
   - component: {fileID: 5379518506200235455}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: HotTile
   m_TagString: Hot
   m_Icon: {fileID: 0}
