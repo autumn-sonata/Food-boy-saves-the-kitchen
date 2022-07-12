@@ -38,6 +38,7 @@ public abstract class TileManager: MonoBehaviour
 
             //Initialise tags of foodSameTag
             foodSameTag = GameObject.FindGameObjectsWithTag(col.tag).ToList();
+            foodSameTag.RemoveAll(food => food.GetComponent<Tags>().isCut());
             EnableFoodSameTagProperty();
 
             //Initialise oldCol to be col

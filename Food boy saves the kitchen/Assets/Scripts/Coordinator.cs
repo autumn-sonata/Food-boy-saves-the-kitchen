@@ -65,8 +65,22 @@ public class Coordinator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //Get all players that can be moved.
-        UpdatePlayerAttrInfo();
+        /* Updates players hashset and playerTypes hashmap.
+         */
+
+        foreach (TileManager tile in tiles)
+        {
+            tile.Initialise();
+        }
+
+        foreach (TileManager youTile in youTiles)
+        {
+            players.UnionWith(youTile.playersAttached());
+            if (youTile.hasFoodOnYouTile())
+            {
+                incrementPlayer(youTile.colFoodTag());
+            }
+        }
     }
 
     private void Update()
@@ -165,26 +179,6 @@ public class Coordinator : MonoBehaviour
         foreach (WinManager winTile in winTiles)
         {
             winTile.moveExecuted();
-        }
-    }
-
-    private void UpdatePlayerAttrInfo()
-    {
-        /* Updates players hashset and playerTypes hashmap.
-         */
-
-        foreach (TileManager tile in tiles)
-        {
-            tile.Initialise();
-        }
-
-        foreach (TileManager youTile in youTiles)
-        {
-            players.UnionWith(youTile.playersAttached());
-            if (youTile.hasFoodOnYouTile())
-            {
-                incrementPlayer(youTile.colFoodTag());
-            }
         }
     }
 
@@ -421,6 +415,8 @@ public class Coordinator : MonoBehaviour
         if (hasMoved())
         {
             TagRecordRoutine();
+            //ask moveManager to make all PastMovesRecords to record their moves.
+            moveManager.RecordThisMove();
             checkedMove = true;
             isInitialise = false;
         }
@@ -493,9 +489,6 @@ public class Coordinator : MonoBehaviour
 
         //Win tile updates
         executeWinManagers();
-
-        //ask moveManager to make all PastMovesRecords to record their moves.
-        moveManager.RecordThisMove();
     }
 
     private void UndoRestartRoutine()

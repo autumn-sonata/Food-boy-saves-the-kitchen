@@ -101,13 +101,13 @@ public class PushObstacleManager : MonoBehaviour
         /* Updates the food to become cut if there is a sharp object.
          */
 
-        if (foreFront.GetComponent<Tags>().isSharp())
+        if (foreFront.GetComponent<Tags>().isSharp() && !foreFrontOfPlayer.GetComponent<Tags>().isKnife())
         {
             //Make food that pushed into the knife cut.
             foreFrontOfPlayer.GetComponent<Tags>().enableIsCut();
         }
 
-        if (foreFrontOfPlayer.GetComponent<Tags>().isSharp())
+        if (foreFrontOfPlayer.GetComponent<Tags>().isSharp() && !foreFront.GetComponent<Tags>().isKnife())
         {
             //Make food in front of the player knife cut.
             foreFront.GetComponent<Tags>().enableIsCut();
