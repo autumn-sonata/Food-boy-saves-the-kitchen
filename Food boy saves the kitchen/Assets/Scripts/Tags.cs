@@ -83,6 +83,16 @@ public class Tags : MonoBehaviour
         return false;
     }
 
+    public void notOnAnyTile()
+    {
+        /* Disables all on tile tags.
+         */
+        for (int i = 1; i < 6; i++)
+        {
+            objectTags[i] = false;
+        }
+    }
+
     public void enableHotTileTag()
     {
         objectTags[3] = true;

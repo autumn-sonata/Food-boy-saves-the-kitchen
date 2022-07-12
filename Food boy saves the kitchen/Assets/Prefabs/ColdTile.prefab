@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 6744809571501272290}
   - component: {fileID: 6744809571501272291}
   - component: {fileID: -8572072036854029697}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: ColdTile
   m_TagString: Cold
   m_Icon: {fileID: 0}
