@@ -183,6 +183,14 @@ public class Coordinator : MonoBehaviour
         }
     }
 
+    private void checkWinConfig()
+    {
+        foreach (WinManager winTile in winTiles)
+        {
+            winTile.checkIfWin();
+        }
+    }
+
     private List<SpriteManager> GetAllSprites()
     {
         SpriteManager[] allObjects = FindObjectsOfType<SpriteManager>();
@@ -405,7 +413,7 @@ public class Coordinator : MonoBehaviour
             TagRoutine();
         }
         SpriteUpdate();
-        executeWinManagers();
+        checkWinConfig();
     }
 
     private void LevelTagBeltUpdate()
@@ -422,7 +430,7 @@ public class Coordinator : MonoBehaviour
             isInitialise = false;
         }
         SpriteUpdate();
-        executeWinManagers();
+        checkWinConfig(); //check cut 
         UndoRestartRoutine();
     }
 

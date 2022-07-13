@@ -2807,11 +2807,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6428328539841942814, guid: 554e1092952146f488bdec8349b31708, type: 3}
       propertyPath: m_Size.x
-      value: 1.875
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6428328539841942814, guid: 554e1092952146f488bdec8349b31708, type: 3}
       propertyPath: m_Size.y
-      value: 1.875
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6428328539841942815, guid: 554e1092952146f488bdec8349b31708, type: 3}
       propertyPath: m_RootOrder
