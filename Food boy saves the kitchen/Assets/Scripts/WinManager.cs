@@ -105,7 +105,7 @@ public class WinManager : MonoBehaviour
         }
     }
 
-    private void checkIfWin()
+    public void checkIfWin()
     {
         /* Checks if there are any winning configurations in the level.
          * Does this by checking foodSameTagTopLeft and whether the relative configuration
