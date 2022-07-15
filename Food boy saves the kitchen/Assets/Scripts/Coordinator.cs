@@ -320,9 +320,10 @@ public class Coordinator : MonoBehaviour
                 //Unconditionally move this object as it is on a conveyer belt.
                 player.moveDestination(direction);
                 player.GetComponent<Tags>().enablePlayerTag();
-                players.Add(player.gameObject);
             }
-            tmpPlayers = list.ConvertAll(obj => obj.Key.gameObject);
+
+            tmpPlayers = list.ConvertAll(obj => obj.Key.gameObject).FindAll(obj => !players.Contains(obj));
+            players.UnionWith(tmpPlayers);
             playerCanMove = true;
         }
     }
