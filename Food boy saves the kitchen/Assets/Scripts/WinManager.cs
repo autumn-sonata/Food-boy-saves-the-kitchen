@@ -133,11 +133,10 @@ public class WinManager : MonoBehaviour
             for (int col = 0; col < winConfig.GetLength(1); col++)
             {
                 Collider2D foodConfig = Physics2D.OverlapPoint(foodCoord + new Vector2(col, -row), push);
+
                 if (!winConfig[row, col] || !foodConfig || foodConfig.GetComponent<Tags>().isInWinTile() ||
                     !foodConfig.CompareTag(winConfig[row, col].tag) || 
                     winConfig[row, col].GetComponent<Tags>().isCut() != foodConfig.GetComponent<Tags>().isCut() ||
-                    winConfig[row, col].GetComponent<Tags>().isHot() != foodConfig.GetComponent<Tags>().isHot() ||
-                    winConfig[row, col].GetComponent<Tags>().isCold() != foodConfig.GetComponent<Tags>().isCold() ||
                     winConfig[row, col].GetComponent<Tags>().isCooked() != foodConfig.GetComponent<Tags>().isCooked())
                 {
                     //Configuration is wrong
