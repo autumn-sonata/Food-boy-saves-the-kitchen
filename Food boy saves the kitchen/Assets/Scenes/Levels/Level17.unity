@@ -296,7 +296,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: ' <color=#D2D0D0>knife cuts food that collides into it.
+  m_Text: '<color=#D2D0D0>knife cuts food that collides into it.
 
     cut food cannot
     move when they are you.
@@ -2403,7 +2403,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: ' <color=#feae34>cut food are treated as different food for the win tile,
+  m_Text: '<color=#feae34>cut food are treated as different food for the win tile,
     but for other tiles they are still the same food type.
 
     </color>'

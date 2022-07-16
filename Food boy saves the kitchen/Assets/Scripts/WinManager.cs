@@ -117,7 +117,7 @@ public class WinManager : MonoBehaviour
             if (matchWinConfig(food))
             {
                 //Debug.Log("You Win!");
-                SceneManager.LoadScene(2);
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
             }
         }
     }
