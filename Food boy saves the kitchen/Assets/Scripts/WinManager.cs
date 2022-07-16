@@ -67,12 +67,13 @@ public class WinManager : MonoBehaviour
          * 2) Search board for winning states.
          */
         updateWinCondition();
+        updateFoodSameTagTopLeft(winConfig[0, 0]);
         checkIfWin();
     }
 
     private void updateWinCondition()
     {
-        /* Checks whether win condition has been updated. 
+        /* Checks whether win condition has been updated every move. 
          * If so, update winConfig, foodSameTagTopLeft and topLeftCenteredCoord. 
          */
 
@@ -92,14 +93,7 @@ public class WinManager : MonoBehaviour
                     //new object from empty.
                     Collider2D updatedFood =
                         Physics2D.OverlapPoint(topLeftCenteredCoord + new Vector2(col, -row), push);
-                    if (updatedFood)
-                    {
-                        winConfig[row, col] = updatedFood.gameObject;
-                        if (row == 0 && col == 0 && updatedFood)
-                        {
-                            updateFoodSameTagTopLeft(updatedFood);
-                        }
-                    }
+                    if (updatedFood) winConfig[row, col] = updatedFood.gameObject;
                 } 
             }
         }
@@ -148,7 +142,7 @@ public class WinManager : MonoBehaviour
         return true;
     }
 
-    private void updateFoodSameTagTopLeft(Collider2D topLeft)
+    private void updateFoodSameTagTopLeft(GameObject topLeft)
     {
         /* Update the foodSameTagTopLeft list to new top left food item since it has changed.
          */
