@@ -237,6 +237,7 @@ public class Coordinator : MonoBehaviour
                 if (Mathf.Abs(horizontalMove) == 1f && playerTimer.countdownFinished() && !player.GetComponent<Tags>().isInAnyTile())
                 {
                     Vector2 direction = new(horizontalMove, 0f);
+                    playerCanMove = false;
                     if (player.GetComponent<ObstacleManager>().allowedToMove(direction))
                         /* Needs to move itself and the other food items in front of it.
                             * Only done when all other destinations have been reached.
@@ -247,6 +248,7 @@ public class Coordinator : MonoBehaviour
                 else if (Mathf.Abs(verticalMove) == 1f && playerTimer.countdownFinished() && !player.GetComponent<Tags>().isInAnyTile())
                 {
                     Vector2 direction = new(0f, verticalMove);
+                    playerCanMove = false;
                     if (player.GetComponent<ObstacleManager>().allowedToMove(direction))
                         /* Needs to move itself and the other food items in front of it.
                             * Only done when all other destinations have been reached.
@@ -264,7 +266,6 @@ public class Coordinator : MonoBehaviour
                 {
                     player.moveDestination(direction);
                 }
-                playerCanMove = false;
             }
         } else if (!allMovementsComplete())
         {
@@ -414,7 +415,6 @@ public class Coordinator : MonoBehaviour
             TagRoutine();
         }
         SpriteUpdate();
-        checkWinConfig();
     }
 
     private void LevelTagBeltUpdate()

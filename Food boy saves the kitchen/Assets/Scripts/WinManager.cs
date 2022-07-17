@@ -67,7 +67,7 @@ public class WinManager : MonoBehaviour
          * 2) Search board for winning states.
          */
         updateWinCondition();
-        updateFoodSameTagTopLeft(winConfig[0, 0]);
+        if (winConfig[0, 0]) updateFoodSameTagTopLeft(winConfig[0, 0]);
         checkIfWin();
     }
 
