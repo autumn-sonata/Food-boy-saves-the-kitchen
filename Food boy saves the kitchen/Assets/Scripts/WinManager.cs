@@ -18,6 +18,8 @@ public class WinManager : MonoBehaviour
     private Vector2 topLeftCorner;
     private Vector2 bottomRightCorner;
 
+    [SerializeField]
+    private GameObject prefabOutline;
     private LayerMask push;
 
     private void Awake()
@@ -111,7 +113,8 @@ public class WinManager : MonoBehaviour
             if (matchWinConfig(food))
             {
                 //Debug.Log("You Win!");
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+                //Show where win configuration is in the scene.
+                OutlineWinConfig(food);
             }
         }
     }
@@ -242,5 +245,33 @@ public class WinManager : MonoBehaviour
             colTags.disableCold();
             collider.GetComponent<DetachChildren>().detachAllChildren();
         }
+    }
+
+    private void OutlineWinConfig(GameObject foodTopLeft)
+    {
+        /* Outlines the win configuration for the player to see.
+         * Sequence of actions to do.
+         */
+        Vector2 topLeftPos = foodTopLeft.transform.position;
+        Vector2 middleWinConfig = new(topLeftPos.x + winConfig.GetLength(1) / 2,
+            topLeftPos.y - winConfig.GetLength(0) / 2);
+        //middleWinConfig is where the box should appear
+
+        GameObject winOutline = Instantiate(prefabOutline);
+        winOutline.transform.position = middleWinConfig;
+
+        //Add flicker on and off functionality
+        StartCoroutine(Flicker(winOutline));
+    }
+
+    private IEnumerator Flicker(GameObject winOutline)
+    {
+        SpriteRenderer render = winOutline.GetComponent<SpriteRenderer>();
+        yield return new WaitForSeconds(0.3f);
+        render.enabled = false;
+        yield return new WaitForSeconds(0.3f);
+        render.enabled = true;
+        yield return new WaitForSeconds(2f);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 }

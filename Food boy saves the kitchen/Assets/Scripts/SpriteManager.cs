@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using SpriteGlow;
 
 public class SpriteManager : MonoBehaviour
 {
@@ -18,17 +19,23 @@ public class SpriteManager : MonoBehaviour
 
     public Transform[] spriteObjects;
     private Dictionary<string, SpriteRenderer> sprites;
+    private SpriteGlowEffect spriteGlow;
     private readonly string original = "original";
     private readonly string cut = "cut";
     private readonly string cold = "cold";
     private readonly string hot = "hot";
-    private readonly string cooked = "cooked";
+    private FoodGlowManager glowManager;
+    private static Color32 cookedGlowColor = new(161, 54, 54, 30);
 
     private void Awake()
     {
         /* Disable all other sprites except for original when first loaded
          * Original is enabled by default.
          */
+        glowManager = GameObject.Find("Main Camera").GetComponent<FoodGlowManager>();
+        spriteGlow = GetComponent<SpriteGlowEffect>();
+        spriteGlow.GlowColor = cookedGlowColor;
+        spriteGlow.enabled = false;
         sprites = new Dictionary<string, SpriteRenderer>();
 
         for (int i = 0; i < spriteObjects.Length; i++)
@@ -41,6 +48,12 @@ public class SpriteManager : MonoBehaviour
         {
             sprites.Add(spriteObj.name, spriteObj.GetComponent<SpriteRenderer>());
         }
+    }
+
+    private void Update()
+    {
+        //Lerp brightness to new brightness
+        if (spriteGlow.enabled) spriteGlow.GlowBrightness = glowManager.getCurrBrightness();
     }
 
     public void UpdateSprites()
@@ -85,11 +98,13 @@ public class SpriteManager : MonoBehaviour
         //Cooked or uncooked?
         if (tag.isCooked())
         {
-            enableSprite(cooked);
+            //enable glow effect.
+            if (!tag.isKnife()) spriteGlow.enabled = true;
         }
         else
         {
-            disableSprite(cooked);
+            //disable glow effect.
+            spriteGlow.enabled = false;
         }
     }
 
