@@ -25,6 +25,7 @@ public class Coordinator : MonoBehaviour
     private Timer playerTimer;
     private PastMovesManager moveManager;
     private InputManager inputManager;
+    private GlowManager glowManager;
     private List<SpriteManager> sprites;
     private List<WinManager> winTiles; //All instances of winTiles.
     private List<YouManager> youTiles; //All instances of youTiles.
@@ -45,6 +46,7 @@ public class Coordinator : MonoBehaviour
         playerTimer = GetComponent<Timer>();
         moveManager = GameObject.Find("Canvas").GetComponent<PastMovesManager>();
         inputManager = GetComponent<InputManager>();
+        glowManager = GetComponent<GlowManager>();
         sprites = GetAllSprites();
         winTiles = FindObjectsOfType<WinManager>().ToList();
         youTiles = FindObjectsOfType<YouManager>().ToList();

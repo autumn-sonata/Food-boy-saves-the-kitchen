@@ -274,6 +274,7 @@ GameObject:
   - component: {fileID: 8585750452550208381}
   - component: {fileID: 3548052383975467262}
   - component: {fileID: -1379665221798162662}
+  - component: {fileID: 445400788164742371}
   m_Layer: 7
   m_Name: Knife
   m_TagString: Knife
@@ -530,6 +531,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isCutAtStart: 0
   isCookedAtStart: 0
+--- !u!114 &445400788164742371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4448616405915179234}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8f6d3c6e4250e84192f5b34ce9e71bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  glowColor: {r: 0.6313726, g: 0.21176471, b: 0.21176471, a: 0.11764706}
+  glowBrightness: 1
+  outlineWidth: 1
+  alphaThreshold: 0.01
+  drawOutside: 1
+  enableInstancing: 0
 --- !u!1 &4448616406593895924
 GameObject:
   m_ObjectHideFlags: 0
