@@ -429,7 +429,7 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Prefabs
+    - Assets/Art/Custom/Tiles
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 0
@@ -475,18 +475,18 @@ MonoBehaviour:
     m_ExpandedIDs: ffffffff00000000c2620000c4620000c6620000c8620000ca620000cc620000d0620000d2620000d4620000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
+      m_Name: Level38
+      m_OriginalName: Level38
       m_EditFieldRect:
         serializedVersion: 2
         x: 0
         y: 0
         width: 0
         height: 0
-      m_UserData: 0
+      m_UserData: 25576
       m_IsWaitingForDelay: 0
       m_IsRenaming: 0
-      m_OriginalEventType: 11
+      m_OriginalEventType: 0
       m_IsRenamingFilename: 1
       m_ClientGUIView: {fileID: 8}
     m_SearchString: 
