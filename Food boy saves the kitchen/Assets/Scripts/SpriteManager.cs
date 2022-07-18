@@ -24,7 +24,6 @@ public class SpriteManager : MonoBehaviour
     private readonly string cut = "cut";
     private readonly string cold = "cold";
     private readonly string hot = "hot";
-    private readonly string cooked = "cooked";
     private FoodGlowManager glowManager;
     private static Color32 cookedGlowColor = new(161, 54, 54, 30);
 
@@ -99,13 +98,11 @@ public class SpriteManager : MonoBehaviour
         //Cooked or uncooked?
         if (tag.isCooked())
         {
-            //enableSprite(cooked);
             //enable glow effect.
             if (!tag.isKnife()) spriteGlow.enabled = true;
         }
         else
         {
-            //disableSprite(cooked);
             //disable glow effect.
             spriteGlow.enabled = false;
         }
