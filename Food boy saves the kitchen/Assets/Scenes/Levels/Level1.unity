@@ -525,6 +525,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: WinTile1x2
       objectReference: {fileID: 0}
+    - target: {fileID: 3933948252900507989, guid: aed5438d30d58924d9021dba2419fb66, type: 3}
+      propertyPath: winCanvas
+      value: 
+      objectReference: {fileID: 1613315799}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: aed5438d30d58924d9021dba2419fb66, type: 3}
 --- !u!1001 &519095223
@@ -1777,6 +1781,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2e20d65162c45cb4a82a991cc73483b4, type: 3}
+--- !u!1 &1613315799 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5101523243436386199, guid: 1f761a5d4b4b934408ce1f365dd05711, type: 3}
+  m_PrefabInstance: {fileID: 5101523243023279383}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1674309853
 GameObject:
   m_ObjectHideFlags: 0
@@ -1876,7 +1885,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 791910646533378050, guid: 9bd740da4aba3d845ba2fca40fe83799, type: 3}
       propertyPath: m_RootOrder
-      value: 15
+      value: 14
       objectReference: {fileID: 0}
     - target: {fileID: 791910646533378050, guid: 9bd740da4aba3d845ba2fca40fe83799, type: 3}
       propertyPath: m_AnchorMax.x
@@ -1969,7 +1978,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2733740149809676049, guid: b06a64faf74b8664794e89157419ac76, type: 3}
       propertyPath: m_RootOrder
-      value: 17
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 2733740149809676049, guid: b06a64faf74b8664794e89157419ac76, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2800,7 +2809,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5101523243436386199, guid: 1f761a5d4b4b934408ce1f365dd05711, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1f761a5d4b4b934408ce1f365dd05711, type: 3}

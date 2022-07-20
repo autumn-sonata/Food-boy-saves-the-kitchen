@@ -19,15 +19,23 @@ public class WinManager : MonoBehaviour
     private Vector2 topLeftCorner;
     private Vector2 bottomRightCorner;
 
-    [SerializeField]
-    private GameObject prefabOutline;
     private LayerMask push;
+    private GameObject winCanvas;
+    [SerializeField] private GameObject prefabOutline;
 
     private void Awake()
     {
         /* Prepare for reading the original win configuration.
          */
         push = LayerMask.GetMask("Push");
+        winCanvas = GameObject.Find("CanvasWin");
+        if (winCanvas)
+        {
+            winCanvas.SetActive(false);
+        } else
+        {
+            Debug.LogError("Add CanvasWin prefab to scene.");
+        }
         hasWon = false;
         foodSameTagTopLeft = new List<GameObject>();
         int x = (int)Math.Ceiling(GetComponent<BoxCollider2D>().size.x);
@@ -114,8 +122,7 @@ public class WinManager : MonoBehaviour
         {
             if (matchWinConfig(food) && !hasWon)
             {
-                hasWon = true;
-                Debug.Log("You Win!");
+                hasWon = true; //only ever run once for this scene.
                 //Show where win configuration is in the scene.
                 OutlineWinConfig(food);
             }
@@ -255,11 +262,11 @@ public class WinManager : MonoBehaviour
         /* Outlines the win configuration for the player to see.
          * Sequence of actions to do.
          */
-        Vector2 topLeftPos = foodTopLeft.transform.position;
-        Vector2 middleWinConfig = new(topLeftPos.x + (winConfig.GetLength(1) - 1) / 2,
-            topLeftPos.y - (winConfig.GetLength(0) - 1) / 2);
+        Vector2 topLeftPos = foodTopLeft.GetComponent<PlayerManager>().destination.transform.position;
+        Vector2 middleWinConfig = new(topLeftPos.x + ((float)winConfig.GetLength(1) - 1) / 2,
+            topLeftPos.y - ((float)winConfig.GetLength(0) - 1) / 2);
         //middleWinConfig is where the box should appear
-        Debug.Log(middleWinConfig);
+
         GameObject winOutline = Instantiate(prefabOutline);
         winOutline.transform.position = middleWinConfig;
 
@@ -272,10 +279,10 @@ public class WinManager : MonoBehaviour
         SpriteRenderer render = winOutline.GetComponent<SpriteRenderer>();
         yield return new WaitForSeconds(0.3f);
         render.enabled = false;
-        //yield return new WaitForSeconds(0.3f);
-        //render.enabled = true;
+        yield return new WaitForSeconds(0.3f);
+        render.enabled = true;
         yield return new WaitForSeconds(2f);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-        //TODO CALL POP UP WINDOW
+        //CALL POP UP WINDOW
+        winCanvas.SetActive(true);
     }
 }
