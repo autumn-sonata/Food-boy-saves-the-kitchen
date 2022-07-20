@@ -518,7 +518,7 @@ public class Coordinator : MonoBehaviour
     private void UndoRestartRoutine()
     {
         //Undo and restart
-        if (inputManager.KeyPressUndo())
+        if (inputManager.KeyPressUndo() && !winFound)
         {
             hasUndone = true;
             moveManager.DoUndo();
@@ -536,7 +536,7 @@ public class Coordinator : MonoBehaviour
                 }
             }
         }
-        if (inputManager.KeyPressRestart()) moveManager.RestartLevel();
+        if (inputManager.KeyPressRestart() && !winFound) moveManager.RestartLevel();
     }
 
     private static void AddOrUpdateDict(Dictionary<string, bool[]> dict, string key, bool[] value)
