@@ -21,6 +21,7 @@ public class WinManager : MonoBehaviour
 
     private LayerMask push;
     private GameObject winCanvas;
+    private Coordinator coordinator;
     [SerializeField] private GameObject prefabOutline;
 
     private void Awake()
@@ -29,6 +30,7 @@ public class WinManager : MonoBehaviour
          */
         push = LayerMask.GetMask("Push");
         winCanvas = GameObject.Find("CanvasWin");
+        coordinator = GameObject.Find("Main Camera").GetComponent<Coordinator>();
         if (winCanvas)
         {
             winCanvas.SetActive(false);
@@ -36,6 +38,8 @@ public class WinManager : MonoBehaviour
         {
             Debug.LogError("Add CanvasWin prefab to scene.");
         }
+        if (!coordinator) Debug.LogError("Add Main Camera to scene. " +
+            "Check if Coordinator component is present.");
         hasWon = false;
         foodSameTagTopLeft = new List<GameObject>();
         int x = (int)Math.Ceiling(GetComponent<BoxCollider2D>().size.x);
@@ -123,6 +127,7 @@ public class WinManager : MonoBehaviour
             if (matchWinConfig(food) && !hasWon)
             {
                 hasWon = true; //only ever run once for this scene.
+                coordinator.WinFound();
                 //Show where win configuration is in the scene.
                 OutlineWinConfig(food);
             }
