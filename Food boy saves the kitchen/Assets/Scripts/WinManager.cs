@@ -14,6 +14,7 @@ public class WinManager : MonoBehaviour
     private GameObject[,] winConfig; //current winning configuration of the level
     private List<GameObject> foodSameTagTopLeft; //stores all foods that are the same tag as topLeft that is not on the win tile.
     private Vector2 topLeftCenteredCoord;
+    private bool hasWon;
 
     private Vector2 topLeftCorner;
     private Vector2 bottomRightCorner;
@@ -27,6 +28,7 @@ public class WinManager : MonoBehaviour
         /* Prepare for reading the original win configuration.
          */
         push = LayerMask.GetMask("Push");
+        hasWon = false;
         foodSameTagTopLeft = new List<GameObject>();
         int x = (int)Math.Ceiling(GetComponent<BoxCollider2D>().size.x);
         int y = (int)Math.Ceiling(GetComponent<BoxCollider2D>().size.y);
@@ -110,9 +112,10 @@ public class WinManager : MonoBehaviour
 
         foreach (GameObject food in foodSameTagTopLeft)
         {
-            if (matchWinConfig(food))
+            if (matchWinConfig(food) && !hasWon)
             {
-                //Debug.Log("You Win!");
+                hasWon = true;
+                Debug.Log("You Win!");
                 //Show where win configuration is in the scene.
                 OutlineWinConfig(food);
             }
@@ -253,10 +256,10 @@ public class WinManager : MonoBehaviour
          * Sequence of actions to do.
          */
         Vector2 topLeftPos = foodTopLeft.transform.position;
-        Vector2 middleWinConfig = new(topLeftPos.x + winConfig.GetLength(1) / 2,
-            topLeftPos.y - winConfig.GetLength(0) / 2);
+        Vector2 middleWinConfig = new(topLeftPos.x + (winConfig.GetLength(1) - 1) / 2,
+            topLeftPos.y - (winConfig.GetLength(0) - 1) / 2);
         //middleWinConfig is where the box should appear
-
+        Debug.Log(middleWinConfig);
         GameObject winOutline = Instantiate(prefabOutline);
         winOutline.transform.position = middleWinConfig;
 
@@ -269,9 +272,10 @@ public class WinManager : MonoBehaviour
         SpriteRenderer render = winOutline.GetComponent<SpriteRenderer>();
         yield return new WaitForSeconds(0.3f);
         render.enabled = false;
-        yield return new WaitForSeconds(0.3f);
-        render.enabled = true;
+        //yield return new WaitForSeconds(0.3f);
+        //render.enabled = true;
         yield return new WaitForSeconds(2f);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        //TODO CALL POP UP WINDOW
     }
 }
