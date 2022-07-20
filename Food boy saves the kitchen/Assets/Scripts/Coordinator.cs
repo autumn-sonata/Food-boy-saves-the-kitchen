@@ -21,6 +21,7 @@ public class Coordinator : MonoBehaviour
     private bool isInitialise;
     private bool hasUndone;
     private bool playerCanMove;
+    private bool winFound;
 
     private Timer playerTimer;
     private PastMovesManager moveManager;
@@ -61,6 +62,7 @@ public class Coordinator : MonoBehaviour
         isInitialise = true;
         hasUndone = false;
         playerCanMove = true;
+        winFound = false;
         InitialiseAllAttributes(); //initialise cooked and cut
     }
 
@@ -142,6 +144,13 @@ public class Coordinator : MonoBehaviour
          */
         players.RemoveWhere(food => !food.GetComponent<Tags>().isPlayer());
         players.UnionWith(foods); //player tag already enabled
+    }
+
+    public void WinFound()
+    {
+        /* Disable any movements of any player.
+         */
+        winFound = true;
     }
 
     private void InitialiseAllAttributes()
@@ -236,7 +245,8 @@ public class Coordinator : MonoBehaviour
             //Allow players that are not children to update their destination.
             foreach (GameObject player in players)
             { 
-                if (Mathf.Abs(horizontalMove) == 1f && playerTimer.countdownFinished() && !player.GetComponent<Tags>().isInAnyTile())
+                if (Mathf.Abs(horizontalMove) == 1f && playerTimer.countdownFinished() && 
+                    !player.GetComponent<Tags>().isInAnyTile() && !winFound)
                 {
                     Vector2 direction = new(horizontalMove, 0f);
                     playerCanMove = false;
@@ -247,7 +257,8 @@ public class Coordinator : MonoBehaviour
                         list.Add(new KeyValuePair<PlayerManager, Vector3>
                             (player.GetComponent<PlayerManager>(), new Vector3(horizontalMove, 0f, 0f)));
                 }
-                else if (Mathf.Abs(verticalMove) == 1f && playerTimer.countdownFinished() && !player.GetComponent<Tags>().isInAnyTile())
+                else if (Mathf.Abs(verticalMove) == 1f && playerTimer.countdownFinished() && 
+                    !player.GetComponent<Tags>().isInAnyTile() && !winFound)
                 {
                     Vector2 direction = new(0f, verticalMove);
                     playerCanMove = false;
@@ -294,7 +305,7 @@ public class Coordinator : MonoBehaviour
                 float horizontalMove = belt.getPushDirectionHorz();
                 float verticalMove = belt.getPushDirectionVert();
                 Collider2D objOnTop = belt.getObjOnTop();
-                if (Mathf.Abs(horizontalMove) == 1f)
+                if (Mathf.Abs(horizontalMove) == 1f && !winFound)
                 {
                     Vector2 direction = new(horizontalMove, 0f);
                     if (objOnTop && objOnTop.GetComponent<ObstacleManager>().allowedToMove(direction))
@@ -304,7 +315,7 @@ public class Coordinator : MonoBehaviour
                         list.Add(new KeyValuePair<PlayerManager, Vector3>
                             (objOnTop.GetComponent<PlayerManager>(), new Vector3(horizontalMove, 0f, 0f)));
                 }
-                else if (Mathf.Abs(verticalMove) == 1f)
+                else if (Mathf.Abs(verticalMove) == 1f && !winFound)
                 {
                     Vector2 direction = new(0f, verticalMove);
                     if (objOnTop && objOnTop.GetComponent<ObstacleManager>().allowedToMove(direction))
