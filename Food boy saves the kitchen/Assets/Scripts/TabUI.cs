@@ -4,14 +4,17 @@ using UnityEngine;
 
 public class TabUI : MonoBehaviour
 {
-
-    [SerializeField] GameObject TabCanvas;
-    [SerializeField] GameObject text;
+    private static int TabToOpen = 0;
+    [SerializeField] List <GameObject> TabPanels;
+    [SerializeField] List <GameObject> text;
 
     // Start is called before the first frame update
     void Start()
     {
-        TabCanvas.SetActive(false);
+        foreach (GameObject panel in TabPanels)
+        {
+            panel.SetActive(false);
+        }
     }
 
     // Update is called once per frame
@@ -19,19 +22,32 @@ public class TabUI : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Tab))
         {
-            TabCanvas.SetActive(true);
-            if (text != null)
+            foreach (GameObject texts in text)
             {
-                text.SetActive(false);
+                texts.SetActive(false);
             }
+
+            TabPanels[TabToOpen].SetActive(true);
+
         }
         else
         {
-            TabCanvas.SetActive(false);
-            if (text != null)
+            foreach (GameObject texts in text)
             {
-                text.SetActive(true);
+                texts.SetActive(true);
             }
+            TabPanels[TabToOpen].SetActive(false);
         }
+    }
+
+    public void NextPanel()
+    {
+        TabToOpen += 1;
+        TabPanels[TabToOpen - 1].SetActive(false);
+    }
+    public void PreviousPanel()
+    {
+        TabToOpen -= 1;
+        TabPanels[TabToOpen + 1].SetActive(false);
     }
 }
