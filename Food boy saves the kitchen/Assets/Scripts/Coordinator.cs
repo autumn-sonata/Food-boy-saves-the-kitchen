@@ -22,6 +22,7 @@ public class Coordinator : MonoBehaviour
     private bool hasUndone;
     private bool playerCanMove;
     private bool winFound;
+    private bool winUpdateAftUndo;
 
     private Timer playerTimer;
     private PastMovesManager moveManager;
@@ -61,6 +62,7 @@ public class Coordinator : MonoBehaviour
         hasUndone = false;
         playerCanMove = true;
         winFound = false;
+        winUpdateAftUndo = false;
         InitialiseAllAttributes(); //initialise cooked and cut
     }
 
@@ -89,6 +91,12 @@ public class Coordinator : MonoBehaviour
     {
         /* Central call to all other managers.
          */
+        if (winUpdateAftUndo)
+        {
+            //next frame right after, sprite has moved, overlappoint can pinpoint.
+            executeWinManagers(); //update Win Manager to previous state.
+            winUpdateAftUndo = false;
+        }
         if (inputManager.KeyHoldTab() && !invisibleCache.Any())
         {
             /* Make all movable objects that are currently visible
@@ -442,7 +450,7 @@ public class Coordinator : MonoBehaviour
             isInitialise = false;
         }
         SpriteUpdate();
-        checkWinConfig(); //check cut 
+        checkWinConfig(); //check static position cut 
         UndoRestartRoutine();
     }
 
@@ -520,7 +528,7 @@ public class Coordinator : MonoBehaviour
         {
             hasUndone = true;
             moveManager.DoUndo();
-            executeWinManagers(); //update Win Manager to previous state.
+            winUpdateAftUndo = true;
             SpriteUpdate();
             //update players and playerTypes to previous state
             players.Clear();

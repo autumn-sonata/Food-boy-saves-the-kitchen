@@ -6,16 +6,22 @@ using UnityEngine.SceneManagement;
 
 public class AudioManager : MonoBehaviour
 {
+    /* Manages audio for the game.
+     * Main menu and level selection screens: Track 0
+     * Lvl 1-20: Track 1
+     * Level 20-??: Track 2
+     */
     private int previousSceneIndex; //to check whether to change soundtrack
     private bool changeTrack;
     [SerializeField] private int Level0BuildIndex;
-    [SerializeField] private int Level20BuildIndex;
+    private int Level20BuildIndex;
     [SerializeField] private AudioSource BGM;
     [SerializeField] private List<AudioClip> Tracks;
 
     private void Awake()
     {
         DontDestroyOnLoad(gameObject); //never be destroyed.
+        Level20BuildIndex = Level0BuildIndex + 20;
         //previousSceneIndex initially starts at 0.
         int numScenes = SceneManager.sceneCountInBuildSettings;
         if (Level0BuildIndex > numScenes || Level20BuildIndex > numScenes ||

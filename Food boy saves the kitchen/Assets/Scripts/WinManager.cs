@@ -109,7 +109,13 @@ public class WinManager : MonoBehaviour
                     //new object from empty.
                     Collider2D updatedFood =
                         Physics2D.OverlapPoint(topLeftCenteredCoord + new Vector2(col, -row), push);
-                    if (updatedFood) winConfig[row, col] = updatedFood.gameObject;
+                    if (updatedFood)
+                    {
+                        winConfig[row, col] = updatedFood.gameObject;
+                    } else
+                    {
+                        winConfig[row, col] = null;
+                    }
                 } 
             }
         }
@@ -139,7 +145,7 @@ public class WinManager : MonoBehaviour
         /* Matches win configuration using the food name of each item.
          * Note that the win tile must be completely full before a winning condition 
          */
-        Vector2 foodCoord = foodTopLeft.transform.position;
+        Vector2 foodCoord = foodTopLeft.GetComponent<PlayerManager>().destination.position;
         for (int row = 0; row < winConfig.GetLength(0); row++)
         {
             for (int col = 0; col < winConfig.GetLength(1); col++)
