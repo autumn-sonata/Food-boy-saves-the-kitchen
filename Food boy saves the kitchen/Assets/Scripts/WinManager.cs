@@ -14,19 +14,33 @@ public class WinManager : MonoBehaviour
     private GameObject[,] winConfig; //current winning configuration of the level
     private List<GameObject> foodSameTagTopLeft; //stores all foods that are the same tag as topLeft that is not on the win tile.
     private Vector2 topLeftCenteredCoord;
+    private bool hasWon;
 
     private Vector2 topLeftCorner;
     private Vector2 bottomRightCorner;
 
-    [SerializeField]
-    private GameObject prefabOutline;
     private LayerMask push;
+    private GameObject winCanvas;
+    private Coordinator coordinator;
+    [SerializeField] private GameObject prefabOutline;
 
     private void Awake()
     {
         /* Prepare for reading the original win configuration.
          */
         push = LayerMask.GetMask("Push");
+        winCanvas = GameObject.Find("CanvasWin");
+        coordinator = GameObject.Find("Main Camera").GetComponent<Coordinator>();
+        if (winCanvas)
+        {
+            winCanvas.SetActive(false);
+        } else
+        {
+            Debug.LogError("Add CanvasWin prefab to scene.");
+        }
+        if (!coordinator) Debug.LogError("Add Main Camera to scene. " +
+            "Check if Coordinator component is present.");
+        hasWon = false;
         foodSameTagTopLeft = new List<GameObject>();
         int x = (int)Math.Ceiling(GetComponent<BoxCollider2D>().size.x);
         int y = (int)Math.Ceiling(GetComponent<BoxCollider2D>().size.y);
@@ -95,7 +109,13 @@ public class WinManager : MonoBehaviour
                     //new object from empty.
                     Collider2D updatedFood =
                         Physics2D.OverlapPoint(topLeftCenteredCoord + new Vector2(col, -row), push);
-                    if (updatedFood) winConfig[row, col] = updatedFood.gameObject;
+                    if (updatedFood)
+                    {
+                        winConfig[row, col] = updatedFood.gameObject;
+                    } else
+                    {
+                        winConfig[row, col] = null;
+                    }
                 } 
             }
         }
@@ -110,9 +130,10 @@ public class WinManager : MonoBehaviour
 
         foreach (GameObject food in foodSameTagTopLeft)
         {
-            if (matchWinConfig(food))
+            if (matchWinConfig(food) && !hasWon)
             {
-                //Debug.Log("You Win!");
+                hasWon = true; //only ever run once for this scene.
+                coordinator.WinFound();
                 //Show where win configuration is in the scene.
                 OutlineWinConfig(food);
             }
@@ -124,7 +145,7 @@ public class WinManager : MonoBehaviour
         /* Matches win configuration using the food name of each item.
          * Note that the win tile must be completely full before a winning condition 
          */
-        Vector2 foodCoord = foodTopLeft.transform.position;
+        Vector2 foodCoord = foodTopLeft.GetComponent<PlayerManager>().destination.position;
         for (int row = 0; row < winConfig.GetLength(0); row++)
         {
             for (int col = 0; col < winConfig.GetLength(1); col++)
@@ -252,9 +273,9 @@ public class WinManager : MonoBehaviour
         /* Outlines the win configuration for the player to see.
          * Sequence of actions to do.
          */
-        Vector2 topLeftPos = foodTopLeft.transform.position;
-        Vector2 middleWinConfig = new(topLeftPos.x + winConfig.GetLength(1) / 2,
-            topLeftPos.y - winConfig.GetLength(0) / 2);
+        Vector2 topLeftPos = foodTopLeft.GetComponent<PlayerManager>().destination.transform.position;
+        Vector2 middleWinConfig = new(topLeftPos.x + ((float)winConfig.GetLength(1) - 1) / 2,
+            topLeftPos.y - ((float)winConfig.GetLength(0) - 1) / 2);
         //middleWinConfig is where the box should appear
 
         GameObject winOutline = Instantiate(prefabOutline);
@@ -272,6 +293,7 @@ public class WinManager : MonoBehaviour
         yield return new WaitForSeconds(0.3f);
         render.enabled = true;
         yield return new WaitForSeconds(2f);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        //CALL POP UP WINDOW
+        winCanvas.SetActive(true);
     }
 }

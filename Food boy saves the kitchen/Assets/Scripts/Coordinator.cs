@@ -21,11 +21,12 @@ public class Coordinator : MonoBehaviour
     private bool isInitialise;
     private bool hasUndone;
     private bool playerCanMove;
+    private bool winFound;
+    private bool winUpdateAftUndo;
 
     private Timer playerTimer;
     private PastMovesManager moveManager;
     private InputManager inputManager;
-    private GlowManager glowManager;
     private List<SpriteManager> sprites;
     private List<WinManager> winTiles; //All instances of winTiles.
     private List<YouManager> youTiles; //All instances of youTiles.
@@ -46,7 +47,6 @@ public class Coordinator : MonoBehaviour
         playerTimer = GetComponent<Timer>();
         moveManager = GameObject.Find("Canvas").GetComponent<PastMovesManager>();
         inputManager = GetComponent<InputManager>();
-        glowManager = GetComponent<GlowManager>();
         sprites = GetAllSprites();
         winTiles = FindObjectsOfType<WinManager>().ToList();
         youTiles = FindObjectsOfType<YouManager>().ToList();
@@ -61,6 +61,8 @@ public class Coordinator : MonoBehaviour
         isInitialise = true;
         hasUndone = false;
         playerCanMove = true;
+        winFound = false;
+        winUpdateAftUndo = false;
         InitialiseAllAttributes(); //initialise cooked and cut
     }
 
@@ -89,6 +91,12 @@ public class Coordinator : MonoBehaviour
     {
         /* Central call to all other managers.
          */
+        if (winUpdateAftUndo)
+        {
+            //next frame right after, sprite has moved, overlappoint can pinpoint.
+            executeWinManagers(); //update Win Manager to previous state.
+            winUpdateAftUndo = false;
+        }
         if (inputManager.KeyHoldTab() && !invisibleCache.Any())
         {
             /* Make all movable objects that are currently visible
@@ -142,6 +150,13 @@ public class Coordinator : MonoBehaviour
          */
         players.RemoveWhere(food => !food.GetComponent<Tags>().isPlayer());
         players.UnionWith(foods); //player tag already enabled
+    }
+
+    public void WinFound()
+    {
+        /* Disable any movements of any player.
+         */
+        winFound = true;
     }
 
     private void InitialiseAllAttributes()
@@ -236,7 +251,8 @@ public class Coordinator : MonoBehaviour
             //Allow players that are not children to update their destination.
             foreach (GameObject player in players)
             { 
-                if (Mathf.Abs(horizontalMove) == 1f && playerTimer.countdownFinished() && !player.GetComponent<Tags>().isInAnyTile())
+                if (Mathf.Abs(horizontalMove) == 1f && playerTimer.countdownFinished() && 
+                    !player.GetComponent<Tags>().isInAnyTile() && !winFound)
                 {
                     Vector2 direction = new(horizontalMove, 0f);
                     playerCanMove = false;
@@ -247,7 +263,8 @@ public class Coordinator : MonoBehaviour
                         list.Add(new KeyValuePair<PlayerManager, Vector3>
                             (player.GetComponent<PlayerManager>(), new Vector3(horizontalMove, 0f, 0f)));
                 }
-                else if (Mathf.Abs(verticalMove) == 1f && playerTimer.countdownFinished() && !player.GetComponent<Tags>().isInAnyTile())
+                else if (Mathf.Abs(verticalMove) == 1f && playerTimer.countdownFinished() && 
+                    !player.GetComponent<Tags>().isInAnyTile() && !winFound)
                 {
                     Vector2 direction = new(0f, verticalMove);
                     playerCanMove = false;
@@ -294,7 +311,7 @@ public class Coordinator : MonoBehaviour
                 float horizontalMove = belt.getPushDirectionHorz();
                 float verticalMove = belt.getPushDirectionVert();
                 Collider2D objOnTop = belt.getObjOnTop();
-                if (Mathf.Abs(horizontalMove) == 1f)
+                if (Mathf.Abs(horizontalMove) == 1f && !winFound)
                 {
                     Vector2 direction = new(horizontalMove, 0f);
                     if (objOnTop && objOnTop.GetComponent<ObstacleManager>().allowedToMove(direction))
@@ -304,7 +321,7 @@ public class Coordinator : MonoBehaviour
                         list.Add(new KeyValuePair<PlayerManager, Vector3>
                             (objOnTop.GetComponent<PlayerManager>(), new Vector3(horizontalMove, 0f, 0f)));
                 }
-                else if (Mathf.Abs(verticalMove) == 1f)
+                else if (Mathf.Abs(verticalMove) == 1f && !winFound)
                 {
                     Vector2 direction = new(0f, verticalMove);
                     if (objOnTop && objOnTop.GetComponent<ObstacleManager>().allowedToMove(direction))
@@ -433,7 +450,7 @@ public class Coordinator : MonoBehaviour
             isInitialise = false;
         }
         SpriteUpdate();
-        checkWinConfig(); //check cut 
+        checkWinConfig(); //check static position cut 
         UndoRestartRoutine();
     }
 
@@ -507,11 +524,11 @@ public class Coordinator : MonoBehaviour
     private void UndoRestartRoutine()
     {
         //Undo and restart
-        if (inputManager.KeyPressUndo())
+        if (inputManager.KeyPressUndo() && !winFound)
         {
             hasUndone = true;
             moveManager.DoUndo();
-            executeWinManagers(); //update Win Manager to previous state.
+            winUpdateAftUndo = true;
             SpriteUpdate();
             //update players and playerTypes to previous state
             players.Clear();
@@ -525,7 +542,7 @@ public class Coordinator : MonoBehaviour
                 }
             }
         }
-        if (inputManager.KeyPressRestart()) moveManager.RestartLevel();
+        if (inputManager.KeyPressRestart() && !winFound) moveManager.RestartLevel();
     }
 
     private static void AddOrUpdateDict(Dictionary<string, bool[]> dict, string key, bool[] value)

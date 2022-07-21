@@ -443,6 +443,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: WinTile1x2
       objectReference: {fileID: 0}
+    - target: {fileID: 3933948252900507989, guid: aed5438d30d58924d9021dba2419fb66, type: 3}
+      propertyPath: winCanvas
+      value: 
+      objectReference: {fileID: 1613315799}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: aed5438d30d58924d9021dba2419fb66, type: 3}
 --- !u!1001 &519095223
@@ -1711,7 +1715,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2852378395913954414, guid: b162ad1317e669f43b107636deec2233, type: 3}
       propertyPath: m_RootOrder
-      value: 15
+      value: 14
       objectReference: {fileID: 0}
     - target: {fileID: 2852378395913954414, guid: b162ad1317e669f43b107636deec2233, type: 3}
       propertyPath: m_AnchorMax.x
@@ -1796,7 +1800,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2733740149809676049, guid: b06a64faf74b8664794e89157419ac76, type: 3}
       propertyPath: m_RootOrder
-      value: 14
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 2733740149809676049, guid: b06a64faf74b8664794e89157419ac76, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1816,15 +1820,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2733740149809676049, guid: b06a64faf74b8664794e89157419ac76, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 2733740149809676049, guid: b06a64faf74b8664794e89157419ac76, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 2733740149809676049, guid: b06a64faf74b8664794e89157419ac76, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 2733740149809676049, guid: b06a64faf74b8664794e89157419ac76, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -2631,7 +2635,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5101523243436386199, guid: 1f761a5d4b4b934408ce1f365dd05711, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1f761a5d4b4b934408ce1f365dd05711, type: 3}
