@@ -20,6 +20,10 @@ public class AudioManager : MonoBehaviour
 
     private void Awake()
     {
+        if (FindObjectsOfType<AudioManager>().Length > 1)
+        {
+            Destroy(gameObject);
+        }
         DontDestroyOnLoad(gameObject); //never be destroyed.
         Level20BuildIndex = Level0BuildIndex + 20;
         //previousSceneIndex initially starts at 0.

@@ -12,7 +12,7 @@ public class WinUI : MonoBehaviour
 
     public void LevelSelect()
     {
-        SceneManager.LoadScene(2);
+        SceneManager.LoadScene(3);
     }
 
     public void QuitGame()
