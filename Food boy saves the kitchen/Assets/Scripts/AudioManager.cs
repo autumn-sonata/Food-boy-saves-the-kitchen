@@ -11,6 +11,7 @@ public class AudioManager : MonoBehaviour
      * Lvl 1-20: Track 1
      * Level 20-??: Track 2
      */
+    public static AudioManager control;
     private int previousSceneIndex; //to check whether to change soundtrack
     private bool changeTrack;
     [SerializeField] private int Level0BuildIndex;
@@ -20,11 +21,15 @@ public class AudioManager : MonoBehaviour
 
     private void Awake()
     {
-        if (FindObjectsOfType<AudioManager>().Length > 1)
+        if (control == null)
+        {
+            DontDestroyOnLoad(gameObject);
+            control = this;
+        } else if (control != this)
         {
             Destroy(gameObject);
         }
-        DontDestroyOnLoad(gameObject); //never be destroyed.
+
         Level20BuildIndex = Level0BuildIndex + 20;
         //previousSceneIndex initially starts at 0.
         int numScenes = SceneManager.sceneCountInBuildSettings;

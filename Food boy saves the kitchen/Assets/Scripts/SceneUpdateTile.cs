@@ -9,6 +9,6 @@ public class SceneUpdateTile : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D col)
     {
-        SceneManager.LoadScene(nextScene + 6);
+        SceneManager.LoadScene(nextScene + 7);
     }
 }
