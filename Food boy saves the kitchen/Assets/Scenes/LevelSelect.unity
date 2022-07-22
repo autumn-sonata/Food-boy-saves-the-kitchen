@@ -134,6 +134,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Level1
       objectReference: {fileID: 0}
+    - target: {fileID: 5348286695951495376, guid: e9c17b65b81defb4fa09b400a4673b2f, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5348286695951495379, guid: e9c17b65b81defb4fa09b400a4673b2f, type: 3}
       propertyPath: nextScene
       value: 1
@@ -1187,6 +1191,14 @@ PrefabInstance:
     - target: {fileID: 5348286695951495376, guid: e9c17b65b81defb4fa09b400a4673b2f, type: 3}
       propertyPath: m_Name
       value: Level4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5348286695951495376, guid: e9c17b65b81defb4fa09b400a4673b2f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5348286695951495378, guid: e9c17b65b81defb4fa09b400a4673b2f, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5348286695951495379, guid: e9c17b65b81defb4fa09b400a4673b2f, type: 3}
       propertyPath: nextScene
@@ -2482,6 +2494,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2852378395913954414, guid: b162ad1317e669f43b107636deec2233, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2852378395930326126, guid: b162ad1317e669f43b107636deec2233, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
