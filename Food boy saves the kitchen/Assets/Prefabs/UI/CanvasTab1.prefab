@@ -820,7 +820,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2852378395930326127
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1112,10 +1112,12 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'the food on top of the you tile and all food of the same type have player
-    movement,
+  m_text: 'the food on top of the you tile makes all food of that type have player
+    movement.
 
-    except for food on top of tiles.'
+    but player movement is disabled while on a tile.
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f28d97c874b1eac4b990792b1045586e, type: 2}
   m_sharedMaterial: {fileID: -4309548825276137998, guid: f28d97c874b1eac4b990792b1045586e, type: 2}
@@ -1124,8 +1126,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190335
-  m_fontColor: {r: 1, g: 0, b: 0, a: 1}
+    rgba: 4280036351
+  m_fontColor: {r: 1, g: 0.16828473, b: 0.10849059, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:

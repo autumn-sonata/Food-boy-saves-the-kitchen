@@ -134,6 +134,10 @@ public class WinManager : MonoBehaviour
             {
                 hasWon = true; //only ever run once for this scene.
                 coordinator.WinFound();
+
+                //Save state of the game
+                AddLvlToCompleted();
+
                 //Show where win configuration is in the scene.
                 OutlineWinConfig(food);
             }
@@ -283,6 +287,14 @@ public class WinManager : MonoBehaviour
 
         //Add flicker on and off functionality
         StartCoroutine(Flicker(winOutline));
+    }
+
+    private void AddLvlToCompleted()
+    {
+        /* Add level completion to PlayerInfo.
+         */
+        int levelNum = SceneManager.GetActiveScene().buildIndex - 7;
+
     }
 
     private IEnumerator Flicker(GameObject winOutline)
