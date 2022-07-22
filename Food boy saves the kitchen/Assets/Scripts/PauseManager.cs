@@ -54,4 +54,14 @@ public class PauseManager : MonoBehaviour
     {
         Application.Quit();
     }
+
+    public void SetFullScreen(bool isFullscreen)
+    {
+        Screen.fullScreen = isFullscreen;
+    }
+
+    public void SetVolume(float volume)
+    {
+        Debug.Log(volume);
+    }
 }
