@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerInfo : MonoBehaviour
 {
@@ -8,25 +10,56 @@ public class PlayerInfo : MonoBehaviour
      * and save states.
      */
 
-    [SerializeField]
     private static GameObject[] levelObj;
     private static LevelStatus[] levels = new LevelStatus[43];
 
-    public void SaveState()
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private void LoadLevelObj()
     {
+        if (levelObj == null)
+        {
+            List<GameObject> res = new();
+            //Initialise all levelObj gameObjects.
+            foreach (int buildIndex in NextLevelManager.levelSelect)
+            {
+                GameObject[] objs =
+                    SceneManager.GetSceneByBuildIndex(buildIndex).GetRootGameObjects();
+                foreach (GameObject obj in objs)
+                {
+                    if (obj.CompareTag("Level")) res.Add(obj);
+                }
+            }
+
+            //sort res array and give to levelObj.
+            levelObj = res.OrderBy(o => o.GetComponent<SceneUpdateTile>().nextScene)
+                .ToArray();
+        }
+    }
+
+    private void SaveState()
+    {
+        //Call whenever clear a level.
         LevelRestriction.Save(this);
     }
 
-    public void LoadState()
+    [RuntimeInitializeOnLoadMethod]
+    private static void LoadState()
     {
+        //Call whenever scene changes.
+        //Load data into PlayerInfo.
         PlayerData data = LevelRestriction.Load();
-
+        levelObj = data.getLevelObj();
         levels = data.getLevelsUnlocked();
     }
 
     public LevelStatus[] getLevelsUnlocked()
     {
         return levels;
+    }
+
+    public GameObject[] getLevelObj()
+    {
+        return levelObj;
     }
 
     public void completedLvl(int completedLvlNum)
@@ -55,10 +88,9 @@ public class PlayerInfo : MonoBehaviour
                 GameObject next = GameObject.FindGameObjectWithTag("Next");
                 if (!next) Debug.LogError("Error with finding Next arrow.");
 
-                //enable collider2D and change sprite
-                levelObj[lvl - 1].GetComponent<BoxCollider2D>().enabled = true;
-                levelObj[lvl - 1].GetComponent<SpriteRenderer>().sprite =
-                    levelObj[lvl - 1].GetComponent<DormantSprite>().GetActiveSprite();
+                next.GetComponent<BoxCollider2D>().enabled = true;
+                next.GetComponent<SpriteRenderer>().sprite =
+                    next.GetComponent<DormantSprite>().GetActiveSprite();
 
             } else if (levels[lvl - 1] != LevelStatus.Locked)
             {
@@ -66,7 +98,14 @@ public class PlayerInfo : MonoBehaviour
             } else
             {
                 levels[lvl - 1] = LevelStatus.Unlocked;
+                //enable collider2D and change sprite
+                levelObj[lvl - 1].GetComponent<BoxCollider2D>().enabled = true;
+                levelObj[lvl - 1].GetComponent<SpriteRenderer>().sprite =
+                    levelObj[lvl - 1].GetComponent<DormantSprite>().GetActiveSprite();
             }
         }
+
+        //Add save state.
+        SaveState();
     }
 }

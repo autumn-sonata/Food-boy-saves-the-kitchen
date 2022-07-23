@@ -60,4 +60,8 @@ public static class NextLevelManager
         {42, new List<int>() {43} },
         {43, new List<int>() {} }
     };
+
+    //Key: Build index, Value: max level.
+    public static readonly List<int> levelSelect = new()
+        { 2, 3, 4, 5 };
 }
