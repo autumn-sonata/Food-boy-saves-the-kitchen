@@ -9,8 +9,8 @@ public class PlayerInfo : MonoBehaviour
      */
 
     [SerializeField]
-    private static GameObject[] levelObj;
-    private static LevelStatus[] levels = new LevelStatus[43];
+    private GameObject[] levelObj;
+    private LevelStatus[] levels = new LevelStatus[43];
 
     public void SaveState()
     {
@@ -40,18 +40,5 @@ public class PlayerInfo : MonoBehaviour
         if (levels[completedLvlNum - 1] != LevelStatus.Unlocked)
             Debug.LogError("Level " + completedLvlNum + " has not been unlocked yet!");
         levels[completedLvlNum - 1] = LevelStatus.Completed; //due to 0-indexing
-    }
-
-    public void unlockedLvl(int unlockedLvlNum)
-    {
-        /* Call to unlock a level.
-         * 
-         * Parameters
-         * ----------
-         * 1) int unlockedLvlNum: The level number to be unlocked.
-         */
-        if (levels[unlockedLvlNum - 1] != LevelStatus.Locked)
-            Debug.LogError("Level " + unlockedLvlNum + " is not even locked!");
-        levels[unlockedLvlNum - 1] = LevelStatus.Unlocked;
     }
 }

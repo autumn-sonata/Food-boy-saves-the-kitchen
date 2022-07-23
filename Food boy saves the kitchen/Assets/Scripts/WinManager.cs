@@ -293,7 +293,7 @@ public class WinManager : MonoBehaviour
     {
         /* Add level completion to PlayerInfo.
          */
-        int levelNum = SceneManager.GetActiveScene().buildIndex - 7;
+        int levelNum = SceneManager.GetActiveScene().buildIndex - 5;
 
     }
 
