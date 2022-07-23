@@ -6,6 +6,8 @@ public static class NextLevelManager
 {
     /* Stores the order of next level.
      * -1: Special in that it unlocks the next page of levels.
+     * Lvl 1, 12, 25, 34 will unlock automatically, being
+     * the first levels of their respective pages.
      * 
      * Parameters
      * ----------
@@ -21,7 +23,7 @@ public static class NextLevelManager
         {5, new List<int>() {} },
         {6, new List<int>() {7} },
         {7, new List<int>() {8} },
-        {8, new List<int>() {9, 10, 12, -1} },
+        {8, new List<int>() {9, 10, -1} },
         {9, new List<int>() {} },
         {10, new List<int>() {11} },
         {11, new List<int>() {} },
@@ -37,7 +39,7 @@ public static class NextLevelManager
         {21, new List<int>() {} },
         {22, new List<int>() {23, 24} },
         {23, new List<int>() {} },
-        {24, new List<int>() {-1, 25} },
+        {24, new List<int>() {-1} },
         {25, new List<int>() {26, 27} },
         {26, new List<int>() {} },
         {27, new List<int>() {28, 29} },
@@ -45,7 +47,7 @@ public static class NextLevelManager
         {29, new List<int>() {30} },
         {30, new List<int>() {31} },
         {31, new List<int>() {32} },
-        {32, new List<int>() {33, -1, 34} },
+        {32, new List<int>() {33, -1} },
         {33, new List<int>() {} },
         {34, new List<int>() {35, 36} },
         {35, new List<int>() {37, 38} },

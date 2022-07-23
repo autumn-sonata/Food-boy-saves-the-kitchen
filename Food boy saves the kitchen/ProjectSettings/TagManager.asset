@@ -16,6 +16,9 @@ TagManager:
   - Saki
   - Apple
   - Meat
+  - Back
+  - Next
+  - Level
   layers:
   - Default
   - TransparentFX
