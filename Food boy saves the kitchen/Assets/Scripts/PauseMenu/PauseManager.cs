@@ -62,11 +62,28 @@ public class PauseManager : MonoBehaviour
 
     public void SetVolume(float volume)
     {
-        Debug.Log(volume);
+        //Attach volume to Audio source listener.
+        GameObject.Find("Solo").GetComponent<AudioSource>().volume = volume;
     }
 
     public bool isPauseOpen()
     {
         return GameIsPaused;
+    }
+
+    public void ResolutionHandler(int optionNum)
+    {
+        switch (optionNum)
+        {
+            case 0:
+                Screen.SetResolution(1920, 1080, Screen.fullScreen);
+                break;
+            case 1:
+                Screen.SetResolution(1600, 900, Screen.fullScreen);
+                break;
+            default:
+                Screen.SetResolution(1280, 720, Screen.fullScreen);
+                break;
+        }
     }
 }
