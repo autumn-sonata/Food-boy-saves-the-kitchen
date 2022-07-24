@@ -64,4 +64,9 @@ public class PauseManager : MonoBehaviour
     {
         Debug.Log(volume);
     }
+
+    public bool isPauseOpen()
+    {
+        return GameIsPaused;
+    }
 }

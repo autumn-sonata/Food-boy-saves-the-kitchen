@@ -1221,6 +1221,16 @@ PrefabInstance:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 899310140419589737, guid: 49966817fca24304ca8f0eaa8e0345ac, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1597388257535471387, guid: 49966817fca24304ca8f0eaa8e0345ac, type: 3}
+      propertyPath: m_text
+      value: 'Level 3
+
+'
+      objectReference: {fileID: 0}
     - target: {fileID: 2971611669500390803, guid: 49966817fca24304ca8f0eaa8e0345ac, type: 3}
       propertyPath: m_Name
       value: CanvasPause

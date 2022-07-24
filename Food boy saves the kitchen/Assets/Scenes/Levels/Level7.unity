@@ -294,7 +294,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 791910646533378050, guid: 9bd740da4aba3d845ba2fca40fe83799, type: 3}
       propertyPath: m_RootOrder
-      value: 14
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 791910646533378050, guid: 9bd740da4aba3d845ba2fca40fe83799, type: 3}
       propertyPath: m_AnchorMax.x
@@ -391,7 +391,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5101523243436386195, guid: 1f761a5d4b4b934408ce1f365dd05711, type: 3}
       propertyPath: m_RootOrder
-      value: 15
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 5101523243436386195, guid: 1f761a5d4b4b934408ce1f365dd05711, type: 3}
       propertyPath: m_AnchorMax.x
@@ -998,6 +998,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1597388257535471387, guid: 49966817fca24304ca8f0eaa8e0345ac, type: 3}
+      propertyPath: m_text
+      value: Level 7
+      objectReference: {fileID: 0}
     - target: {fileID: 2971611669500390803, guid: 49966817fca24304ca8f0eaa8e0345ac, type: 3}
       propertyPath: m_Name
       value: CanvasPause

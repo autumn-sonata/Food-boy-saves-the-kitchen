@@ -2457,7 +2457,7 @@ Transform:
   - {fileID: 406678350}
   - {fileID: 419827689}
   m_Father: {fileID: 0}
-  m_RootOrder: 15
+  m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1186990754
 PrefabInstance:
@@ -2523,6 +2523,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1219881079, guid: 9bd740da4aba3d845ba2fca40fe83799, type: 3}
+      propertyPath: m_RootOrder
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 791910646533378050, guid: 9bd740da4aba3d845ba2fca40fe83799, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -2533,7 +2537,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 791910646533378050, guid: 9bd740da4aba3d845ba2fca40fe83799, type: 3}
       propertyPath: m_RootOrder
-      value: 18
+      value: 19
       objectReference: {fileID: 0}
     - target: {fileID: 791910646533378050, guid: 9bd740da4aba3d845ba2fca40fe83799, type: 3}
       propertyPath: m_AnchorMax.x
@@ -2619,6 +2623,10 @@ PrefabInstance:
       propertyPath: text.Array.data[0]
       value: 
       objectReference: {fileID: 1144413581}
+    - target: {fileID: 8759954492430858930, guid: 9bd740da4aba3d845ba2fca40fe83799, type: 3}
+      propertyPath: m_RootOrder
+      value: 7
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9bd740da4aba3d845ba2fca40fe83799, type: 3}
 --- !u!1001 &1597685094
@@ -2743,7 +2751,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 16
+  m_RootOrder: 17
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1684041499
 PrefabInstance:
@@ -3067,6 +3075,10 @@ PrefabInstance:
     - target: {fileID: 899310139678230459, guid: 49966817fca24304ca8f0eaa8e0345ac, type: 3}
       propertyPath: m_Name
       value: CanvasPause
+      objectReference: {fileID: 0}
+    - target: {fileID: 1597388257535471387, guid: 49966817fca24304ca8f0eaa8e0345ac, type: 3}
+      propertyPath: m_text
+      value: Level 34
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 49966817fca24304ca8f0eaa8e0345ac, type: 3}
