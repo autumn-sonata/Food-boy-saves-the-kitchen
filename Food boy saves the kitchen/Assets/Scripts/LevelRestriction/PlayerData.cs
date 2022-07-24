@@ -6,13 +6,17 @@ using UnityEngine;
 [Serializable]
 public class PlayerData
 {
-    private GameObject[] levelObj;
     private LevelStatus[] levels;
+    private bool[] colliders;
+    private bool[] levelSprite;
+    private bool[] nextArrow;
 
     public PlayerData(PlayerInfo player)
     {
-        levelObj = player.getLevelObj();
         levels = player.getLevelsUnlocked();
+        colliders = player.getColliders();
+        levelSprite = player.getLevelSprites();
+        nextArrow = player.getNextArrow();
     }
 
     public LevelStatus[] getLevelsUnlocked()
@@ -24,8 +28,30 @@ public class PlayerData
         return levels;
     }
 
-    public GameObject[] getLevelObj()
+    public bool[] getColliders()
     {
-        return levelObj; 
+        if (colliders == null)
+        {
+            Debug.LogError("Colliders in PlayerData is not initialised.");
+        }
+        return colliders; 
+    }
+
+    public bool[] getLevelSprite()
+    {
+        if (levelSprite == null)
+        {
+            Debug.LogError("Level sprites in PlayerData is not initialised.");
+        }
+        return levelSprite;
+    }
+
+    public bool[] getNextArrow()
+    {
+        if (nextArrow == null)
+        {
+            Debug.LogError("NextArrow array in PlayerData is not initialised.");
+        }
+        return nextArrow;
     }
 }

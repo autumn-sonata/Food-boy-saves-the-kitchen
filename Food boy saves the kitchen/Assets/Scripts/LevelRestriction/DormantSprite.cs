@@ -10,10 +10,12 @@ public class DormantSprite : MonoBehaviour
     [SerializeField]
     private Sprite levelSprite;
 
-    public Sprite GetActiveSprite()
+    public void ChangeToActiveSprite()
     {
+        /* Changes the SpriteRenderer sprite to levelSprite.
+         */
         if (!levelSprite) 
             Debug.LogError("LevelSprite in DormantSprite not initialised.");
-        return levelSprite;
+        GetComponent<SpriteRenderer>().sprite = levelSprite;
     }
 }

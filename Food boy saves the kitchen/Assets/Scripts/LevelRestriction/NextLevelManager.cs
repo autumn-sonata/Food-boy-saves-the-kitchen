@@ -62,6 +62,15 @@ public static class NextLevelManager
     };
 
     //Key: Build index, Value: max level.
-    public static readonly List<int> levelSelect = new()
-        { 2, 3, 4, 5 };
+    public static readonly Dictionary<int, KeyValuePair<int, int>> 
+        levelSelect = new()
+    {
+        {2, new KeyValuePair<int, int>(1, 11) },
+        {3, new KeyValuePair<int, int>(12, 24) },
+        {4, new KeyValuePair<int, int>(25, 33) },
+        {5, new KeyValuePair<int, int>(34, 43) }
+    };
+//Levels unlocked automatically due to being first in scene
+public static readonly List<int> specialUnlockedLvls = new()
+        { 1, 12, 25, 34 };
 }
