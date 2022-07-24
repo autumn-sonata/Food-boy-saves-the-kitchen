@@ -544,7 +544,7 @@ MonoBehaviour:
       m_UserData: 27158
       m_IsWaitingForDelay: 0
       m_IsRenaming: 0
-      m_OriginalEventType: 0
+      m_OriginalEventType: 11
       m_IsRenamingFilename: 1
       m_ClientGUIView: {fileID: 8}
     m_SearchString: 
@@ -1018,9 +1018,9 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 420
+    x: 484
     y: 623
-    width: 1103
+    width: 1045
     height: 376
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
