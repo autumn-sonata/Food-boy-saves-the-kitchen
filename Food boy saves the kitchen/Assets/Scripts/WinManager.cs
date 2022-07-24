@@ -294,7 +294,9 @@ public class WinManager : MonoBehaviour
         /* Add level completion to PlayerInfo.
          */
         int levelNum = SceneManager.GetActiveScene().buildIndex - 5;
-
+        //Tutorial level not counted.
+        if (!FindObjectOfType<PlayerInfo>()) Debug.LogError("Start game from Main menu.");
+        if (levelNum >= 1) FindObjectOfType<PlayerInfo>().completedLvl(levelNum);
     }
 
     private IEnumerator Flicker(GameObject winOutline)

@@ -6947,7 +6947,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38b318c690c755a41a9fdc389a361b26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Level0BuildIndex: 7
+  Level1BuildIndex: 6
   BGM: {fileID: 2081450945}
   Tracks:
   - {fileID: 8300000, guid: bdc06c7016cb9124db1a947b937f1f98, type: 3}
@@ -6965,50 +6965,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70707ca19da07f44eaa40f8e15b42f2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelObj:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  levels: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  colliders: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  levelSprite: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 --- !u!1001 &1480970160129594025
 PrefabInstance:
   m_ObjectHideFlags: 0

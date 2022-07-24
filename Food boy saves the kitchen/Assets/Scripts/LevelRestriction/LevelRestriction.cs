@@ -9,22 +9,22 @@ public static class LevelRestriction
 {
     /* IO from PlayerData to Binary file.
      */
+    private static readonly string path = Path.Combine(Application.persistentDataPath,
+            "gameProg.data");
 
-    public static void Save(PlayerInfo playerInfo)
+    public static void Save(PlayerInfo player)
     {
         BinaryFormatter bf = new();
-        using FileStream file = File.Create(Path.Combine(Application.persistentDataPath,
-            "/gameProg.dat"));
+        using FileStream file = File.Create(path);
 
-        PlayerData data = new PlayerData(playerInfo);
+        PlayerData data = new PlayerData(player);
         bf.Serialize(file, data);
         file.Close();
     }
 
     public static PlayerData Load()
     {
-        string path = Path.Combine(Application.persistentDataPath + "/gameProg.dat");
-        if (File.Exists(path))
+        if (saveFileExists())
         {
             BinaryFormatter bf = new();
             using FileStream file = File.OpenRead(path);
@@ -37,5 +37,10 @@ public static class LevelRestriction
             Debug.LogError("MaxLvlFile not found in " + path);
             return null;
         }
+    }
+
+    public static bool saveFileExists()
+    {
+        return File.Exists(path);
     }
 }
