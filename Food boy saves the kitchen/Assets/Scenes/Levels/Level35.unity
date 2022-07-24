@@ -218,6 +218,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: CanvasPause
       objectReference: {fileID: 0}
+    - target: {fileID: 1597388257535471387, guid: 49966817fca24304ca8f0eaa8e0345ac, type: 3}
+      propertyPath: m_text
+      value: Level 35
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 49966817fca24304ca8f0eaa8e0345ac, type: 3}
 --- !u!1001 &314450617
@@ -1496,7 +1500,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 791910646533378050, guid: 9bd740da4aba3d845ba2fca40fe83799, type: 3}
       propertyPath: m_RootOrder
-      value: 19
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 791910646533378050, guid: 9bd740da4aba3d845ba2fca40fe83799, type: 3}
       propertyPath: m_AnchorMax.x
