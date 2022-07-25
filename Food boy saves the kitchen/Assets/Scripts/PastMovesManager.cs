@@ -17,8 +17,13 @@ public class PastMovesManager : MonoBehaviour
     private bool canUndo; //cooldown before another key from undo/restart can be activated
     private List<PastMovesRecords> pastRecords; //remembers all components of PastMovesRecords.
 
+    #region Unity specific functions
+
     private void Awake()    
     {
+        /* Initialises turn text and pastrecords list.
+         */
+
         moveText.text = prefix + turn.ToString();
         turn = -1;
         canUndo = true;
@@ -27,6 +32,11 @@ public class PastMovesManager : MonoBehaviour
 
     private void Start()
     {
+        /* Gets all instances of PastMoveRecords (which means that 
+         * these items will revert to previous state once undo button
+         * has been pressed).
+         */
+
         GameObject[] movableObjects = FindObjectsOfType<GameObject>();
         foreach (GameObject obj in movableObjects)
         {
@@ -35,15 +45,40 @@ public class PastMovesManager : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region Record
+
     public int getTurn()
     {
+        /* Gets turn number of current movement.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * int: turn number of current turn
+         */
+
         return turn;
     }
 
     public void RecordThisMove()
     {
-        /* A turn has passed.
+        /* A turn has passed. Record the move
+         * down so that undo may use it at a later time.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
          */
+
         turn++;
         foreach (PastMovesRecords record in pastRecords)
         {
@@ -55,12 +90,57 @@ public class PastMovesManager : MonoBehaviour
     private void changeMoveText()
     {
         /* Changes the Moves count on screen.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
          */
+
         moveText.text = prefix + turn.ToString();
     }
 
+    #endregion
+
+    #region Restart
+    public void RestartLevel()
+    {
+        /* Restarts the level by loading the exact same scene anew.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
+         */
+
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    #endregion
+
+    #region Undo
+
     public void DoUndo()
     {
+        /* The "Z" key has been pressed by the player, 
+         * execute the undo function for all objects which
+         * have a past move history.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
+         */
+
         if (canUndo && turn > 0)
         {
             canUndo = false;
@@ -71,16 +151,20 @@ public class PastMovesManager : MonoBehaviour
         }
     }
 
-    public void RestartLevel()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-    }
-
     private void callUndoForObjectWithTag()
     {
         /* Handles undo of all player objects.
          * https://answers.unity.com/questions/454590/c-how-to-check-if-a-gameobject-contains-a-certain.html
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
          */
+
         foreach (PastMovesRecords component in pastRecords)
         {
             component.Undo();
@@ -91,10 +175,20 @@ public class PastMovesManager : MonoBehaviour
     {
         /* Waits for undoCooldownDuration seconds before being able to undo again
          * https://foxxthom.medium.com/making-a-simple-and-efficient-cool-down-playerTimer-in-unity-137efcbb8dce
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * IEnumerator: Coroutine return.
          */
         yield return new WaitForSeconds(UndoCooldownDuration);
         canUndo = true;
     }
+
+    #endregion
 }
 
 

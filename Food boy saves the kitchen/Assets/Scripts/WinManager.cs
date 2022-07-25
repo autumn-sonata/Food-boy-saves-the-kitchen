@@ -11,6 +11,7 @@ public class WinManager : MonoBehaviour
      * Fails the player if there is no other way to win aka a reset or undo must be made
      * to further progress.
      */
+
     private GameObject[,] winConfig; //current winning configuration of the level
     private List<GameObject> foodSameTagTopLeft; //stores all foods that are the same tag as topLeft that is not on the win tile.
     private Vector2 topLeftCenteredCoord;
@@ -28,6 +29,7 @@ public class WinManager : MonoBehaviour
     {
         /* Prepare for reading the original win configuration.
          */
+
         push = LayerMask.GetMask("Push");
         winCanvas = GameObject.Find("CanvasWin");
         coordinator = GameObject.Find("Main Camera").GetComponent<Coordinator>();
@@ -81,7 +83,16 @@ public class WinManager : MonoBehaviour
         /* What to run when a move is being done.
          * 1) Get winning configuration on win tile.
          * 2) Search board for winning states.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
          */
+
         updateWinCondition();
         if (winConfig[0, 0]) updateFoodSameTagTopLeft(winConfig[0, 0]);
         checkIfWin();
@@ -91,6 +102,14 @@ public class WinManager : MonoBehaviour
     {
         /* Checks whether win condition has been updated every move. 
          * If so, update winConfig, foodSameTagTopLeft and topLeftCenteredCoord. 
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
          */
 
         //Check topLeftCenteredCoord since coord of winTile might have changed.
@@ -126,6 +145,14 @@ public class WinManager : MonoBehaviour
         /* Checks if there are any winning configurations in the level.
          * Does this by checking foodSameTagTopLeft and whether the relative configuration
          * matches winConfig.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
          */
 
         foreach (GameObject food in foodSameTagTopLeft)
@@ -148,7 +175,18 @@ public class WinManager : MonoBehaviour
     {
         /* Matches win configuration using the food name of each item.
          * Note that the win tile must be completely full before a winning condition 
+         * 
+         * Parameters
+         * ----------
+         * 1) foodTopLeft: food item that is not on any win tile that matches the 
+         * top left food item on the win tile. 
+         * 
+         * Return
+         * ------
+         * bool: True if the win configuration is met, user/player has won the level,
+         *   False otherwise.
          */
+
         Vector2 foodCoord = foodTopLeft.GetComponent<PlayerManager>().destination.position;
         for (int row = 0; row < winConfig.GetLength(0); row++)
         {
@@ -173,7 +211,16 @@ public class WinManager : MonoBehaviour
     private void updateFoodSameTagTopLeft(GameObject topLeft)
     {
         /* Update the foodSameTagTopLeft list to new top left food item since it has changed.
+         * 
+         * Parameters
+         * ----------
+         * 1) topLeft: Movable object on the top left side of the win tile.
+         * 
+         * Return
+         * ------
+         * 
          */
+
         foodSameTagTopLeft.Clear();
 
         foreach (GameObject food in GameObject.FindGameObjectsWithTag(topLeft.tag))
@@ -187,6 +234,17 @@ public class WinManager : MonoBehaviour
 
     private void UpdateTileCorners()
     {
+        /* Update the different tile corners, in case the win tile was moving.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
+         */
+
         topLeftCorner = new Vector2(transform.position.x - winConfig.GetLength(1) / 2f,
             transform.position.y + winConfig.GetLength(0) / 2f);
         bottomRightCorner = new Vector2(transform.position.x + winConfig.GetLength(1) / 2f,
@@ -201,7 +259,17 @@ public class WinManager : MonoBehaviour
          * as necessary.
          * 
          * Current winConfig is outdated during execution of this function.
+         * 
+         * Parameters
+         * ----------
+         * 1) hotCold: Determines which food type should be hot or cold.
+         * 2) heavyTiles: List of all the heavy tiles in the current level.
+         * 
+         * Return
+         * ------
+         * 
          */
+
         UpdateTileCorners();
         for (int row = 0; row < winConfig.GetLength(0); row++)
         {
@@ -256,7 +324,16 @@ public class WinManager : MonoBehaviour
         /* Checks if any new object is now in the win tile. 
          * If so, enable the win tile tag and remove children.
          * Disable heavy and hot/cold as necessary.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
          */
+
         Collider2D[] winTileObj = 
             Physics2D.OverlapAreaAll(topLeftCorner + new Vector2(0.5f, -0.5f), 
             bottomRightCorner + new Vector2(-0.5f, 0.5f), push);
@@ -276,7 +353,17 @@ public class WinManager : MonoBehaviour
     {
         /* Outlines the win configuration for the player to see.
          * Sequence of actions to do.
+         * 
+         * Parameters
+         * ----------
+         * 1) foodTopLeft: food object that is on the top left of the
+         *   winning configuration (not on the win tile).
+         * 
+         * Return
+         * ------
+         * 
          */
+
         Vector2 topLeftPos = foodTopLeft.GetComponent<PlayerManager>().destination.transform.position;
         Vector2 middleWinConfig = new(topLeftPos.x + ((float)winConfig.GetLength(1) - 1) / 2,
             topLeftPos.y - ((float)winConfig.GetLength(0) - 1) / 2);
@@ -292,7 +379,16 @@ public class WinManager : MonoBehaviour
     private void AddLvlToCompleted()
     {
         /* Add level completion to PlayerInfo.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
          */
+
         int levelNum = SceneManager.GetActiveScene().buildIndex - 5;
         //Tutorial level not counted.
         if (!FindObjectOfType<PlayerInfo>()) Debug.LogError("Start game from Main menu.");
@@ -301,6 +397,19 @@ public class WinManager : MonoBehaviour
 
     private IEnumerator Flicker(GameObject winOutline)
     {
+        /* Coroutine to run when a win configuration is found,
+         * to highlight the winning configuration that the user/player
+         * found in trying to solve the level.
+         * 
+         * Parameters
+         * ----------
+         * 1) winOutline: gameObject that handles the sprite of the outline
+         * 
+         * Return
+         * ------
+         * IEnumerator: Coroutine return.
+         */
+
         SpriteRenderer render = winOutline.GetComponent<SpriteRenderer>();
         yield return new WaitForSeconds(0.3f);
         render.enabled = false;

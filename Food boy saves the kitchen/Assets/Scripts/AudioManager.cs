@@ -7,20 +7,30 @@ using UnityEngine.SceneManagement;
 public class AudioManager : MonoBehaviour
 {
     /* Manages audio for the game.
-     * Main menu and level selection screens: Track 0
-     * Lvl 1-20: Track 1
-     * Level 20-??: Track 2
+     * Main menu and level selection screens: Seabed Transcription
+     * Lvl 1-20: 8bitPiano
+     * Level 20-43: AcGuitar
      */
+
     public static AudioManager control;
     private int previousSceneIndex; //to check whether to change soundtrack, default 0
     private bool changeTrack;
+
     [SerializeField] private int Level1BuildIndex;
     private int Level20BuildIndex;
     [SerializeField] private AudioSource BGM;
     [SerializeField] private List<AudioClip> Tracks;
 
+    #region Unity specific functions
+
     private void Awake()
     {
+        /* Make the music persistent throughout the game using a singleton,
+         * which is the "control" variable.
+         * 
+         * Initialisation of variables.
+         */
+
         if (control == null)
         {
             DontDestroyOnLoad(gameObject);
@@ -40,6 +50,10 @@ public class AudioManager : MonoBehaviour
 
     private void Update()
     {
+        /* Updates the music soundtrack if the scene changes to the main menu or
+         * levels respectively.
+         */
+
         int currScene = SceneManager.GetActiveScene().buildIndex;
         if (currScene != previousSceneIndex)
         {
@@ -76,4 +90,6 @@ public class AudioManager : MonoBehaviour
             previousSceneIndex = currScene;
         }
     }
+
+    #endregion
 }

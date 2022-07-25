@@ -7,13 +7,36 @@ public class WinUI : MonoBehaviour
 {
     public void NextLevel()
     {
+        /* Loads the next level once a level has been completed.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
+         */
+
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 
     public void LevelSelect()
     {
+        /* Figure out which level select scene the level select button will return
+         * to.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
+         */
+
         bool hasScene = false;
-        //Figure out which level select scene to load into.
+
         int currLvlNum = SceneManager.GetActiveScene().buildIndex - 5;
         if (currLvlNum < 0)
         {
@@ -37,6 +60,17 @@ public class WinUI : MonoBehaviour
 
     public void QuitGame()
     {
+        /* Quit the game.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
+         */
+
         Application.Quit();
     }
 }

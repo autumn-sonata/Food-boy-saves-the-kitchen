@@ -17,8 +17,14 @@ public class ConveyerBeltManager : MonoBehaviour
 
     private LayerMask push;
 
+    #region Unity specific functions
+
     private void Awake()
     {
+        /* Initialisation of direction that the conveyer belt is 
+         * pushing in.
+         */
+
         push = LayerMask.GetMask("Push");
 
         //translate the direction of movement into directionPush.
@@ -43,23 +49,62 @@ public class ConveyerBeltManager : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region Getting conveyer belt information
+
     /* When movement is done, check whether there is any object on this tile.
      * Then update accordingly.
      */
     public Collider2D getObjOnTop()
     {
         /* Gets the current element which is on top of the conveyer belt.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * Collider2D: collider of the object on top of the conveyer belt.
          */
+
         return Physics2D.OverlapPoint(transform.position, push);
     }
 
     public float getPushDirectionHorz()
     {
+        /* Determine conveyer belt's x-axis push.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * float: 1 if pushing to right, -1 if pushing to left,
+         *   0 if not pushing within the x-axis.
+         */
+
         return directionPush.x;
     }
 
     public float getPushDirectionVert()
     {
+        /* Determine conveyer belt's y-axis push.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * float: 1 if pushing upwards, -1 if pushing downwards,
+         *   0 if not pushing within the y-axis. 
+         */
+
         return directionPush.y;
     }
+
+    #endregion
 }

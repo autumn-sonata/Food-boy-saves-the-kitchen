@@ -10,6 +10,10 @@ public class SharpBlade : MonoBehaviour
 
     void Awake()
     {
+        /* Enables the sharp property of knives at the
+         * start of the level.
+         */
+
         GetComponent<Tags>().enableIsSharp();
     }
 }

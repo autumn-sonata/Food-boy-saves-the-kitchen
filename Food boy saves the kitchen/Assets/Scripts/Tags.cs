@@ -21,6 +21,7 @@ public class Tags : MonoBehaviour
      * 13) Is inactive (in the level)
      * If the tag e.g Player is not found at the current moment, then disable Player behaviour.
      */
+
     private bool[] objectTags = new bool[15];
 
     public bool isKnife()
@@ -28,6 +29,7 @@ public class Tags : MonoBehaviour
         return gameObject.tag == "Knife";
     }
 
+    #region Player
     public bool isPlayer()
     {
         return objectTags[0];
@@ -43,6 +45,9 @@ public class Tags : MonoBehaviour
         objectTags[0] = true;
     }
 
+    #endregion
+
+    #region Tiles
     public void enableWinTileTag()
     {
         objectTags[1] = true;
@@ -138,6 +143,9 @@ public class Tags : MonoBehaviour
         return objectTags[5];
     }
 
+    #endregion
+
+    #region Object Attributes
     public void enableHeavy()
     {
         objectTags[6] = true;
@@ -233,6 +241,9 @@ public class Tags : MonoBehaviour
         return objectTags[12];
     }
 
+    #endregion
+
+    #region Tag interactions
     public bool[] getTags()
     {
         /* To record tags for undo.
@@ -244,6 +255,7 @@ public class Tags : MonoBehaviour
     {
         /* To set tag in the case of undo
          */
+
         objectTags = tags;
     }
 
@@ -251,6 +263,7 @@ public class Tags : MonoBehaviour
     {
         /* Prints out the tags for debugging purposes.
          */
+
         Debug.Log(name +
                   "\n1) Is player " + objectTags[0] +
                   "\n2) Part of winTile " + objectTags[1] +
@@ -266,4 +279,6 @@ public class Tags : MonoBehaviour
                   "\n12) Is cooked " + objectTags[11] +
                   "\n13) Is inactive " + objectTags[12]);
     }
+
+    #endregion
 }

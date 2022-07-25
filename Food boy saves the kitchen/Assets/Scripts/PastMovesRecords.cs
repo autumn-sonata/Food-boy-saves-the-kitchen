@@ -9,8 +9,14 @@ public class PastMovesRecords : MonoBehaviour
     /* Stores all the past records of this object.
      * Past moves are to be used by the undo function.
      */
+
+    #region MoveLogs class initialisation
+
     private class MoveLogs
     {
+        /* Stores all relevant information for undoing an action
+         */
+
         private readonly int turn;
         private readonly Vector3 prevPosition;
         private readonly List<bool> tags;
@@ -26,51 +32,97 @@ public class PastMovesRecords : MonoBehaviour
 
         public int getTurn()
         {
+            /* Get the turn number of this move log.
+             */
+
             return turn;
         }
 
         public Vector3 getPrevPosition()
         {
+            /* Gets position recorded in this move log.
+             */
+
             return prevPosition;
         }
 
         public List<bool> getTags()
         {
+            /* Gets tags of gameObject at this turn number.
+             */
+
             return tags;
         }
 
         public bool getActive()
         {
+            /* Gets whether the gameObject has been destroyed
+             * or not at this turn number.
+             */
+
             return isActive;
         }
     }
 
+    #endregion
+
     private Stack<MoveLogs> moveLogs;
     private PastMovesManager moveManager; //higher in hierarchy
     private PastMovesSameTag sameTagManager; //lower in hierarchy. For tiles.
- 
-    // Start is called before the first frame update
+
+    #region Unity specific functions
+
     private void Awake()
     {
+        /* Initialises the move log stack and references to the move manager.
+         */
+
         moveLogs = new Stack<MoveLogs>();
         moveManager = GameObject.Find("Canvas").GetComponent<PastMovesManager>();
         sameTagManager = GetComponent<PastMovesSameTag>();
     }
 
+    #endregion
+
+    #region Record
+
     public void RecordMove()
     {
         /* Adds entry to moveLogs stack.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
          */
+
         moveLogs.Push(new MoveLogs(turnNumber(), transform.position, 
             new List<bool>(GetComponent<Tags>().getTags().ToList()), gameObject.activeInHierarchy));
 
         if (isTile()) sameTagManager.RecordMove(turnNumber());
     }
 
+    #endregion
+
+    #region Undo
+
     public void Undo()
     {
-        /* Undo the move done by this object.
+        /* Undo the move done by this object back to previous
+         * turn number.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
          */
+
         if (GetComponent<DetachChildren>())
             GetComponent<DetachChildren>().detachAllChildren();
         if (moveLogs.Count > 0)
@@ -93,13 +145,41 @@ public class PastMovesRecords : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region Miscellaneous
     private int turnNumber()
     {
+        /* Gets turn number of current turn.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * int: turn number of current turn.
+         */
+
         return moveManager.getTurn();
     } 
 
     private bool isTile()
     {
+        /* Checks if this object is a tile or not.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * bool: True if this gameObject is a tile, False
+         *   otherwise.
+         */
+
         return sameTagManager != null;
     }
+
+    #endregion
 }

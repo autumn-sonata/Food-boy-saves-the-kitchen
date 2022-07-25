@@ -8,18 +8,41 @@ public abstract class HotColdManager : TileManager
     /* Manager for the hot and cold tiles.
      */
 
+    #region Routines
     protected override void OldColRoutine()
     {
-        //Update foodSameTag and oldCol tags.
+        /* Update foodSameTag and oldCol tags.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
+         */
+
         DisableFoodSameTagProperty();
         disableTileProperty();
     }
 
     protected override void NewColRoutine()
     {
-        //Update to new collider
+        /* Update to new collider
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
+         */
+
         enableTileProperty();
     }
+
+    #endregion
 
     protected override void PlayerAdjustment()
     {

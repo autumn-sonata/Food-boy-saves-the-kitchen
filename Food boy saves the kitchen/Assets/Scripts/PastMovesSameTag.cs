@@ -10,6 +10,10 @@ public class PastMovesSameTag : MonoBehaviour
 
     private class MoveLogs
     {
+        /* MoveLogs class to store information to revert back to 
+         * for tiles. 
+         */
+
         private int turn;
         private List<GameObject> foodSameTag;
         private Collider2D col;
@@ -25,21 +29,37 @@ public class PastMovesSameTag : MonoBehaviour
 
         public int getTurn()
         {
+            /* Gets recorded turn.
+             */
+
             return turn;
         }
 
         public List<GameObject> getFoodSameTag()
         {
+            /* Gets recorded food items of the same tag
+             * that would be affected by tag changes of 
+             * current collider.
+             */
+
             return foodSameTag;
         }
 
         public Collider2D getCol()
         {
+            /* Get the collider of the gameObject on the 
+             * tile.
+             */
+
             return col;
         }
 
         public Collider2D getOldCol()
         {
+            /* Get the previous collider of the gameObject
+             * on the tile.
+             */
+
             return oldCol;
         }
     }
@@ -47,26 +67,54 @@ public class PastMovesSameTag : MonoBehaviour
     private Stack<MoveLogs> moveLogs;
     private TileManager tile;
 
-    // Start is called before the first frame update
+    #region Unity specific functions
+
     private void Awake()
     {
         moveLogs = new Stack<MoveLogs>();
         tile = SelectTileType();
     }
 
+    #endregion
+
+    #region Record
+
     public void RecordMove(int turn)
     {
         /* Adds entry to moveLogs stack.
+         * 
+         * Parameters
+         * ----------
+         * turn: turn number to register the current state
+         *   of the gameObject.
+         * 
+         * Return
+         * ------
+         * 
          */
 
         moveLogs.Push(new MoveLogs(turn, new List<GameObject>(tile.getFoodSameTag()), 
             tile.getCol(), tile.getOldCol()));
     }
 
+    #endregion
+
+    #region Undo
+
     public void Undo(int turn)
     {
         /* Undo the move done by this object.
+         * 
+         * Parameters
+         * ----------
+         * turn: turn number to register the current state
+         *   of the gameObject.
+         * 
+         * Return
+         * ------
+         * 
          */
+
         if (moveLogs.Count > 0)
         {
             MoveLogs top = moveLogs.Pop();
@@ -78,9 +126,22 @@ public class PastMovesSameTag : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region Miscellaneous
+
     private TileManager SelectTileType()
     {
         /* Choose between the different tile types.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * TileManager: Selects the correct tile type
+         *   of current gameObject this script is attached to.
          */
 
         if (GetComponent<YouManager>())
@@ -98,4 +159,6 @@ public class PastMovesSameTag : MonoBehaviour
         Debug.LogError("Manager not found in PastMovesSameTag.");
         return null;
     }
+
+    #endregion
 }
