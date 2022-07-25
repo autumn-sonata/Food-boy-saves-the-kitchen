@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class PauseManager : MonoBehaviour
 {
@@ -9,9 +10,33 @@ public class PauseManager : MonoBehaviour
 
     public GameObject pauseMenuUI;
 
+    private Resolution[] resolutions;
+    public TMP_Dropdown resolutionDropDown;
+
     void Start()
     {
-        pauseMenuUI.SetActive(false); 
+        pauseMenuUI.SetActive(false);
+
+        resolutions = Screen.resolutions;
+        resolutionDropDown.ClearOptions();
+        List<string> options = new();
+
+        int currResolutionIndex = 0;
+        for (int i = 0; i < resolutions.Length; i++)
+        {
+            Resolution reso = resolutions[i];
+            options.Add(reso.width + " x " + reso.height);
+
+            if (reso.width == Screen.currentResolution.width &&
+                reso.height == Screen.currentResolution.height)
+            {
+                currResolutionIndex = i;
+            }
+        }
+
+        resolutionDropDown.AddOptions(options);
+        resolutionDropDown.value = currResolutionIndex;
+        resolutionDropDown.RefreshShownValue();
     }
 
     // Update is called once per frame
@@ -62,11 +87,17 @@ public class PauseManager : MonoBehaviour
 
     public void SetVolume(float volume)
     {
-        Debug.Log(volume);
+        GameObject.Find("Solo").GetComponent<AudioSource>().volume = volume;
     }
 
     public bool isPauseOpen()
     {
         return GameIsPaused;
+    }
+
+    public void SetResolution(int resolutionIndex)
+    {
+        Resolution res = resolutions[resolutionIndex];
+        Screen.SetResolution(res.width, res.height, Screen.fullScreen);
     }
 }
