@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class PauseManager : MonoBehaviour
 {
@@ -9,9 +10,33 @@ public class PauseManager : MonoBehaviour
 
     public GameObject pauseMenuUI;
 
+    private Resolution[] resolutions;
+    public TMP_Dropdown resolutionDropDown;
+
     void Start()
     {
-        pauseMenuUI.SetActive(false); 
+        pauseMenuUI.SetActive(false);
+
+        resolutions = Screen.resolutions;
+        resolutionDropDown.ClearOptions();
+        List<string> options = new();
+
+        int currResolutionIndex = 0;
+        for (int i = 0; i < resolutions.Length; i++)
+        {
+            Resolution reso = resolutions[i];
+            options.Add(reso.width + " x " + reso.height);
+
+            if (reso.width == Screen.currentResolution.width &&
+                reso.height == Screen.currentResolution.height)
+            {
+                currResolutionIndex = i;
+            }
+        }
+
+        resolutionDropDown.AddOptions(options);
+        resolutionDropDown.value = currResolutionIndex;
+        resolutionDropDown.RefreshShownValue();
     }
 
     // Update is called once per frame
@@ -62,7 +87,6 @@ public class PauseManager : MonoBehaviour
 
     public void SetVolume(float volume)
     {
-        //Attach volume to Audio source listener.
         GameObject.Find("Solo").GetComponent<AudioSource>().volume = volume;
     }
 
@@ -71,19 +95,9 @@ public class PauseManager : MonoBehaviour
         return GameIsPaused;
     }
 
-    public void ResolutionHandler(int optionNum)
+    public void SetResolution(int resolutionIndex)
     {
-        switch (optionNum)
-        {
-            case 0:
-                Screen.SetResolution(1920, 1080, Screen.fullScreen);
-                break;
-            case 1:
-                Screen.SetResolution(1600, 900, Screen.fullScreen);
-                break;
-            default:
-                Screen.SetResolution(1280, 720, Screen.fullScreen);
-                break;
-        }
+        Resolution res = resolutions[resolutionIndex];
+        Screen.SetResolution(res.width, res.height, Screen.fullScreen);
     }
 }
