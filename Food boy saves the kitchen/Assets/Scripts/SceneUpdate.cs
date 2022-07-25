@@ -6,6 +6,9 @@ using UnityEngine.SceneManagement;
 public class SceneUpdate : MonoBehaviour
 {
     public int Level;
+
+    #region Button functions
+
     public void MainMenuButton()
     {
         //Load main menu
@@ -29,6 +32,9 @@ public class SceneUpdate : MonoBehaviour
     }
     public void NextLevelButton()
     {
+        //Load next level after this current level.
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
+
+    #endregion
 }

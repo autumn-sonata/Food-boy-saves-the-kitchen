@@ -10,14 +10,18 @@ public class TextManager : MonoBehaviour
 
     void Update()
     {
-            if (CanvasTab.GetComponent<TabUI>().isTabOpen() || CanvasPause.GetComponent<PauseManager>().isPauseOpen())
+        /* Determines whether the texts on the different
+         * canvases should be shown to the player or not.
+         */
+
+        if (CanvasTab.GetComponent<TabUI>().isTabOpen() || CanvasPause.GetComponent<PauseManager>().isPauseOpen())
         {
             foreach (GameObject texts in text)
             {
                 texts.SetActive(false);
             }
         }
-            else
+        else
         {
             foreach (GameObject texts in text)
             {

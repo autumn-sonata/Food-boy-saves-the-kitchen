@@ -9,14 +9,34 @@ public class HeavyObstacleManager : MonoBehaviour
      * 
      * Prevents the player from moving in a certain direction if there is a wall.
      */
+
     private LayerMask heavy;
+
+    #region Unity specific functions
     private void Awake()
     {
+        /* Initialise the heavy layermask.
+         */
+
         heavy = LayerMask.GetMask("Heavy");
     }
 
-    public bool isTouchingHeavy(Vector2 position, Vector2 direction)
+    #endregion
+
+    public bool isTouchingHeavy(Vector2 position)
     {
+        /* Checks whether this position is on top of a heavy layer object
+         * aka the walls surrounding each level.
+         * 
+         * Parameters
+         * ----------
+         * 1) position: 2D coordinate on the unity scene to check for 
+         *   level bounding walls.
+         * 
+         * Return
+         * ------
+         * 
+         */
         return Physics2D.OverlapCircle(position, 0.3f, heavy, 0f, 0f);
     }
 }

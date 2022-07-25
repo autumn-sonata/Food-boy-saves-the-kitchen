@@ -7,7 +7,11 @@ using UnityEngine.SceneManagement;
 public class PlayerInfo : MonoBehaviour
 {
     /* Functionality for providing player progression 
-     * and save states.
+     * and load/save states.
+     * 
+     * Limits the number of levels that the player has 
+     * access to so that the player will not be overwhelmed
+     * with the different kinds of game mechanics.
      */
 
     private static readonly int numLvls = 43;
@@ -22,19 +26,16 @@ public class PlayerInfo : MonoBehaviour
     private static readonly KeyValuePair<int, int> levelSelIndex = new(2, 5);
     private int sceneIndex;
 
+    #region Unity specific functions
+
     private void Awake()
     {
+        /* Initialise current progress to be completely fresh.
+         * Aka new game.
+         */
+
         sceneIndex = SceneManager.GetActiveScene().buildIndex;
-        levels = new LevelStatus[numLvls];
-        colliders = new bool[numLvls];
-        levelSprite = new bool[numLvls];
-        nextArrow = new bool[3];
-        foreach (int specialLvl in NextLevelManager.specialUnlockedLvls)
-        {
-            levels[specialLvl - 1] = LevelStatus.Unlocked;
-            colliders[specialLvl - 1] = true;
-            levelSprite[specialLvl - 1] = true;
-        }
+        InitialiseLevelProgress();
 
         if (!LevelRestriction.saveFileExists())
             SaveState();
@@ -42,13 +43,17 @@ public class PlayerInfo : MonoBehaviour
 
     private void Update()
     {
+        /* Driver function for reading the level status information and
+         * translating it into actually unlocking levels in Unity.
+         */
+
         int currSceneIndex = SceneManager.GetActiveScene().buildIndex;
         if (currSceneIndex != sceneIndex)
         {
             sceneIndex = currSceneIndex;
-            
+
             //runs only when scene changes.
-            if (currSceneIndex >= levelSelIndex.Key && 
+            if (currSceneIndex >= levelSelIndex.Key &&
                 currSceneIndex <= levelSelIndex.Value)
             {
                 LoadState();
@@ -74,9 +79,24 @@ public class PlayerInfo : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region Helper functions
     private void UnlockNextLvlSet()
     {
-        //Special lvl, needs to unlock next level select screen.
+        /* Function for special levels. When this function is run,
+         * the next level select screen will be open and accessible
+         * to the player.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
+         */
+
         GameObject next = GameObject.FindGameObjectWithTag("Next");
         if (!next) Debug.LogError("Error with finding Next arrow.");
 
@@ -84,17 +104,86 @@ public class PlayerInfo : MonoBehaviour
         next.GetComponent<DormantSprite>().ChangeToActiveSprite();
     }
 
+    private void InitialiseLevelProgress()
+    {
+        /* Initialises level progress, as if the game has been started
+         * anew.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
+         */
+
+        levels = new LevelStatus[numLvls];
+        colliders = new bool[numLvls];
+        levelSprite = new bool[numLvls];
+        nextArrow = new bool[3];
+        foreach (int specialLvl in NextLevelManager.specialUnlockedLvls)
+        {
+            levels[specialLvl - 1] = LevelStatus.Unlocked;
+            colliders[specialLvl - 1] = true;
+            levelSprite[specialLvl - 1] = true;
+        }
+    }
+
+    public void ResetProgress()
+    {
+        /* Resets the level progression.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
+         */
+
+        InitialiseLevelProgress();
+        SaveState();
+    }
+
+    #endregion
+
     #region SaveLoadMethods
 
     private void SaveState()
     {
-        //Call whenever clear a level.
+        /* Function to be called whenever 
+         * the player clears a level, to update the information
+         * in the system.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
+         */
+
         LevelRestriction.Save(this);
     }
 
     private void LoadState()
     {
-        //Call only if scene is one of the level selects.
+        /* Function to be called whenever the level
+         * information needs to be retrieved from 
+         * the binary file.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
+         */
+
         PlayerData data = LevelRestriction.Load();
 
         levels = data.getLevelsUnlocked();
@@ -107,21 +196,71 @@ public class PlayerInfo : MonoBehaviour
     #region PlayerData methods
     public LevelStatus[] getLevelsUnlocked()
     {
+        /* Method to store level status information 
+         * into PlayerData.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * LevelStatus[]: The status of each level in the game.
+         */
         return levels;
     }
 
     public bool[] getColliders()
     {
+        /* Method to store current collider information
+         * into PlayerData.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * bool[]: Whether the colliders have been enabled
+         *   or disabled.
+         */
+
         return colliders;
     }
 
     public bool[] getLevelSprites()
     {
+        /* Method to store current level sprite information
+         * into PlayerData.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * bool[]: Whether the numbers for the levels has been
+         *   lighted up or not.
+         */
+
         return levelSprite;
     }
 
     public bool[] getNextArrow()
     {
+        /* Method to store information on whether the next
+         * set of levels has been unlocked or not.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * bool[]: Whether the next set of scenes has been unlocked
+         *   or not.
+         */
+
         return nextArrow;
     }
 
@@ -139,7 +278,12 @@ public class PlayerInfo : MonoBehaviour
          * Parameters
          * ----------
          * 1) int completedLvlNum: The level number to be completed.
+         * 
+         * Return
+         * ------
+         * 
          */
+
         if (levels[completedLvlNum - 1] == LevelStatus.Locked)
             Debug.LogError("Level " + completedLvlNum + " has not been unlocked yet!");
         levels[completedLvlNum - 1] = LevelStatus.Completed;
@@ -159,10 +303,12 @@ public class PlayerInfo : MonoBehaviour
                         break;
                     }
                 }
-            } else if (levels[lvl - 1] != LevelStatus.Locked)
+            }
+            else if (levels[lvl - 1] != LevelStatus.Locked)
             {
                 Debug.LogError("Level " + lvl + " is not even locked!");
-            } else
+            }
+            else
             {
                 levels[lvl - 1] = LevelStatus.Unlocked;
                 //enable collider2D and change sprite

@@ -1935,7 +1935,6 @@ MonoBehaviour:
   - {fileID: 5130153392776137135}
   - {fileID: 6821363207516778384}
   - {fileID: 433285665391754493}
-  text: []
 --- !u!1 &974413203971988652
 GameObject:
   m_ObjectHideFlags: 0
@@ -3225,10 +3224,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '"win'' tile
+  m_text: '"win" tile
 
-    win the level by forming another set of whatever food
-    is on the win tile in order'
+    Arrange another set of whatever is on top of the win tile,
+    in the same orientation, to complete the level.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f28d97c874b1eac4b990792b1045586e, type: 2}
   m_sharedMaterial: {fileID: -4309548825276137998, guid: f28d97c874b1eac4b990792b1045586e, type: 2}

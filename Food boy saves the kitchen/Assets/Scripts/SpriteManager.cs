@@ -27,11 +27,14 @@ public class SpriteManager : MonoBehaviour
     private FoodGlowManager glowManager;
     private static Color32 cookedGlowColor = new(161, 54, 54, 30);
 
+    #region Unity specific functions
+
     private void Awake()
     {
         /* Disable all other sprites except for original when first loaded
          * Original is enabled by default.
          */
+
         glowManager = GameObject.Find("Main Camera").GetComponent<FoodGlowManager>();
         spriteGlow = GetComponent<SpriteGlowEffect>();
         spriteGlow.GlowColor = cookedGlowColor;
@@ -56,13 +59,24 @@ public class SpriteManager : MonoBehaviour
         if (spriteGlow.enabled) spriteGlow.GlowBrightness = glowManager.getCurrBrightness();
     }
 
+    #endregion
+
+    #region Updating sprites
+
     public void UpdateSprites()
     {
-        /* Updates the sprites based on the tags.
+        /* Updates the sprites based on the tags on the gameObjects.
          * If the object is supposed to be inactive, disable the gameObject.
          * 
-         * Returns bool on whether sprite has been updated in any form
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
          */
+
         Tags tag = GetComponent<Tags>();
         SpriteRenderer render = GetComponent<SpriteRenderer>();
         if (tag.isCut())
@@ -111,14 +125,34 @@ public class SpriteManager : MonoBehaviour
     private void enableSprite(string name)
     {
         /* Enables the sprite with the specific name.
+         * 
+         * Parameters
+         * ----------
+         * 1) name: "cut", "cold", "hot", "original"
+         * 
+         * Return
+         * ------
+         * 
          */
+
         sprites[name].enabled = true;
     }
 
     private void disableSprite(string name)
     {
         /* Disables the sprite with the specific name.
+         * 
+         * Parameters
+         * ----------
+         * 1) name: "cut", "cold", "hot", "original"
+         * 
+         * Return
+         * ------
+         * 
          */
+
         sprites[name].enabled = false;
     }
+
+    #endregion
 }

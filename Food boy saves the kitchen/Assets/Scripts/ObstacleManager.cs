@@ -15,11 +15,22 @@ public class ObstacleManager : MonoBehaviour
     public bool allowedToMove(Vector2 direction)
     {
         /* Does a check on whether the player is able to move in that direction.
+         * 
+         * Parameters
+         * ----------
+         * 1) direction: Get the direction of movement as dictated by the 
+         *   user/player by keyboard input.
+         * 
+         * Return
+         * ------
+         * bool: True if movement of player in direction of movement is possible,
+         *   False otherwise.
          */
+
         GetComponent<PushObstacleManager>().updateDirection(direction);
 
         return !GetComponent<HeavyObstacleManager>().isTouchingHeavy
-            (GetComponent<PushObstacleManager>().PosInfrontOfPushQueue(), direction) &&
+            (GetComponent<PushObstacleManager>().PosInfrontOfPushQueue()) &&
             !GetComponent<PushObstacleManager>().HasHeavyInFront();
     }
 }

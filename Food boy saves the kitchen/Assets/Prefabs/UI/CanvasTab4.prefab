@@ -2251,7 +2251,6 @@ MonoBehaviour:
   - {fileID: 3935341196182825010}
   - {fileID: 1219881078}
   - {fileID: 5820847460148986773}
-  text: []
 --- !u!1 &1039750383912411449
 GameObject:
   m_ObjectHideFlags: 0
@@ -5816,7 +5815,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: 'like "you" and "Heavy", "hot" and "Cold" are not applied to objects when
-    they are on top a tile.
+    they are on top of a tile.
 
 
 '
@@ -6871,10 +6870,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '"win'' tile
+  m_text: '"win" tile
 
-    win the level by forming another set of whatever food
-    is on the win tile in order'
+    Arrange another set of whatever is on top of the win tile,
+    in the same orientation, to complete the level.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f28d97c874b1eac4b990792b1045586e, type: 2}
   m_sharedMaterial: {fileID: -4309548825276137998, guid: f28d97c874b1eac4b990792b1045586e, type: 2}

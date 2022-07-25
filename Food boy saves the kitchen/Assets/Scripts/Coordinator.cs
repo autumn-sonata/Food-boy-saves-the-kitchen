@@ -11,23 +11,24 @@ public class Coordinator : MonoBehaviour
      * 
      * Also coordinates which food items are to be players among you tiles.
      */
+
     private const float MoveDelay = 0.2f;
 
     private HashSet<GameObject> players; //stores every single player on the level. Managed by YouManager
     private Dictionary<string, int> playerTypes; //stores the food types of players on the level
     private List<GameObject> invisibleCache; //stores items that are invisible when holding tab
-    private List<GameObject> tmpPlayers;
-    private bool checkedMove;
-    private bool isInitialise;
-    private bool hasUndone;
-    private bool playerCanMove;
-    private bool winFound;
-    private bool winUpdateAftUndo;
+    private List<GameObject> tmpPlayers; //stores players for conveyer belt to act as players
+    private bool checkedMove; //checks if a move has been made on the board (with movement)
+    private bool isInitialise; //checks if this is the first time a script is run on the scene.
+    private bool hasUndone; 
+    private bool playerCanMove; //checks if the player is able to move (after conveyer belt moves).
+    private bool winFound; //checks if the user/player has beat the level.
+    private bool winUpdateAftUndo; 
 
-    private Timer playerTimer;
-    private PastMovesManager moveManager;
-    private InputManager inputManager;
-    private List<SpriteManager> sprites;
+    private Timer playerTimer; //timer to count cooldown on player movement.
+    private PastMovesManager moveManager; //manager to store past moves (for undo)
+    private InputManager inputManager; //manager to receive player inputs from keyboard.
+    private List<SpriteManager> sprites; //sprites of all the different movable objects in the level.
     private List<WinManager> winTiles; //All instances of winTiles.
     private List<YouManager> youTiles; //All instances of youTiles.
     private List<ColdManager> coldTiles; //All instances of coldTiles.
@@ -36,9 +37,15 @@ public class Coordinator : MonoBehaviour
     private List<TileManager> tiles; //All tiles excluding winTiles.
     private List<ConveyerBeltManager> conveyerBelts; //All conveyer belts.
 
+    #region Unity specific functions
+
     private void Awake()
     {
-        //Initialisation of players and playerTypes
+        /* Initialisation of players and playerTypes, 
+         * and all other variables. Since this is the central script for running the game,
+         * so this function will look for all the tiles, and save them for future use.
+         */
+
         players = new();
         playerTypes = new();
         tmpPlayers = new();
@@ -66,7 +73,6 @@ public class Coordinator : MonoBehaviour
         InitialiseAllAttributes(); //initialise cooked and cut
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         /* Updates players hashset and playerTypes hashmap.
@@ -89,8 +95,10 @@ public class Coordinator : MonoBehaviour
 
     private void Update()
     {
-        /* Central call to all other managers.
+        /* Central call to all other managers. This function is the driver for the
+         * logic of the entire game.
          */
+
         if (winUpdateAftUndo)
         {
             //next frame right after, sprite has moved, overlappoint can pinpoint.
@@ -121,17 +129,198 @@ public class Coordinator : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region Attribute initialisation
+    private void InitialiseAllAttributes()
+    {
+        /* Initialise cut and cooked if stated as so.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
+         */
+        foreach (AttributeInitialisation attr in FindObjectsOfType<AttributeInitialisation>())
+        {
+            attr.Initialise();
+        }
+    }
+
+    #endregion
+
+    #region Driver code for update
+    private void LevelTagPlayerUpdate()
+    {
+        /* Driver code for updating the positions and sprites
+         * based on user/player input.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
+         */
+
+        CheckInactive();
+        CheckUndo();
+
+        if (hasMoved())
+        {
+            TagRoutine();
+        }
+        SpriteUpdate();
+    }
+
+    private void LevelTagBeltUpdate()
+    {
+        /* Driver code for updating the positions and sprites
+         * based on conveyer input.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
+         */
+
+        CheckInactive();
+        CheckUndo();
+
+        if (hasMoved())
+        {
+            TagRoutine();
+            //ask moveManager to make all PastMovesRecords to record their moves.
+            moveManager.RecordThisMove();
+            checkedMove = true;
+            isInitialise = false;
+        }
+        SpriteUpdate();
+        checkWinConfig(); //check static position cut 
+        UndoRestartRoutine();
+    }
+
+    private void TagRoutine()
+    {
+        /* Updates the tiles and tags for their different properties
+         * and knowledge of who is standing on which tile.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
+         */
+
+        foreach (GameObject player in players)
+        {
+            player.GetComponent<DetachChildren>().detachAllChildren();
+        }
+
+        foreach (TileManager tile in tiles)
+        {
+            tile.TriggerTile(); //update collider
+        }
+
+        /* Dictionary parameters -> [Tag name: [isCold?, isHot?]]
+         * 
+         * The hotCold hashmap represents the objects on hot and cold 
+         * tiles and whether  
+         */
+        Dictionary<string, bool[]> hotCold = new();
+
+        UpdateHotColdPlayers(hotCold);
+
+        if (!isInitialise)
+        {
+            foreach (TileManager tile in tiles)
+            {
+                /* Enable hot/cold and heavy again for food 
+                 * items going out of tile
+                 */
+                tile.ActivateDormantHotCold(hotCold);
+            }
+
+            //You, cold and hot tile tag + updates in case change of objects
+            foreach (TileManager tile in tiles)
+            {
+                tile.OldColUpdate(); //run all old col updates before new ones.
+            }
+
+            foreach (WinManager winTile in winTiles)
+            {
+                winTile.ExitTrigger(hotCold, heavyTiles);
+            }
+
+            //Tag updates for new objects that stepped into different tiles
+            foreach (WinManager winTile in winTiles)
+            {
+                winTile.EnterTrigger();
+            }
+
+            foreach (TileManager tile in tiles)
+            {
+                tile.NewColUpdate();
+            }
+
+            //Deactivate objects if both hot and cold.
+            foreach (TileManager tile in tiles)
+            {
+                tile.DeactivateDormantHotCold(hotCold);
+            }
+        }
+
+        HeavyActivation();
+        SpriteUpdate(); //deactivates gameobject if tags are appropriate.
+
+        //Win tile updates
+        executeWinManagers();
+    }
+
+    #endregion
+
+    #region players array modifications
+
     public void decrementPlayer(string playerType)
     {
         /* Decrements value of playerType by 1 in playerTypes hashmap.
+         * 
+         * Parameters
+         * ----------
+         * 1) playerType: string containing the tag name of the object stepping
+         *   out of a tile.
+         * 
+         * Return
+         * ------
+         * 
          */
+
         playerTypes[playerType]--;
     }
 
     public void incrementPlayer(string playerType)
     {
         /* Increments value of playerType by 1 in playerTypes hashmap.
+         * 
+         * Parameters
+         * ----------
+         * 1) playerType: string containing the tag name of the object stepping
+         *   into a tile.
+         * 
+         * Return
+         * ------
+         * 
          */
+
         if (!playerTypes.ContainsKey(playerType)) playerTypes.Add(playerType, 0);
             playerTypes[playerType]++;
     }
@@ -140,39 +329,163 @@ public class Coordinator : MonoBehaviour
     {
         /* Checks whether the playerType is still a valid player
          * (due to other you tiles having the object on it)
+         * 
+         * Parameters
+         * ----------
+         * 1) playerType: string containing the tag name of an object.
+         * 
+         * Return
+         * ------
+         * bool: checks whether that object is supposed to be a player based
+         *   on the tag it has.
          */
+
         return playerTypes[playerType] > 0;
     }
 
     public void addAndRemovePlayers(List<GameObject> foods)
     {
         /* To call to add and remove items from players that are no longer players.
+         * 
+         * Parameters
+         * ----------
+         * 1) foods: food items that has been updated based on objects moving onto/
+         *   out of tiles.
+         * 
+         * Return
+         * ------
+         * 
          */
+
         players.RemoveWhere(food => !food.GetComponent<Tags>().isPlayer());
         players.UnionWith(foods); //player tag already enabled
     }
 
+    #endregion
+
+    #region win tile modifications
     public void WinFound()
     {
         /* Disable any movements of any player.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
          */
+
         winFound = true;
     }
 
-    private void InitialiseAllAttributes()
+    private void executeWinManagers()
     {
-        /* Initialise cut and cooked if stated.
+        /* Updates the win tiles of their current winning
+         * configurations and checks for any winning states
+         * on the board.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
          */
-        foreach (AttributeInitialisation attr in FindObjectsOfType<AttributeInitialisation>())
+
+        foreach (WinManager winTile in winTiles)
         {
-            attr.Initialise();
+            winTile.moveExecuted();
         }
     }
+
+    private void checkWinConfig()
+    {
+        /* All win tiles on the level will check for
+         * possible win states on the board.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
+         */
+
+        foreach (WinManager winTile in winTiles)
+        {
+            winTile.checkIfWin();
+        }
+    }
+
+    #endregion
+
+    #region sprite updates
+    private List<SpriteManager> GetAllSprites()
+    {
+        /* Gets all the sprites present in the scene.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * List<SpriteManager>: List of all SpriteManager scripts present
+         *   in the scene.
+         */
+
+        SpriteManager[] allObjects = FindObjectsOfType<SpriteManager>();
+        return allObjects.ToList();
+    }
+
+    private void SpriteUpdate()
+    {
+        /* Update sprites to match tags.
+         * However, if gameObject isInactive, then first: 
+         * 1) Disable gameObjects
+         * 2) Update sprites list.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
+         */
+
+        List<SpriteManager> toDisable = sprites.FindAll(sprite =>
+            sprite.GetComponent<Tags>().isInactive());
+        toDisable.ForEach(sprite => sprite.gameObject.SetActive(false));
+
+        foreach (SpriteManager sprite in sprites)
+        {
+            sprite.UpdateSprites();
+        }
+    }
+
+    #endregion
+
+    #region player and conveyer belt movement
     private bool allMovementsComplete()
     {
         /* Checks whether the moves for all moving players are complete
          * by checking whether they are all at their destination.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * bool: True if all movements of objects to their respective
+         *   destinations are complete, false otherwise.
          */
+
         if (players.Count() == 0 && playerTypes.Values.All(numPlayer => numPlayer == 0))
         {
             //No players, force stop music and undo/reset
@@ -186,53 +499,35 @@ public class Coordinator : MonoBehaviour
     private bool hasMoved()
     {
         /* Ask if a move is done.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * bool: True if a move is done on the board, false otherwise.
          */
+
         bool movementsComplete = allMovementsComplete();
         if (!movementsComplete) checkedMove = false;
         return allMovementsComplete() && !checkedMove;
     }
 
-    private void executeWinManagers()
-    {
-        foreach (WinManager winTile in winTiles)
-        {
-            winTile.moveExecuted();
-        }
-    }
-
-    private void checkWinConfig()
-    {
-        foreach (WinManager winTile in winTiles)
-        {
-            winTile.checkIfWin();
-        }
-    }
-
-    private List<SpriteManager> GetAllSprites()
-    {
-        SpriteManager[] allObjects = FindObjectsOfType<SpriteManager>();
-        return allObjects.ToList();
-    }
-
-    private void SpriteUpdate()
-    {
-        /* Update sprites to match tags.
-         * However, if gameObject isInactive, then first: 
-         * 1) Disable gameObjects
-         * 2) Update sprites list.
-         */
-        List<SpriteManager> toDisable = sprites.FindAll(sprite => 
-            sprite.GetComponent<Tags>().isInactive());
-        toDisable.ForEach(sprite => sprite.gameObject.SetActive(false));
-
-        foreach (SpriteManager sprite in sprites)
-        {
-            sprite.UpdateSprites();
-        }
-    }
-
     private void PlayerRoutine()
     {
+        /* Driver code for carrying out player movement based
+         * on user/player keyboard input. 
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
+         */
+
         if (allMovementsComplete() && playerCanMove)
         {
             if (tmpPlayers.Any())
@@ -299,6 +594,14 @@ public class Coordinator : MonoBehaviour
          * 
          * Uses "players" from playerConveyerBelt instead.
          * Only runs when there is a player update.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
          */
 
         if (allMovementsComplete() && !playerCanMove && !isInitialise)
@@ -348,13 +651,42 @@ public class Coordinator : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region undo and restart 
+
     private void CheckInactive()
     {
+        /* Updates players array on whether the objects are supposed to be destroyed
+         * or not. Objects are destroyed if they are both hot and cold, or when
+         * hot and cold objects collide with each other.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
+         */
+
         players.RemoveWhere(player => player.GetComponent<Tags>().isInactive());
     }
 
     private void CheckUndo()
     {
+        /* Re-initialises the tiles of their objects standing on top of them after
+         * and undo has been executed.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
+         */
+
         if (hasUndone)
         {
             hasUndone = false;
@@ -366,11 +698,24 @@ public class Coordinator : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region movable object attributes
+
     private void UpdateHotColdPlayers(Dictionary<string, bool[]> hotCold)
     {
         /* Initialises the hotCold hashmap.
          * Updates players based on hotCold.
+         * 
+         * Parameters
+         * ----------
+         * 1) hotCold: Determines whether the food type is supposed to be hot or cold.
+         * 
+         * Return
+         * ------
+         * 
          */
+
         foreach (TileManager hotTile in hotTiles)
         {
             if (!String.IsNullOrEmpty(hotTile.colFoodTag()))
@@ -403,7 +748,16 @@ public class Coordinator : MonoBehaviour
     private void HeavyActivation()
     {
         /* After update of other tags, update heavy tags.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
          */
+
         Tags[] objWithTag = FindObjectsOfType<Tags>();
         Dictionary<string, bool> heavyTags = new();
         foreach (TileManager tile in heavyTiles)
@@ -424,106 +778,24 @@ public class Coordinator : MonoBehaviour
         }
     }
 
-    private void LevelTagPlayerUpdate()
-    {
-        CheckInactive();
-        CheckUndo();
+    #endregion
 
-        if (hasMoved())
-        {
-            TagRoutine();
-        }
-        SpriteUpdate();
-    }
-
-    private void LevelTagBeltUpdate()
-    {
-        CheckInactive();
-        CheckUndo();
-
-        if (hasMoved())
-        {
-            TagRoutine();
-            //ask moveManager to make all PastMovesRecords to record their moves.
-            moveManager.RecordThisMove();
-            checkedMove = true;
-            isInitialise = false;
-        }
-        SpriteUpdate();
-        checkWinConfig(); //check static position cut 
-        UndoRestartRoutine();
-    }
-
-    private void TagRoutine()
-    {
-        foreach (GameObject player in players)
-        {
-            player.GetComponent<DetachChildren>().detachAllChildren();
-        }
-
-        foreach (TileManager tile in tiles)
-        {
-            tile.TriggerTile(); //update collider
-        }
-
-        /* Dictionary parameters -> [Tag name: [isCold?, isHot?]]
-         * 
-         * The hotCold hashmap represents the objects on hot and cold 
-         * tiles and whether  
-         */
-        Dictionary<string, bool[]> hotCold = new();
-
-        UpdateHotColdPlayers(hotCold);
-
-        if (!isInitialise)
-        {
-            foreach (TileManager tile in tiles)
-            {
-                /* Enable hot/cold and heavy again for food 
-                 * items going out of tile
-                 */
-                tile.ActivateDormantHotCold(hotCold);
-            }
-
-            //You, cold and hot tile tag + updates in case change of objects
-            foreach (TileManager tile in tiles)
-            {
-                tile.OldColUpdate(); //run all old col updates before new ones.
-            }
-
-            foreach (WinManager winTile in winTiles)
-            {
-                winTile.ExitTrigger(hotCold, heavyTiles);
-            }
-
-            //Tag updates for new objects that stepped into different tiles
-            foreach (WinManager winTile in winTiles)
-            {
-                winTile.EnterTrigger();
-            }
-
-            foreach (TileManager tile in tiles)
-            {
-                tile.NewColUpdate();
-            }
-
-            //Deactivate objects if both hot and cold.
-            foreach (TileManager tile in tiles)
-            {
-                tile.DeactivateDormantHotCold(hotCold);
-            }
-        }
-
-        HeavyActivation();
-        SpriteUpdate(); //deactivates gameobject if tags are appropriate.
-
-        //Win tile updates
-        executeWinManagers();
-    }
+    #region undo and restart
 
     private void UndoRestartRoutine()
     {
-        //Undo and restart
+        /* Specifies execution of undo and restart,
+         * namely "Z" and "R" for the user/player.
+         * 
+         * Parameters
+         * ----------
+         * 
+         * 
+         * Return
+         * ------
+         * 
+         */
+
         if (inputManager.KeyPressUndo() && !winFound)
         {
             hasUndone = true;
@@ -545,8 +817,27 @@ public class Coordinator : MonoBehaviour
         if (inputManager.KeyPressRestart() && !winFound) moveManager.RestartLevel();
     }
 
+    #endregion
+
+    #region miscellaneous
+
     private static void AddOrUpdateDict(Dictionary<string, bool[]> dict, string key, bool[] value)
     {
+        /* Updates the dictionary (hot cold) with the object type, and whether it has hot and/or
+         * cold.
+         * 
+         * Parameters
+         * ----------
+         * 1) dict: Dictionary in which the information is being updated to
+         * 2) key: tags that the movable objects will have
+         * 3) value: boolean array of size 2 that will determine whether the tag
+         *   is supposed to have hot and/or cold associated with it.
+         * 
+         * Return
+         * ------
+         * 
+         */
+
         if (dict.ContainsKey(key))
         {
             bool[] lst = dict[key];
@@ -571,8 +862,16 @@ public class Coordinator : MonoBehaviour
     {
         /* For debugging tags. 
          * 
-         * Parameters: name of object in scene
+         * Parameters
+         * ----------
+         * 1) name: name of object in scene.
+         * 
+         * Return
+         * ------
+         * 
          */
         GameObject.Find(name).GetComponent<Tags>().printTags();
     }
+
+    #endregion
 }

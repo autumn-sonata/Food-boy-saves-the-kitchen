@@ -5,7 +5,9 @@ using UnityEngine;
 public static class NextLevelManager
 {
     /* Stores the order of next level.
-     * -1: Special in that it unlocks the next page of levels.
+     * 
+     * Lvl -1: Special in that it unlocks the next page of levels.
+     * 
      * Lvl 1, 12, 25, 34 will unlock automatically, being
      * the first levels of their respective pages.
      * 
@@ -61,7 +63,12 @@ public static class NextLevelManager
         {43, new List<int>() {} }
     };
 
-    //Key: Build index, Value: max level.
+    /* Dictionary mapping the build index to the level
+     * range present within each level select screen.
+     * 
+     * Key: Build index, Value: level range.
+     */
+
     public static readonly Dictionary<int, KeyValuePair<int, int>> 
         levelSelect = new()
     {
@@ -70,7 +77,12 @@ public static class NextLevelManager
         {4, new KeyValuePair<int, int>(25, 33) },
         {5, new KeyValuePair<int, int>(34, 43) }
     };
-//Levels unlocked automatically due to being first in scene
-public static readonly List<int> specialUnlockedLvls = new()
+
+    /* A list of levels unlocked automatically due to being the first
+     * level in the scene.
+     * 
+     * Integers refer to the level numbers for each level select screen.
+     */
+    public static readonly List<int> specialUnlockedLvls = new()
         { 1, 12, 25, 34 };
 }
