@@ -25,16 +25,7 @@ public class PlayerInfo : MonoBehaviour
     private void Awake()
     {
         sceneIndex = SceneManager.GetActiveScene().buildIndex;
-        levels = new LevelStatus[numLvls];
-        colliders = new bool[numLvls];
-        levelSprite = new bool[numLvls];
-        nextArrow = new bool[3];
-        foreach (int specialLvl in NextLevelManager.specialUnlockedLvls)
-        {
-            levels[specialLvl - 1] = LevelStatus.Unlocked;
-            colliders[specialLvl - 1] = true;
-            levelSprite[specialLvl - 1] = true;
-        }
+        InitialiseLevelProgress();
 
         if (!LevelRestriction.saveFileExists())
             SaveState();
@@ -46,9 +37,9 @@ public class PlayerInfo : MonoBehaviour
         if (currSceneIndex != sceneIndex)
         {
             sceneIndex = currSceneIndex;
-            
+
             //runs only when scene changes.
-            if (currSceneIndex >= levelSelIndex.Key && 
+            if (currSceneIndex >= levelSelIndex.Key &&
                 currSceneIndex <= levelSelIndex.Value)
             {
                 LoadState();
@@ -82,6 +73,30 @@ public class PlayerInfo : MonoBehaviour
 
         next.GetComponent<BoxCollider2D>().enabled = true;
         next.GetComponent<DormantSprite>().ChangeToActiveSprite();
+    }
+
+    private void InitialiseLevelProgress()
+    {
+        /* Initialises level progress.
+         */
+        levels = new LevelStatus[numLvls];
+        colliders = new bool[numLvls];
+        levelSprite = new bool[numLvls];
+        nextArrow = new bool[3];
+        foreach (int specialLvl in NextLevelManager.specialUnlockedLvls)
+        {
+            levels[specialLvl - 1] = LevelStatus.Unlocked;
+            colliders[specialLvl - 1] = true;
+            levelSprite[specialLvl - 1] = true;
+        }
+    }
+
+    public void ResetProgress()
+    {
+        /* Resets the level progression.
+         */
+        InitialiseLevelProgress();
+        SaveState();
     }
 
     #region SaveLoadMethods
@@ -159,10 +174,12 @@ public class PlayerInfo : MonoBehaviour
                         break;
                     }
                 }
-            } else if (levels[lvl - 1] != LevelStatus.Locked)
+            }
+            else if (levels[lvl - 1] != LevelStatus.Locked)
             {
                 Debug.LogError("Level " + lvl + " is not even locked!");
-            } else
+            }
+            else
             {
                 levels[lvl - 1] = LevelStatus.Unlocked;
                 //enable collider2D and change sprite
