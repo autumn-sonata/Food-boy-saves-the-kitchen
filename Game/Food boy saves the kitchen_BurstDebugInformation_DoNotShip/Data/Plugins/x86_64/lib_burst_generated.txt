@@ -110,6 +110,7 @@ Library: lib_burst_generated
 --compilation-defines=ENABLE_TILEMAP
 --compilation-defines=ENABLE_TIMELINE
 --compilation-defines=ENABLE_LEGACY_INPUT_MANAGER
+--compilation-defines=UNITY_POST_PROCESSING_STACK_V2
 --compilation-defines=PACKAGE_PHYSICS
 --compilation-defines=PACKAGE_PHYSICS2D
 --compilation-defines=PACKAGE_TILEMAP
@@ -122,6 +123,8 @@ Library: lib_burst_generated
 --compilation-defines=MODULE_PHYSICS_EXISTS
 --compilation-defines=MODULE_PHYSICS_2D_EXISTS
 --compilation-defines=MODULE_PARTICLE_SYSTEM_EXISTS
+--compilation-defines=ENABLE_VR_MODULE
+--compilation-defines=ENABLE_XR_MODULE
 --compilation-defines=ENABLE_ANIMATION_BURST
 --compilation-defines=TIMELINE_FRAMEACCURATE
 --compilation-defines=ENABLE_SPRITESHAPE_BURST
@@ -134,6 +137,7 @@ Library: lib_burst_generated
 --root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Unity.Services.Core.Telemetry.dll
 --root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Unity.VisualScripting.State.dll
 --root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Unity.VisualScripting.Core.dll
+--root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Unity.Postprocessing.Runtime.dll
 --root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Assembly-CSharp.dll
 --root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Unity.Services.Core.Environments.Internal.dll
 --root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Unity.Burst.dll
@@ -144,6 +148,7 @@ Library: lib_burst_generated
 --root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Unity.Services.Core.Internal.dll
 --root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Unity.Services.Core.Analytics.dll
 --root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Unity.2D.SpriteShape.Runtime.dll
+--root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Elringus.SpriteGlow.Runtime.dll
 --root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Unity.Services.Core.Scheduler.dll
 --root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Unity.Services.Core.Registration.dll
 --root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Unity.2D.PixelPerfect.dll
@@ -273,6 +278,7 @@ Library: lib_burst_generated
 --compilation-defines=ENABLE_TILEMAP
 --compilation-defines=ENABLE_TIMELINE
 --compilation-defines=ENABLE_LEGACY_INPUT_MANAGER
+--compilation-defines=UNITY_POST_PROCESSING_STACK_V2
 --compilation-defines=PACKAGE_PHYSICS
 --compilation-defines=PACKAGE_PHYSICS2D
 --compilation-defines=PACKAGE_TILEMAP
@@ -285,6 +291,8 @@ Library: lib_burst_generated
 --compilation-defines=MODULE_PHYSICS_EXISTS
 --compilation-defines=MODULE_PHYSICS_2D_EXISTS
 --compilation-defines=MODULE_PARTICLE_SYSTEM_EXISTS
+--compilation-defines=ENABLE_VR_MODULE
+--compilation-defines=ENABLE_XR_MODULE
 --compilation-defines=ENABLE_ANIMATION_BURST
 --compilation-defines=TIMELINE_FRAMEACCURATE
 --compilation-defines=ENABLE_SPRITESHAPE_BURST
@@ -297,6 +305,7 @@ Library: lib_burst_generated
 --root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Unity.Services.Core.Telemetry.dll
 --root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Unity.VisualScripting.State.dll
 --root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Unity.VisualScripting.Core.dll
+--root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Unity.Postprocessing.Runtime.dll
 --root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Assembly-CSharp.dll
 --root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Unity.Services.Core.Environments.Internal.dll
 --root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Unity.Burst.dll
@@ -307,6 +316,7 @@ Library: lib_burst_generated
 --root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Unity.Services.Core.Internal.dll
 --root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Unity.Services.Core.Analytics.dll
 --root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Unity.2D.SpriteShape.Runtime.dll
+--root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Elringus.SpriteGlow.Runtime.dll
 --root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Unity.Services.Core.Scheduler.dll
 --root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Unity.Services.Core.Registration.dll
 --root-assembly=D:\Unity\Food-boy-saves-the-kitchen\Food boy saves the kitchen\Temp\StagingArea\Data\Managed\Unity.2D.PixelPerfect.dll
