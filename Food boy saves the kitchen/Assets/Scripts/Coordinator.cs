@@ -345,7 +345,8 @@ public class Coordinator : MonoBehaviour
 
     public void addAndRemovePlayers(List<GameObject> foods)
     {
-        /* To call to add and remove items from players that are no longer players.
+        /* To call to add and remove items from players that are no longer players or
+         * should not move due to being cut.
          * 
          * Parameters
          * ----------
@@ -357,7 +358,8 @@ public class Coordinator : MonoBehaviour
          * 
          */
 
-        players.RemoveWhere(food => !food.GetComponent<Tags>().isPlayer());
+        players.RemoveWhere(food => !food.GetComponent<Tags>().isPlayer() || 
+            (food.GetComponent<Tags>().isCut() && !food.GetComponent<Tags>().isKnife()));
         players.UnionWith(foods); //player tag already enabled
     }
 
@@ -542,6 +544,9 @@ public class Coordinator : MonoBehaviour
             float horizontalMove = inputManager.KeyDirectionHorz();
             float verticalMove = inputManager.KeyDirectionVert();
 
+            //checks for cut and not player before moving items.
+            addAndRemovePlayers(new());
+
             var list = new List<KeyValuePair<PlayerManager, Vector3>>();
             //Allow players that are not children to update their destination.
             foreach (GameObject player in players)
@@ -640,6 +645,7 @@ public class Coordinator : MonoBehaviour
             {
                 PlayerManager player = kvp.Key;
                 Vector3 direction = kvp.Value;
+
                 //Unconditionally move this object as it is on a conveyer belt.
                 player.moveDestination(direction);
                 player.GetComponent<Tags>().enablePlayerTag();

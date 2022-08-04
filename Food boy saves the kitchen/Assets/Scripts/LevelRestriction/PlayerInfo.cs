@@ -189,6 +189,7 @@ public class PlayerInfo : MonoBehaviour
         levels = data.getLevelsUnlocked();
         colliders = data.getColliders();
         levelSprite = data.getLevelSprite();
+        nextArrow = data.getNextArrow();
     }
 
     #endregion
