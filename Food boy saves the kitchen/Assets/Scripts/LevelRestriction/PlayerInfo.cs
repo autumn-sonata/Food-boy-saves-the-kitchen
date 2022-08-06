@@ -189,6 +189,7 @@ public class PlayerInfo : MonoBehaviour
         levels = data.getLevelsUnlocked();
         colliders = data.getColliders();
         levelSprite = data.getLevelSprite();
+        nextArrow = data.getNextArrow();
     }
 
     #endregion
@@ -303,10 +304,6 @@ public class PlayerInfo : MonoBehaviour
                         break;
                     }
                 }
-            }
-            else if (levels[lvl - 1] != LevelStatus.Locked)
-            {
-                Debug.LogError("Level " + lvl + " is not even locked!");
             }
             else
             {

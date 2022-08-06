@@ -195,9 +195,9 @@ public class WinManager : MonoBehaviour
                 Collider2D foodConfig = Physics2D.OverlapPoint(foodCoord + new Vector2(col, -row), push);
 
                 if (!winConfig[row, col] || !foodConfig || foodConfig.GetComponent<Tags>().isInWinTile() ||
-                    !foodConfig.CompareTag(winConfig[row, col].tag) || 
-                    winConfig[row, col].GetComponent<Tags>().isCut() != foodConfig.GetComponent<Tags>().isCut() ||
-                    winConfig[row, col].GetComponent<Tags>().isCooked() != foodConfig.GetComponent<Tags>().isCooked())
+                    !foodConfig.CompareTag(winConfig[row, col].tag) || !foodConfig.GetComponent<Tags>().isKnife() &&
+                    (winConfig[row, col].GetComponent<Tags>().isCut() != foodConfig.GetComponent<Tags>().isCut() ||
+                    winConfig[row, col].GetComponent<Tags>().isCooked() != foodConfig.GetComponent<Tags>().isCooked()))
                 {
                     //Configuration is wrong
                     return false;
