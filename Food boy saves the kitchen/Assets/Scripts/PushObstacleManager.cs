@@ -142,6 +142,8 @@ public class PushObstacleManager : MonoBehaviour
 
         foreach (GameObject food in inFront)
         {
+            //make sure food items do not have any current children.
+            food.GetComponent<DetachChildren>().detachAllChildren();
             food.transform.parent = transform;
         }
     }

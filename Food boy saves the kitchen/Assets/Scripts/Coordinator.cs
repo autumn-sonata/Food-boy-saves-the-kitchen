@@ -18,6 +18,7 @@ public class Coordinator : MonoBehaviour
     private Dictionary<string, int> playerTypes; //stores the food types of players on the level
     private List<GameObject> invisibleCache; //stores items that are invisible when holding tab
     private List<GameObject> tmpPlayers; //stores players for conveyer belt to act as players
+    private List<GameObject> originalPlayers; //stores normal players before unionisation with conveyer belt
     private bool checkedMove; //checks if a move has been made on the board (with movement)
     private bool isInitialise; //checks if this is the first time a script is run on the scene.
     private bool hasUndone; 
@@ -50,6 +51,7 @@ public class Coordinator : MonoBehaviour
         playerTypes = new();
         tmpPlayers = new();
         invisibleCache = new();
+        originalPlayers = new();
 
         playerTimer = GetComponent<Timer>();
         moveManager = GameObject.Find("Canvas").GetComponent<PastMovesManager>();
@@ -63,7 +65,8 @@ public class Coordinator : MonoBehaviour
         tiles = new List<TileManager>();
         tiles = tiles.Concat(youTiles).Concat(coldTiles).Concat(hotTiles)
             .Concat(heavyTiles).ToList();
-        conveyerBelts = FindObjectsOfType<ConveyerBeltManager>().ToList();
+        conveyerBelts = FindObjectsOfType<ConveyerBeltManager>().OrderBy
+            (belt => belt.GetComponent<ConveyerBeltManager>().direction).ToList();
         checkedMove = false;
         isInitialise = true;
         hasUndone = false;
@@ -121,7 +124,7 @@ public class Coordinator : MonoBehaviour
                 invisibleCache.ForEach(obj => obj.SetActive(true));
                 invisibleCache.Clear();
             }
-
+         
             PlayerRoutine();
             LevelTagPlayerUpdate(); //updates all the tags on the board.
             ConveyerBeltRoutine();
@@ -534,10 +537,22 @@ public class Coordinator : MonoBehaviour
         {
             if (tmpPlayers.Any())
             {
-                tmpPlayers.ForEach(obj => {
-                    obj.GetComponent<Tags>().disablePlayerTag();
-                    obj.GetComponent<DetachChildren>().detachAllChildren();
-                });
+                foreach (GameObject obj in tmpPlayers)
+                {
+                    bool supposedPlayer = false;
+                    //compare and check if obj tag is on any "You" tile.
+                    foreach (YouManager youTile in youTiles)
+                    {
+                        if (youTile.getCol().CompareTag(obj.tag)) supposedPlayer = true;
+                    }
+
+                    if (!supposedPlayer)
+                    {
+                        obj.GetComponent<Tags>().disablePlayerTag();
+                        obj.GetComponent<DetachChildren>().detachAllChildren();
+                    }
+                }
+
                 players.RemoveWhere(player => !player.GetComponent<Tags>().isPlayer());
             }
             //Everyone has stopped movement, poll for new move through input.
