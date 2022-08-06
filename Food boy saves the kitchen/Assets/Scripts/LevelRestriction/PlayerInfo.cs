@@ -305,10 +305,6 @@ public class PlayerInfo : MonoBehaviour
                     }
                 }
             }
-            else if (levels[lvl - 1] != LevelStatus.Locked)
-            {
-                Debug.LogError("Level " + lvl + " is not even locked!");
-            }
             else
             {
                 levels[lvl - 1] = LevelStatus.Unlocked;
