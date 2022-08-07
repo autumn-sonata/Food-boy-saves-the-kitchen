@@ -10,39 +10,13 @@ public class PauseManager : MonoBehaviour
 
     public GameObject pauseMenuUI;
 
-    private Resolution[] resolutions;
-    public TMP_Dropdown resolutionDropDown;
-
     #region Unity specific functions
     void Start()
     {
         /* Initialisation of pauseMenu's UI
-         * and the different types of resolutions
-         * supported on the user/player's computer.
          */
 
         pauseMenuUI.SetActive(false);
-
-        //resolutions = Screen.resolutions;
-        //resolutionDropDown.ClearOptions();
-        //List<string> options = new();
-
-        //int currResolutionIndex = 0;
-        //for (int i = 0; i < resolutions.Length; i++)
-        //{
-        //    Resolution reso = resolutions[i];
-        //    options.Add(reso.width + " x " + reso.height);
-
-        //    if (reso.width == Screen.currentResolution.width &&
-        //        reso.height == Screen.currentResolution.height)
-        //    {
-        //        currResolutionIndex = i;
-        //    }
-        //}
-
-        //resolutionDropDown.AddOptions(options);
-        //resolutionDropDown.value = currResolutionIndex;
-        //resolutionDropDown.RefreshShownValue();
     }
 
     void Update()
@@ -212,25 +186,6 @@ public class PauseManager : MonoBehaviour
         {
             Debug.LogError("Start game from the Main menu!");
         }
-    }
-
-    public void SetResolution(int resolutionIndex)
-    {
-        /* Sets the resolution of the game based on the dropdown
-         * box as shown in the settings menu.
-         * 
-         * Parameters
-         * ----------
-         * 1) resolutionIndex: Index of the different checkboxes,
-         *   0-indexed.
-         * 
-         * Return
-         * ------
-         * 
-         */
-
-        Resolution res = resolutions[resolutionIndex];
-        Screen.SetResolution(res.width, res.height, Screen.fullScreen);
     }
 
     #endregion
