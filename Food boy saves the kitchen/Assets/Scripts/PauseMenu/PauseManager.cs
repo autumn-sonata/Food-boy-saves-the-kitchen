@@ -23,26 +23,26 @@ public class PauseManager : MonoBehaviour
 
         pauseMenuUI.SetActive(false);
 
-        resolutions = Screen.resolutions;
-        resolutionDropDown.ClearOptions();
-        List<string> options = new();
+        //resolutions = Screen.resolutions;
+        //resolutionDropDown.ClearOptions();
+        //List<string> options = new();
 
-        int currResolutionIndex = 0;
-        for (int i = 0; i < resolutions.Length; i++)
-        {
-            Resolution reso = resolutions[i];
-            options.Add(reso.width + " x " + reso.height);
+        //int currResolutionIndex = 0;
+        //for (int i = 0; i < resolutions.Length; i++)
+        //{
+        //    Resolution reso = resolutions[i];
+        //    options.Add(reso.width + " x " + reso.height);
 
-            if (reso.width == Screen.currentResolution.width &&
-                reso.height == Screen.currentResolution.height)
-            {
-                currResolutionIndex = i;
-            }
-        }
+        //    if (reso.width == Screen.currentResolution.width &&
+        //        reso.height == Screen.currentResolution.height)
+        //    {
+        //        currResolutionIndex = i;
+        //    }
+        //}
 
-        resolutionDropDown.AddOptions(options);
-        resolutionDropDown.value = currResolutionIndex;
-        resolutionDropDown.RefreshShownValue();
+        //resolutionDropDown.AddOptions(options);
+        //resolutionDropDown.value = currResolutionIndex;
+        //resolutionDropDown.RefreshShownValue();
     }
 
     void Update()
